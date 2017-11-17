@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src", 
+        "outDir": "./lib", 
+        "module": "commonjs",
+        "target": "es2017",
+        "declaration": true
+    },
+    "exclude": [
+        "lib",
+        "node_modules",
+        "templates"
+    ]
+}
