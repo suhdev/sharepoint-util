@@ -1,0 +1,17 @@
+import { CommonType } from './CommonType';
+/**
+ * @name {{getAttr(list,'interface')}}
+ * @description {{getAttr(list,'description','desc')}}
+ * 
+ * Guid: {{getAttr(list,'id')}}
+ * ContentTypes {{getAttr(list,'contentTypes')|join(', ')}}
+ * Title: {{getAttr(list,'listTitle','title')}}
+ * Content Types Enabled: {{ 'Yes' if getAttr(list,'enableContentTypes') else 'No' }}
+ * Attachments Enabled: {{ 'Yes' if getAttr(list,'enableAttachments') else 'No' }}
+ * TemplateType: {{getAttr(list,'listTemplate','template')}}
+ */
+export interface {{ getAttr(list, 'interface') }} extends CommonType{
+    {% for field in fields %}
+    { { getAttr(field, 'name') } } { { '?' if getAttr(field, 'required')} }: { { getJsTypeForField(getAttr(field, 'type')) } };
+    {% endfor %}
+}

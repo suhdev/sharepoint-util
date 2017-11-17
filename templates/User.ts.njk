@@ -1,0 +1,14 @@
+export interface UserId {
+    NameId: string;
+    NameIdIssuer: string;
+}
+
+export interface User {
+    Id: number;
+    Email?: string;
+    LoginName?: string;
+    Title: string;
+    UserId?: UserId;
+    IsSiteAdmin?: boolean;
+    PrincipalType?: number;
+}

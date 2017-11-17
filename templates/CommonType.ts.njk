@@ -1,0 +1,14 @@
+import {ListItemAttachment} from './ListItemAttachment'; 
+import {User} from './User'; 
+export interface CommonType {
+    Id:string|number;
+    Title:string;
+    Description?:string;
+    ContentTypeId?:string;
+    Modified?:Date;
+    Created?:Date;
+    CreatedBy?:User; 
+    ModifiedBy?:User; 
+    Attachments?:ListItemAttachment[]; 
+    $dirty?:boolean;
+}
