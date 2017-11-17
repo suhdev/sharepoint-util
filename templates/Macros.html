@@ -1,0 +1,1313 @@
+{% macro Folder(folder) %}
+    {% if hasAttr(folder,'children') %}
+    <pnp:Folder Name="{{getAttr(folder,'name')}}">
+        {% for f in getAttr(folder,'children') %}
+            {{Folder(f)}}
+        {% endfor %}
+        {% if hasAttr(folder,'security') %}
+            {{Security(getAttr(folder,'security'))}}
+        {% endif %}
+    </pnp:Folder>
+    {% else %}
+    <pnp:Folder Name="{{getAttr(folder,'name')}}" />
+    {% endif %}
+{% endmacro %}
+
+{% macro Security(security) %}
+    <pnp:Security>
+        <pnp:BreakRoleInheritance 
+            CopyRoleAssignment="{{getAttr(security,'copyRoleAssignments')|default(false)}}"
+            ClearSubscopes="{{getAttr(security,'clearScores')|default(true)}}">
+            {% for key,val in getAttr(security,'roles','roleAssignment','roleAssignments') %}
+            <pnp:RoleAssignment Principal="{{key}}" RoleDefinition="{{val}}" />
+            {% endfor %}
+        </pnp:BreakRoleInheritance>
+    </pnp:Security>
+{% endmacro %}
+
+{% macro SiteSecurity(security) %}
+    <pnp:Security 
+        {% if hasAttr(security,'breakRoleInheritance') %}
+        BreakRoleInheritance="{{getAttr(security,'breakRoleInheritance')|default(false)}}"
+        {% endif %}
+        {% if hasAttr(security,'copyRoleAssignments') %}
+        CopyRoleAssignments="{{getAttr(security,'copyRoleAssignments')|default(false)}}"
+        {% endif %}
+        {% if hasAttr(security,'clearSubScopes') %}
+        ClearSubscopes="{{getAttr(security,'clearSubScopes')|default(false)}}"{% endif %}>
+        <pnp:AdditionalAdministrators>
+            {% for admin in getAttr(security,'admins','additionalAdmins','administrators','additionalAdministrators') %}
+                <pnp:User Name="{{admin}}" />
+            {% endfor %}
+        </pnp:AdditionalAdministrators>
+        <pnp:AdditionalOwners>
+            {% for admin in getAttr(security,'owners','additionalOwners') %}
+                <pnp:User Name="{{admin}}" />
+            {% endfor %}
+        </pnp:AdditionalOwners>
+        <pnp:AdditionalMembers>
+            {% for admin in getAttr(security,'members','additionalMembers') %}
+                <pnp:User Name="{{admin}}" />
+            {% endfor %}
+        </pnp:AdditionalMembers>
+        <pnp:AdditionalVisitors>
+            {% for admin in getAttr(security,'visitors','additionalVisitors') %}
+                <pnp:User Name="{{admin}}" />
+            {% endfor %}
+        </pnp:AdditionalVisitors>
+        {% if hasAttr(security,'siteGroups','groups') %}
+        <pnp:SiteGroups>
+            {% for group in getAttr(security,'siteGroups','groups') %}
+            <pnp:SiteGroup
+                Title="{{getAttr(group,'title','name')}}"
+                Description="{{getAttr(group,'description','desc')}}"
+                Owner="{{getAttr(group,'owner')}}">
+                {% if hasAttr(group,'members') %}
+                    <pnp:Members>
+                    {% for member in getAttr(group,'members') %}
+                        <pnp:User Name="{{member}}" />
+                    {% endfor %}
+                    </pnp:Members>
+                {% endif %}
+            </pnp:SiteGroup>
+            {% endfor %}
+        </pnp:SiteGroups>
+        {% endif %}
+    </pnp:Security>
+{% endmacro %}
+
+{% macro CustomAction(action) %}
+<pnp:CustomAction
+    {% if hasAttr(action,'name') %}
+    Name="{{getAttr(action,'name')}}"
+    {% endif %}
+    {% if hasAttr(action'description','desc') %}
+    Description="{{getAttr(action,'desc','description')}}"
+    {% endif %}
+    {% if hasAttr(action,'registrationType','registration') %}
+    RegistrationType="{{getAttr(action,'registration','registrationType')}}"
+    {% endif %}
+    {% if hasAttr(action,'registrationId') %}
+    RegistrationId="{{getAttr(action,'registrationId')}}"
+    {% endif %}
+    {% if hasAttr(action,'location') %}
+    Location="{{getAttr(action,'location')}}"
+    {% endif %}
+    {% if hasAttr(action,'sequence') %}
+    Sequence="{{getAttr(action,'sequence')}}"
+    {% endif %}
+    {% if hasAttr(action,'rights') %}
+    Rights="{{getAttr(action,'rights')|join(',')}}"
+    {% endif %}
+    {% if hasAttr(action,'featureId') %}
+    FeatureId="{{getAttr(action,'featureId')}}"
+    {% endif %}
+    {% if hasAttr(action,'group', 'groupId') %}
+    Group="{{getAttr(action,'group','groupId')}}"
+    {% endif %}
+    {% if hasAttr(action,'title') %}
+    Title="{{getAttr(action,'title')}}"
+    {% endif %}
+    {% if hasAttr(action,'imageUrl') %}
+    ImageUrl="{{getAttr(action,'imageUrl')}}"
+    {% endif %}
+    {% if hasAttr(action,'url') %}
+        {% if getAttr(action,'addParamsToUrl') %}
+        Url="{{getAttr(action,'url')}}?ItemUrl={ItemUrl}&amp;ItemId={ItemId}&amp;ListId={ListId}&amp;SiteUrl={SiteUrl}"
+        {% else %}
+        Url="{{getAttr(action,'url')}}"
+        {% endif %}
+    {% endif %}   
+    {% if hasAttr(action,'scriptBlock') %}
+    ScriptBlock="{{getAttr(action,'scriptBlock')}}"
+    {% endif %}
+    {% if hasAttr(action,'scriptSrc') %}
+    ScriptSrc="{{getAttr(action,'scriptSrc')}}"
+    {% endif %}
+    {% if hasAttr(action,'enabled') %}
+    Enabled="{{hasAttr(action,'enabled')}}"
+    {% endif %} 
+    {% if hasAttr(action,'commandUIExtensionFile') %}
+    >
+        <pnp:CommandUIExtension>
+            {% include getAttr(action,'commandUIExtensionFile') %}
+        </pnp:CommandUIExtension>
+    </pnp:CustomAction>
+    {% else %}
+    />
+    {% endif %}
+{% endmacro %}
+
+{% macro Feature(feature) %}
+<pnp:Feature
+    ID="{{getAttr(feature,'id')}}"
+    Description="{{getAttr(feature,'desc','description')}}" />
+{% endmacro %}
+
+{% macro TermGroup(group) %}
+<pnp:TermGroup 
+    {% if getAttr(group,'id') %}
+    ID="{{getFieldId(group)|parenthesize}}"
+    {% endif %}
+    Name="{{getAttr(group,'name')}}">
+    {% if hasAttr(group,'termsets','termSets') %}
+    <pnp:TermSets>
+        {% for t in getAttr(group,'termsets','termSets') %}
+            {{TermSet(t)}}
+        {% endfor %}
+    </pnp:TermSets>
+    {% endif %}
+    {% if hasAttr(group,'contributors') %}
+    <pnp:Contributors>
+        {% for c in getAttr(group,'contributors') %}
+        <pnp:User Name="{{c}}" />
+        {% endfor %}
+    </pnp:Contributors>
+    {% endif %}
+    {% if hasAttr(group,'managers') %}
+        {% for m in getAttr(group,'managers') %}
+        <pnp:User Name="{{m}}" />
+        {% endfor %}
+    {% endif %}
+</pnp:TermGroup> 
+{% endmacro %}
+
+{% macro Term(t) %}
+<pnp:Term 
+    Name="{{getAttr(t,'name')}}"
+    ID="{{getFieldId(t)|parenthesize}}">
+     {% if hasAttr(t,'terms') %}
+    <pnp:Terms>
+        {% for tt in getAttr(t,'terms') %}
+        {{Term(tt)}}
+        {% endfor %}
+    </pnp:Terms>
+    {% endif %}
+    {% if hasAttr(t,'customProperties') %}
+    <pnp:CustomProperties>
+        {% for key,val in getAttr(t,'customProperties') %}
+        <pnp:Property Key="{{key}}" Value="{{val}}" />
+        {% endfor %}
+    </pnp:CustomProperties>
+    {% endif %}
+    {% if hasAttr(t,'localCustomProperties') or hasAttr(t,'linkUrl','url','targetUrl','linkTitle') %}
+    <pnp:LocalCustomProperties>
+        {% for key,val in getAttr(t,'localCustomProperties') %}
+        <pnp:Property Key="{{key}}" Value="{{val}}" />
+        {% endfor %}
+        {% if hasAttr(t,'linkUrl','targetUrl','url') %}
+        <pnp:Property Key="_Sys_Nav_SimpleLinkUrl" Value="{{getAttr(t,'linkUrl','targetUrl','url')}}" />
+        {% endif %}
+        {% if hasAttr(t,'linkTitle','linkLabel') %}
+        <pnp:Property Key="_Sys_Nav_Title" Value="{{getAttr(t,'linkTitle','linkLabel')}}" />
+        {% endif %}
+    </pnp:LocalCustomProperties>
+    {% endif %}
+</pnp:Term>
+{% endmacro %}
+
+{% macro TermSet(tset) %}
+<pnp:TermSet Name="{{getAttr(tset,'name')}}"
+    ID="{{getFieldId(tset)|parenthesize}}" 
+    {% if hasAttr(tset,'isDeprecated') %}IsDeprecated="{{getAttr(tset,'isDeprecated')}}"{% endif %}
+    {% if hasAttr(tset,'language','lang') %}Language="{{getAttr(tset,'language','lang')|default(1033)}}"{% endif %}>
+    {% if hasAttr(tset,'terms') %}
+    <pnp:Terms>
+        {% for t in getAttr(tset,'terms') %}
+        {{Term(t)}}
+        {% endfor %}
+    </pnp:Terms>
+    {% endif %}
+    {% if hasAttr(tset,'customProperties') or hasAttr(tset,'navigation','nav') %}
+    <pnp:CustomProperties>
+        {% for key,val in getAttr(tset,'customProperties') %}
+        <pnp:Property Key="{{key}}" Value="{{val}}" />
+        {% endfor %}
+        {% if hasAttr(tset,'nav','navigation','isNavigation') %}
+        <pnp:Property Key="_Sys_Nav_IsNavigationTermSet" Value="true" />
+        {% endif %}
+    </pnp:CustomProperties>
+    {% endif %}
+    {% if hasAttr(tset,'localCustomProperties') or hasAttr(tset,'linkUrl','targetUrl','url','linkTitle','linkLabel') %}
+    <pnp:LocalCustomProperties>
+        {% for key,val in getAttr(tset,'localCustomProperties') %}
+        <pnp:Property Key="{{key}}" Value="{{val}}" />
+        {% endfor %}
+        {% if hasAttr(tset,'linkUrl','targetUrl','url') %}
+        <pnp:Property Key="_Sys_Nav_SimpleLinkUrl" Value="{{getAttr(tset,'linkUrl','targetUrl','url')}}" />
+        {% endif %}
+        {% if hasAttr(tset,'linkTitle','linkLabel') %}
+        <pnp:Property Key="_Sys_Nav_Title" Value="{{getAttr(tset,'linkTitle','linkLabel')}}" />
+        {% endif %}
+    </pnp:LocalCustomProperties>
+    {% endif %}
+    {% if hasAttr(tset,'labels') %}
+    <pnp:Labels>
+        {% for key,val in getAttr(tset,'labels') %}
+        <pnp:Label Language="{{key}}" Value="{{val}}" />
+        {% endfor %}
+    </pnp:Labels>
+    {% endif %}
+</pnp:TermSet>
+{% endmacro %}
+
+{% macro WebSettings(webSettings) %}
+<pnp:WebSettings 
+{% if hasAttr(webSettings,'requestAccessEmail') %}
+RequestAccessEmail="{{getAttr(webSettings,'requestAccessEmail')}}"
+{% endif %}
+{% if hasAttr(webSettings,'noCrawl') %}
+NoCrawl="{{getAttr(webSettings,'noCrawl')}}"
+{% endif %}
+{% if hasAttr(webSettings,'welcomePage') %}
+WelcomePage="{{getAttr(webSettings,'welcomePage')}}"
+{% endif %}
+{% if hasAttr(webSettings,'title') %}
+Title="{{getAttr(webSettings,'title')}}"
+{% endif %}
+{% if hasAttr(webSettings,'desc','description') %}
+Description="{{getAttr(webSettings,'desc','description')}}"
+{% endif %}
+{% if hasAttr(webSettings,'logo','siteLogo') %}
+SiteLogo="{{getAttr(webSettings,'logo','siteLogo')}}"
+{% endif %}
+{% if hasAttr(webSettings,'alternateCss','alternateCSS') %}
+AlternateCSS="{{getAttr(webSettings,'alternateCss','alternateCSS')}}"
+{% endif %}
+{% if hasAttr(webSettings,'materPage','masterPageUrl') %}
+MasterPageUrl="{{getAttr(webSettings,'materPage','masterPageUrl')}}"
+{% endif %}
+{% if hasAttr(webSettings,'customMasterPage','customMasterPageUrl') %}
+CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageUrl')}}"
+{% endif %}
+/>
+{% endmacro %}
+{% macro AuditSettings(auditSettings) %}
+<pnp:AuditSettings 
+    {% if hasAttr(auditSettings,'auditLogTrimmingRetention') %}AuditLogTrimmingRetention="{{getAttr(auditSettings,'auditLogTrimmingRetention')}}" {% endif %} 
+    {% if hasAttr(auditSettings,'trimAuditLog') %} TrimAuditLog="{{getAttr(auditSettings,'trimAuditLog')}}" {% endif %}>
+    {% for audit in getAttr(auditSettings,'audits') %}
+        <pnp:Audit AuditFlag="{{audit}}" />
+    {% endfor %}
+</pnp:AuditSettings>
+{% endmacro %}
+{% macro RegionalSettings(regionalSettings) %}
+<pnp:RegionalSettings
+    {% if hasAttr(regionalSettings,'adjustHijriDays') %}
+    AdjustHijriDays="{{getAttr(regionalSettings,'adjustHijriDays')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'alternateCalendarType') %}
+    AlternateCalendarType="{{getAttr(regionalSettings,'alternateCalendarType')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'calendarType') %}
+    CalendarType="{{getAttr(regionalSettings,'calendarType')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'collation') %}
+    Collation="{{getAttr(regionalSettings,'collation')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'firstDayOfWeek') %}
+    FirstDayOfWeek="{{getAttr(regionalSettings,'firstDayOfWeek')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'firstWeekOfYear') %}
+    FirstWeekOfYear="{{getAttr(regionalSettings,'firstWeekOfYear')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'localeId') %}
+    LocaleId="{{getAttr(regionalSettings,'localeId')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'showWeeks') %}
+    ShowWeeks="{{getAttr(regionalSettings,'showWeeks')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'time24') %}
+    Time24="{{getAttr(regionalSettings,'time24')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'timeZone') %}
+    TimeZone="{{getAttr(regionalSettings,'timeZone')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'workDayEndHour') %}
+    WorkDayEndHour="{{getAttr(regionalSettings,'workDayEndHour')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'workDayStartHour') %}
+    WorkDayStartHour="{{getAttr(regionalSettings,'workDayStartHour')}}"
+    {% endif %}
+    {% if hasAttr(regionalSettings,'workDays') %}
+    WorkDays="{{getAttr(regionalSettings,'workDays')}}"
+    {% endif %}/>
+{% endmacro %}
+
+{% macro ContentType(contentType) %}
+{% set validation = validateContentType(contentType) %}
+<pnp:ContentType
+    ID="{{getContentTypeId(contentType)}}"
+    Name="{{getAttr(contentType,'name','internalName','staticName')}}"
+    Group="{{getAttr(contentType,'group')}}"
+    Description="{{getAttr(contentType,'description')}}"
+    {% if hasAttr(contentType,'readOnly') %}
+    ReadOnly="{{getAttr(contentType,'readOnly')}}"
+    {% endif %}
+    {% if hasAttr(contentType,'overwrite') %}
+    Overwrite="{{getAttr(contentType,'overwrite')}}"
+    {% endif %}
+    {% if hasAttr(contentType,'hidden') %}
+    Hidden="{{getAttr(contentType,'hidden')}}"
+    {% endif %}
+    {% if hasAttr(contentType,'sealed') %}
+    Sealed="{{getAttr(contentType,'sealed')}}"
+    {% endif %}
+    {% if hasAttr(contentType,'newFormUrl') %}
+    NewFormUrl="{{getAttr(contentType,'newFormUrl')}}"
+    {% endif %}
+    {% if hasAttr(contentType,'editFormUrl') %}
+    EditFormUrl="{{getAttr(contentType,'editFormUrl')}}"
+    {% endif %}
+    {% if hasAttr(contentType,'displayFormUrl') %}
+    DisplayFormUrl="{{getAttr(contentType,'displayFormUrl')}}"
+    {% endif %}
+    >
+    {% if hasAttr(contentType,'pnp:fieldRefs') %}
+        <pnp:FieldRefs>
+        {% for field in getAttr(contentType,'pnp:fieldRefs') %}
+            <pnp:FieldRef ID="{{getFieldId(field)|parenthesize}}" />
+        {% endfor %}
+        </pnp:FieldRefs>
+    {% endif %}
+    {% if hasAttr(contentType,'fields') %}
+        <pnp:FieldRefs>
+        {% for fieldName in getAttr(contentType,'fields') %}
+            <pnp:FieldRef ID="{{getFieldIdByName(fieldName)|parenthesize}}" />
+        {% endfor %}
+        </pnp:FieldRefs>
+    {% endif %}
+    {% if hasAttr(contentType,'documentSetTemplate') %}
+        <pnp:DocumentSetTemplate
+            {% set template = getAttr(contentType,'documentSetTemplate') %}
+            {% if hasAttr(template,'welcomePage') %}
+            WelcomePage="{{getAttr(template,'WelcomePage')}}"
+            {% endif %}>
+            {% if hasAttr(template,'allowedContentTypes') %}
+            <pnp:AllowedContentTypes>
+                {% for act in getAttr(template,'allowedContentTypes') %}
+                    {% set contentTypeId = getContentTypeId(act) %}
+                    {% if contentTypeId %}
+                    <pnp:AllowedContenType ContentTypeID="{{contentTypeId}}" />
+                    {% else %}
+                    <pnp:AllowedContenType ContentTypeID="{{act}}" />
+                    {% endif %}
+                {% endfor %}
+            </pnp:AllowedContentTypes>
+            {% endif %}
+            {% if hasAttr(template,'defaultDocuments') %}
+                <pnp:DefaultDocuments>
+                    {% for doc in getAttr(template,'defaultDocuments') %}
+                    <pnp:DefaultDocument Name="{{getAttr(doc,'name')}}"
+                        {% if hasAttr(doc,'contentType') %}
+                        ContenTypeID="{{getContentTypeId(getAttr(doc,'contentType'))}}"
+                        {% elif hasAttr(doc,'contentTypeId') %}
+                        ContentTypeID="{{getAttr(doc,'contentTypeId')}}"
+                        {% endif %}
+                        FileSourcePath="{{getAttr(doc,'fileSourcePath')}}"/>
+                    {% endfor %}
+                </pnp:DefaultDocuments>
+            {% endif %}
+            {% if hasAttr(template,'sharedFields') %}
+                <pnp:SharedFields>
+                    {% for field in getAttr(template,'sharedFields') %}
+                    <pnp:SharedField ID="{{getFieldIdByName(field)|parenthesize}}" />
+                    {% endfor %}
+                </pnp:SharedFields>
+            {% endif %}
+            {% if hasAttr(template,'welcomePageFields') %}
+                <pnp:WelcomePageFields>
+                    {% for field in getAttr(template,'welcomePageFields') %}
+                    <pnp:WelcomePageField ID="{{getFieldIdByName(field)|parenthesize}}" />
+                    {% endfor %}
+                </pnp:WelcomePageFields>
+            {% endif %}
+        </pnp:DocumentSetTemplate>
+    {% endif %}    
+</pnp:ContentType>
+{% endmacro %}
+
+{% macro ComposedLook(composedLook) %}
+<pnp:ComposedLook
+    Name="{{getAttr(composedLook,'name')}}"
+    ColorFile="{{getAttr(composedLook,'colorFile')}}"
+    FontFile="{{getAttr(composedLook,'fontFile')}}"
+    {% if hasAttr(composedLook,'backgroundFile') %}
+    BackgroundFile="{{getAttr(composedLook,'backgroundFile')}}"
+    {% endif %}
+    {% if hasAttr(composedLook,'version') %}
+    Version="{{getAttr(composedLook,'version')}}"
+    {% endif %}>
+</pnp:ComposedLook>
+{% endmacro %}
+{% macro Field(field) %}
+{% set taxFieldId = '' %}
+{% if isTaxonomyField(field) %}
+{% set taxFieldId = generateTaxonomyFieldId(getAttr(field,'id')) %}
+<Field Type="Note" 
+    DisplayName="{{getAttr(field,'displayName')}}_TaxonomyField" 
+    StaticName="{{getAttr(field,'StaticName','InternalName','name')}}_Note" 
+    Name="{{getAttr(field,'StaticName','InternalName','name')}}_Note" 
+    ID="{{taxFieldId}}" 
+    ShowInViewForms="FALSE" 
+    Required="FALSE" 
+    Hidden="TRUE"
+    CanToggleHidden="TRUE"
+    ShowField="Term1033" />
+{% endif %}
+<Field 
+    Name="{{getAttr(field,'name','InternalName','StaticName')}}"
+    StaticName="{{getAttr(field,'name','InternalName','StaticName')}}"
+    Type="{{getFieldType(getAttr(field,'type'))}}"
+    ID="{{getFieldId(field)|parenthesize}}"
+    DisplayName="{{getAttr(field,'displayName')}}"
+    {% if hasAttr(field,'indexed') %}
+    Indexed="{{getAttr(field,'indexed')}}"
+    {% endif %}
+    {% if hasAttr(field,'displayImage') %}
+    DisplayImage="{{getAttr(field,'displayImage')}}"
+    {% endif %}
+    {% if hasAttr(field,'headerImage') %}
+    HeaderImage="{{getAttr(field,'headerImage')}}"
+    {% endif %}
+    {% if hasAttr(field,'HTMLEncode') %}
+    HTMLEncode="{{getAttr(field,'HTMLEncode')}}"
+    {% endif %}
+    {% if hasAttr(field,'percentage') %}
+    Percentage="{{getAttr(field,'percentage')}}"
+    {% endif %}
+    {% if hasAttr(field,'classInfo') %}
+    ClassInfo="{{getAttr(field,'classInfo')}}"
+    {% endif %}
+    {% if hasAttr(field,'decimals') %}
+    Decimals="{{getAttr(field,'decimals')}}"
+    {% endif %}
+    {% if hasAttr(field,'description','desc') %}
+    Description="{{getAttr(field,'description','desc')}}"
+    {% endif %}
+    {% if hasAttr(field,'enableLookup') %}
+    EnableLookup="{{getAttr(field,'enableLookup')}}"
+    {% endif %}
+    {% if hasAttr(field,'commas') %}
+    Commas="{{getAttr(field,'commas')}}"
+    {% endif %}
+    {% if hasAttr(field,'overwrite') %}
+    Overwrite="{{booleanToUpper(getAttr(field,'overwrite'))}}"
+    {% endif %}
+    {% if hasAttr(field,'sortable') %}
+    Sortable="{{booleanToUpper(getAttr(field,'sortable'))}}"
+    {% endif %}
+    {% if hasAttr(field,'showInDisplayForm') %}
+    ShowInDisplayForm="{{booleanToUpper(getAttr(field,'showInDisplayForm'))}}"
+    {% endif %}
+    {% if hasAttr(field,'showInEditForm') %}
+    ShowInEditForm="{{booleanToUpper(getAttr(field,'showInEditForm'))}}"
+    {% endif %}
+    {% if hasAttr(field,'showInNewForm') %}
+    ShowInNewForm="{{booleanToUpper(getAttr(field,'showInNewForm'))}}"
+    {% endif %}
+    {% if hasAttr(field,'showInViewForms') %}
+    ShowInViewForms="{{booleanToUpper(getAttr(field,'showInViewForms'))}}"
+    {% endif %}
+    {% if hasAttr(field,'showInFileDlg') %}
+    ShowInFileDlg="{{booleanToUpper(getAttr(field,'showInFileDlg'))}}"
+    {% endif %}
+    {% if hasAttr(field,'height') %}
+    Height="{{getAttr(field,'height')}}"
+    {% endif %}
+    {% if hasAttr(field,'width') %}
+    Width="{{getAttr(field,'width')}}"
+    {% endif %}
+    {% if hasAttr(field,'hidden') %}
+    Hidden="{{booleanToUpper(getAttr(field,'hidden'))}}"
+    {% endif %}
+    {% if hasAttr(field,'required') %}
+    Required="{{booleanToUpper(getAttr(field,'required'))}}"
+    {% endif %}
+    {% if hasAttr(field,'group') %}
+    Group="{{getAttr(field,'group')}}"
+    {% endif %}
+    {% if hasAttr(field,'lcid') %}
+    LCID="{{getAttr(field,'lcid')}}"
+    {% endif %}
+    {% if hasAttr(field,'maxLength') %}
+    MaxLength="{{getAttr(field,'maxLength')}}"
+    {% endif %}
+    {% if hasAttr(field,'max') %}
+    Max="{{getAttr(field,'max')}}"
+    {% endif %}
+    {% if hasAttr(field,'min') %}
+    Min="{{getAttr(field,'min')}}"
+    {% endif %}
+    {% if hasAttr(field,'multi','mult') %}
+        Mult="{{booleanToUpper(getAttr(field,'multi','mult'))}}"
+    {% endif %}
+    {% if getAttr(field,'type') == "DateTime" %}
+        {% if hasAttr(field,'format') %}
+        Format="{{getAttr(field,'format')}}"
+        {% endif %}
+    {% endif %}
+    {% if getAttr(field,'type') == "Note" or getAttr(field,'type') === 'HTML' %}
+        {% if hasAttr(field,'richText') %}
+        RichText="{{booleanToUpper(getAttr(field,'richText'))}}"
+        {% endif %}
+        {% if hasAttr(field,'richTextMode') %}
+        RichTextMode="{{getAttr(field,'richTextMode')}}"
+        {% endif %}
+        {% if hasAttr(field,'numLines') %}
+        NumLines="{{getAttr(field,'numLines') }}"
+        {% endif %}
+    {% endif %}
+    {% if hasAttr(field,'list','showField') %}
+    ShowField="{{getAttr(field,'showField')|default('Title')}}"
+    {% endif %}
+    {% if hasAttr(field,'list','listTitle') %}
+    List="Lists/{{getAttr(field,'list','listTitle')}}"
+    {% endif %}>
+    {% if hasAttr(field,'default') %}
+    <Default>{{getAttr(field,'default')}}</Default>
+    {% endif %}
+    {% if getAttr(field,'type') == "Choice" and hasAttr(field,'choices') %}
+    <CHOICES>
+        {% for item in getAttr(field,'choices') %}
+        <CHOICE>{{item}}</CHOICE>
+        {% endfor %}
+    </CHOICES>
+    {% endif %}
+    {% if getAttr(field,'type') == "Choice" and hasAttr(field,'mappings') %}
+    <MAPPINGS>
+        {% for item in getAttr(field,'mappings') %}
+        <MAPPING Value="{{item.val}}">{{item.choice}}</MAPPING>
+        {% endfor %}
+    </MAPPINGS>
+    {% endif %}
+    {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'formula') %}
+    <Formula>{{getAttr(field,'formula')}}</Formula>
+    {% endif %}
+    {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'defaultFormula') %}
+    <DefaultFormula>{{getAttr(field,'defaultFormula')}}</DefaultFormula>
+    {% endif %}
+    {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'pnp:fieldRefs') %}
+    <pnp:FieldRefs>
+        {% for ref in getAttr(field,'pnp:fieldRefs') %}
+        <pnp:FieldRef Name="{{ref}}" />
+        {% endfor %}
+    </pnp:FieldRefs>
+    {% endif %}
+    {% if isTaxonomyField(field) %}
+    <Customization>
+        <ArrayOfProperty>
+            <Property>
+                <Name>SspId</Name>
+                <Value xmlns:q1="http://www.w3.org/2001/XMLSchema" p4:type="q1:string" xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">{{getAttr(field,'sspid')|default('{sitecollectiontermstoreid}')}}</Value>
+            </Property>
+            <Property>
+            <Name>TermSetId</Name>
+            <Value xmlns:q2="http://www.w3.org/2001/XMLSchema" p4:type="q2:string" xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">{termsetid:{{getAttr(field,'termGroupName','groupName','termGroupId')}}:{{getAttr(field,'termSetId','termSet','termSetName')}}}</Value>
+            </Property>
+            <Property>
+            <Name>TextField</Name>
+            <Value xmlns:q6="http://www.w3.org/2001/XMLSchema" p4:type="q6:string" xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">{{taxFieldId}}</Value>
+            </Property>
+            <Property>
+            <Name>IsPathRendered</Name>
+            <Value xmlns:q7="http://www.w3.org/2001/XMLSchema" p4:type="q7:boolean" xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">{{getAttr(field,'isPathRendered')|default(false)}}</Value>
+            </Property>
+            <Property>
+            <Name>IsKeyword</Name>
+            <Value xmlns:q8="http://www.w3.org/2001/XMLSchema" p4:type="q8:boolean" xmlns:p4="http://www.w3.org/2001/XMLSchema-instance">{{getAttr(field,'isKeyword')|default(false)}}</Value>
+            </Property>
+        </ArrayOfProperty>
+    </Customization>
+    {% endif %}
+</Field> 
+{% endmacro %}
+
+{% macro List(list) %}
+<pnp:ListInstance 
+    Title="{{getAttr(list,'title')}}"
+    Description="{{getAttr(list,'description')}}"
+    {% if hasAttr(list,'documentTemplate') %}
+    DocumentTemplate="{{getAttr(list,'documentTemplate')}}"
+    {% endif %}
+    {% if hasAttr(list,'onQuickLaunch') %}
+    OnQuickLaunch="{{getAttr(list,'onQuickLaunch')}}"
+    {% endif %}
+    {% if hasAttr(list,'templateType') %}
+    TemplateType="{{getAttr(list,'templateType')}}"
+    {% endif %}
+    EnableVersioning="{{getAttr(list,'enableVersioning')|default('false')}}"
+    {% if hasAttr(list,'enableMinorVersions') %}
+    EnableMinorVersions="{{getAttr(list,'enableMinorVersions')|default('false')}}"
+    {% endif %}
+    {% if hasAttr(list,'enableModeration') %}
+    EnableModeration="{{getAttr(list,'enableModeration')|default('false')}}"
+    {% endif %}
+    {% if hasAttr(list,'forceCheckout') %}
+    ForceCheckout="{{getAttr(list,'forceCheckout')}}"
+    {% endif %}
+    {% if hasAttr(list,'enableAttachments')  or getAttr(list,'templateType') == 101%}
+    EnableAttachments="{{false if getAttr(list,'templateType') == 101 else getAttr(list,'enableAttachments')}}"
+    {% endif %}
+    {% if hasAttr(list,'minorVersionLimit') %}
+    MinorVersionLimit="{{getAttr(list,'minorVersionLimit')}}"
+    {% endif %}
+    {% if hasAttr(list,'draftVersionVisibility') %}
+    DraftVersionVisibility="{{getAttr(list,'draftVersionVisibility')}}"
+    {% endif %}
+    {% if hasAttr(list,'maxVersionLimit') %}
+    MaxVersionLimit="{{getAttr(list,'maxVersionLimit')}}"
+    {% endif %}
+    ContentTypesEnabled="true"
+    {% if hasAttr(list,'enableFolderCreation') %}
+    EnableFolderCreation="{{getAttr(list,'enableFolderCreation')}}"
+    {% endif %}
+    {% if hasAttr(list,'hidden') %}
+    Hidden="{{getAttr(list,'hidden')|default('false')}}"
+    {% endif %}
+    {% if hasAttr(list,'removeExistingContentTypes') %}
+    RemoveExistingContentTypes="{{getAttr(list,'removeExistingContentTypes')}}"
+    {% endif %}
+    {% if hasAttr(list,'url') %}
+    Url="{{getAttr(list,'url')}}"
+    {% else %} 
+    Url="Lists/{{getAttr(list,'title')}}"
+    {% endif %}>
+    {% if hasAttr(list,'views') and hasItems(list,'views') %}
+    <pnp:Views {% if hasAttr(list,'removeExistingViews') %}RemoveExistingViews="{{getAttr(list,'removeExistingViews')}}" {% endif %}>
+        {% for view in getAttr(list,'views') %}
+        {{View(view)}}
+        {% endfor %}
+    </pnp:Views>
+    {% elif getAttr(list,'createDefaultView') %}
+    {{log('Feature not supported','Creating default view is not supported yet')}}
+    {% endif %}
+    {% if hasAttr(list,'contentTypes') or hasAttr(list,'contentTypeIds') %}
+    {% if hasContentBindings(list) %}
+    <pnp:ContentTypeBindings>
+        {% for contentType in getAttr(list,'contentTypeIds') %}
+            <pnp:ContentTypeBinding ContentTypeID="{{contentType}}" {% if loop.index == 1 %}Default="true" {% endif%} />
+        {% endfor %}
+        {% for contentType in getAttr(list,'contentTypes') %}
+            {% if contentType != 'Item' %}
+            <pnp:ContentTypeBinding ContentTypeID="{{getContentTypeIdByName(contentType)}}" {% if loop.index == 1 %} Default="true" {% endif %} />
+            {% endif %}
+        {% endfor %}
+    </pnp:ContentTypeBindings>
+    {% endif %}
+    {% endif %}
+    {% if hasAttr(list,'dataRows') %}
+    <pnp:DataRows>
+        {% for row in getAttr(list,'dataRows') %}
+        <pnp:DataRow>
+            {% if hasAttr(row,'data') %}
+                {% for key,val in getAttr(row,'data') %}
+                <pnp:DataValue FieldName="{{key}}">{{val}}</pnp:DataValue>
+                {% endfor %}
+            {% endif %}
+            {% if hasAttr(row,'security') %}
+                {{Security(getAttr(row,'security'))}}
+            {% endif %}
+        </pnp:DataRow>
+        {% endfor %}
+    </pnp:DataRows>
+    {% endif %}
+    {% if hasAttr(list,'fieldDefaults') %}
+    <pnp:FieldDefaults>
+        {% for key,val in getAttr(list,'fieldDefaults') %}
+        <pnp:FieldDefault FieldName="{{key}}">{{val}}</pnp:FieldDefault>
+        {% endfor %}
+    </pnp:FieldDefaults>
+    {% endif %}
+    {% if hasAttr(list,'security') %}
+    {{Security(getAttr(list,'security'))}}
+    {% endif %}
+    {% if hasAttr(list,'folders') %}
+    <pnp:Folders>
+        {% for ff in getAttr(list,'folders') %}
+            {{Folder(ff)}}
+        {% endfor %}
+    </pnp:Folders>
+    {% endif %}
+    {% if hasAttr(list,'userCustomActions','userActions') %}
+    <pnp:UserCustomActions>
+        {% for action in getAttr(list,'userCustomActions' ,'userActions' ) %}
+        {{CustomAction(action)}}
+        {% endfor %}
+    </pnp:UserCustomActions>
+    {% endif %}
+</pnp:ListInstance>
+{% endmacro %}
+
+{% macro NavigationNode(node) %}
+    {% if hasAttr(node,'children','items','nodes') %}
+    <pnp:NavigationNode Title="{{getAttr(node,'title')}}">
+        {% for n in getAttr(node,'children','items','nodes') %}
+        {{NavigationNode(n)}}
+        {% endfor %}
+    </pnp:NavigationNode>
+    {% else %}
+    <pnp:NavigationNode Title="{{getAttr(node,'title')}}" 
+        IsExternal="{{getAttr(node,'isExternal','external')|default(false)}}" 
+        Url="{{getAttr(node,'url')}}" />
+    {% endif %}
+{% endmacro %}
+
+{% macro StructuralNavigation(structural) %}
+<pnp:StructuralNavigation {%if hasAttr(structural,'removeExistingNodes') %}RemoveExistingNodes="{{getAttr(structural,'removeExistingNodes')}}"{% endif %}>
+    {% for item in getAttr(structural,'nodes','children','items') %}
+        {{NavigationNode(item)}}
+    {% endfor %}
+</pnp:StructuralNavigation>
+{% endmacro %}
+
+{% macro View(list,view) %}
+<View Name="{{getAttr(view,'name')|prenthesize}}" 
+    {% if getAttr(view,'defaultView') %} DefaultView="TRUE" {% endif %} 
+    {% if getAttr(view,'mobileView') %} MobileView="TRUE" {% endif %}
+    Type="{{getAttr(view,'type')|default('HTML')}}" 
+    DisplayName="{{getAttr(view,'displayName')}}" 
+    {% if getAttr(view,'useAbsoluteUrl') %}
+    Url="{{getAttr(view,'url')}}"
+    {% else %}
+    Url="{site}/Lists/{{getAttr(list,'title')}}/{{getAttr(view,url)}}" 
+    {% endif %} 
+    {% if getAttr(view,'level') %}
+    Level="{{getAttr(view,'level')}}" 
+    {% endif %}
+    {% if getAttr(view,'baseViewId') %}
+    BaseViewID="{{getAttr(view,'baseViewId')}}"
+    {% endif %}
+    {% if getAttr(view,'contentTypeId') or getAttr(view,'contentType') %}  
+        {% if getAttr(view,'contentType') %}
+            ContentTypeID="{{getContentTypeIdByName(getAttr(view,'contentType'))}}"
+        {% else %}
+            ContentTypeID="{{getAttr(view,'contentTypeId')}}"
+        {% endif %}
+    {% else %}
+    ContentTypeID="0x"
+    {% endif %} 
+    ImageUrl="{{getAttr(view,'imageUrl') | default('/_layouts/15/images/generic.png?rev=39')}}">
+    {% if hasAttr(view,'query') %}
+    {{getAttr(view,query)}}
+    {% endif %}
+    {% if hasAttr(view,'viewFields') and hasItems(view,'viewFields') %}
+        <ViewFields>
+        {% for viewField in getAttr(view,'viewFields') %}
+            <FieldRef Name="{{viewField}}" />
+        {% endfor %}
+        </ViewFields>
+    {% endif %}
+    <RowLimit Paged="TRUE">{{getAttr(view,'rowLimit')}}</RowLimit>
+    {% if hasAttr(view,'aggregations') and hasItems(view,'aggregations') %}
+    <Aggregations Value="On">
+        {% for aggregation in getAttr(view,'aggregations') %}
+        <FieldRef Name="{{getAttr(aggregation,'name')}}" Type="{{getAttr(aggregation,'type')}}">
+        {% endfor %}
+    </Aggregations>
+    {% else %}
+    <Aggregations Value="Off" />
+    {% endif %}
+    {% if hasAttr(view,'jsLink') %}
+    <JSLink>{{getAttr(view,'jsLink')|join('|')}}</JSLink>
+    {% else %}
+    <JSLink>clienttemplates.js</JSLink>
+    {% endif %} 
+    {% if hasAttr(view,'xslLink') %}
+    <XslLink Default="TRUE">{{getAttr(view,'xslLink')}}</XslLink>
+    {% else %}
+    <XslLink Default="TRUE">main.xsl</XslLink>
+    {% endif %} 
+    {% if hasAttr(view,'toolbar') %}
+    <Toolbar Type="{{getAttr(view,'toolbar')}}" {% if hasAttr(view,'position') %}Position="{{getAttr(view,'position')}}" {% endif %}/>
+    {% else %}
+    <Toolbar Type="Standard" />
+    {% endif %}
+</View>
+{% endmacro %}
+
+{% macro Navigation(navigation) %}
+ <pnp:Navigation>
+    {% if hasAttr(navigation,'global','globalNav','globalNavigation') %}
+    {% set globalNav = getAttr(navigation,'global','globalNav','globalNavigation') %}
+    <pnp:GlobalNavigation 
+        NavigationType="{{getAttr(globalNav,'navType','type','navigationType')|default('Structural')}}">
+        {% if getAttr(globalNav,'navType','type','navigationType') == "Managed" %}
+            <pnp:ManagedNavigation
+            TermStoreId="{{getAttr(globalNav,'termStoreId') | default('{sitecollectiontermstoreid}')}}"
+            TermSetId="{{getAttr(globalNav,'termSetId','termsetId') | default('{sitecollectionnavigationtermsetid}')}}" />
+        {% endif %}
+        {% if hasAttr(globalNav,'structural') %}
+            {{StructuralNavigation(getAttr(globalNav,'structural'))}}
+        {% endif %} 
+    </pnp:GlobalNavigation>
+    {% endif %}
+    {% if hasAttr(navigation,'current','currentNavigation','currentNav') %}
+    {% set currentNav = getAttr(navigation,'current','currentNavigation','currentNav') %}
+    <pnp:CurrentNavigation NavigationType="{{getAttr(currentNav,'navigationType','type','navType')|default('Structural')}}">
+        {% if getAttr(globalNav,'navType','type','navigationType') == "Managed" %}
+            <pnp:ManagedNavigation
+            TermStoreId="{{getAttr(globalNav,'termStoreId') | default('{sitecollectiontermstoreid}')}}"
+            TermSetId="{{getAttr(globalNav,'termSetId','termsetId') | default('{sitecollectionnavigationtermsetid}')}}" />
+        {% endif %}
+        {% if hasAttr(currentNav,'structural') %}
+        {{StructuralNavigation(getAttr(currentNav,'structural'))}}
+        {% endif %}
+    </pnp:CurrentNavigation>
+    {% endif %}
+    </pnp:Navigation>
+{% endmacro %}
+
+{% macro File(file) %}
+<pnp:File Src="{{getAttr(file,'src')}}" 
+    {% if hasAttr(file,'isMasterPage','masterPage') and getAttr(file,'isMasterPage','masterPage') %}
+    Folder="_catalogs/masterpage"
+    {% elif hasAttr(file,'isPageLayout','pageLayout') %}
+    Folder="_catalogs/masterpage"
+    {% else %}
+    Folder="{{getAttr(file,'folder')}}"
+    {% endif %}
+    {% if hasAttr(file,'overwrite') %}
+    Overwrite="{{getAttr(file,'overwrite')|default(false)}}"
+    {% endif %}
+    Level="{{getAttr(file,'level')|default('Published')}}">
+    {% if hasAttr(file,'props','properties') %}
+    <pnp:Properties>
+        {% if getAttr(file,'isMasterPage') %}
+            <pnp:Property Key="ContentTypeId" Value="{contenttypeid:Master Page}" />
+            <pnp:Property Key="HTML_x0020_File_x0020_Type" Value="SharePoint.WebPartPage.Document" />
+            <pnp:Property Key="ProgId" Value="SharePoint.WebPartPage.Document" />
+        {% endif %}
+        {% for key,val in getAttr(file,'props','properties') %}
+            {% if key == 'PublishingAssociatedContentType' %}
+            <pnp:Property Key="PublishingAssociatedContentType" Value=";#{{val}};#{{getContentTypeIdByName(val)}};#" />
+            {% else %}
+            <pnp:Property Key="{{key}}" Value="{{val}}" />
+            {% endif %}
+        {% endfor %}
+    </pnp:Properties>
+    {% endif %}
+</pnp:File>
+{% endmacro %}
+
+{% macro Directory(directory) %}
+<pnp:Directory Src="{{getAttr(directory,'src')}}" 
+    Folder="{{getAttr(directory,'folder')}}" 
+    Overwrite="{{getAttr(directory,'overwrite')|default(true)}}"
+    Recursive="{{getAttr(directory,'recursive')|default(true)}}" 
+    {% if hasAttr(directory,'included','includedExtensions') %}
+    IncludedExtensions="{{getAttr(directory,'included','includedExtensions')}}" 
+    {% endif %}
+    {% if hasAttr(directory,'excluded','excludedExtensions') %}
+    ExcludedExtensions="{{getAttr(directory,'excluded','excludedExtensions')}}" 
+    {% endif %}
+    {% if hasAttr(directory,'metadataMappingFile') %}
+    MetadataMappingFile="{{getAttr(directory,'metadataMappingFile')}}"
+    {% endif %}/>
+{% endmacro %}
+
+{% macro Page(page) %}
+<pnp:Page Url="{{getAttr(page,'url')}}" Layout="{{getAttr(page,'pageLayout','layout')}}" Overwrite="{{getAttr(page,'overwrite')|default(false)}}">
+
+</pnp:Page>
+{% endmacro %}
+
+{% macro AddContentTypeToPagesLibrary(contentType,def = false) %}
+Write-Log "Adding {{contentType}} To Pages Library"
+Add-PnPContentTypeToList -List "Pages" -ContentType "{{contentType}}" {% if def %} -DefaultContentType {% endif %}
+{% endmacro %}
+
+{% macro AddContentTypeToList(list,contentType) %}
+Write-Log "Adding {{contentType}} To {{list}} List"
+Add-PnPContentTypeToList -List "{{list}}" -ContentType "{{contentType}}"
+{% endmacro %}
+
+{% macro RemoveList(title,force) %}
+Write-Log "Removing List {{title}}"
+Remove-PnPList -Identity "{{title}}" {% if force %}-Force{% endif%}
+{% endmacro %}
+
+{% macro AddList(title,url,template) %}
+Write-Log "Adding List {{title}}"
+New-PnPList -Title "{{title}}" -Url "{{url}}" -Template "{{template}}"
+{% endmacro %}
+
+{% macro AddContentTypeToList(contentType,list) %}
+Write-Log "Adding Content Type {{contentType}} to List {{list}}"
+Add-PnPContentTypeToList -List "{{list}}" -ContentType "{{contentType}}"
+{% endmacro %}
+
+{% macro RemoveContentTypeFromList(title,list) %}
+Write-Log "Removing Content Type {{title}} from List {{list}}"
+Remove-PnPContentTypeFromList -List "{{list}}" -ContentType "{{title}}"
+{% endmacro %}
+
+{% macro RemoveContentType(contentType) %}
+Write-Log "Removing Content Type {{contentType}} from web"
+Remove-PnPContentType -Identity "{{contentType}}"
+{% endmacro %}
+
+{% macro SetListDefaultContentType(list,contentType) %}
+Write-Log "Setting List {{list}} default content type to {{contentType}}"
+Set-PnPDefaultContentTypeToList -List "{{list}}" -ContentType "{{contentType}}"
+{% endmacro %}
+
+{% macro AddFieldToContentType(field,contentType) %}
+Write-Log "Adding field {{field}} to content type {{contentType}}"
+Add-PnPFieldToContentType -Field "{{field}}" -ContentType "{{contentType}}"
+{% endmacro %}
+
+{% macro RemoveFieldFromContentType(field,contentType) %}
+Write-Log "Removing field {{field}} from content type {{contentType}}"
+Remove-PnPFieldFromContentType -Field "{{field}}" -ContentType "{{contentType}}"
+{% endmacro %}
+
+{% macro EnableFeature(id,force) %}
+Write-Log "Enabling feature {{id}}"
+Enable-PnPFeature -Identity {{id}} {% if force %} -Force {% endif %}
+{% endmacro %}
+
+{% macro DisableFeature(id,force) %}
+Write-Log "Disabling feature {{id}}"
+Disable-PnPFeature -Identity {{id}} {% if force %} -Force {% endif %}
+{% endmacro %}
+
+{% macro AddField(command) %}
+Write-Log "Adding field {{getAttr(command,'displayName','name','internalName','id','staticName')}}" 
+Add-PnPField -DisplayName "{{getAttr(command,'displayName','title')}}" -InternalName "{{getAttr(command,'name','internalName','staticName')}}" -Type {{getFieldType(getAttr(command,'type'))}} {% if hasAttr(command,'list') %} -List {{getAttr(command,'list')}}{% endif %} {% if hasAttr(command,'id') %}-Id {{getAttr(command,'id')}}{% endif %} {% if hasAttr(command,'addToDefaultView','defaultView') %}-AddToDefaultView {% endif %} {% if hasAttr(command,'group') %}-Group "{{getAttr(command,'group')}}"{% endif %} {% if hasAttr(command,'requied') %}-Required{% endif %} {% if hasAttr(command,'clientSideComponentId') %}-ClientSideComponentId {{getAttr(command,'clientSideComponentId')}} {% endif %} {% if hasAttr(command,'clientSideComponentProperties') %}-ClientSideComponentProperties {{getAttr(command,'clientSideComponentProperties')}}{% endif %} {% if hasAttr(command,'choices')%}-Choices {{getAttr(command,'choices').join(',')}}{% endif %}
+{% endmacro %}
+
+{% macro RemoveField(field,list) %}
+Write-Log "Removing field {{field}}" 
+Remove-PnPField -Identity "{{field}}" {% if list %}-List "{{list}}"{%endif%}
+{% endmacro %}
+
+{% macro AddPublishingPage(name,layout,title,publish,folder,meta) %}
+Write-Log "Adding Publishing Page" 
+Add-PnPPublishingPage -PageName "{{name}}" -PageTemplateName "{{layout|default('BlankWebPartPage')}}" -Title "{{title}}" {%if publish %}-Publish{% endif %} {% if folder %}-Folder "{{folder}}" {%endif%}
+
+{% endmacro %}
+
+{% macro SetPublishingPageFields(meta,siteUrl,name) %}
+{% if meta %}
+Set-PnPFileCheckedOut -Url "{{siteUrl}}/Pages/{{name}}.aspx"
+
+$item = Get-PnPFile -Url "{{siteUrl}}/Pages/{{name}}.aspx" -AsListItem
+
+Set-PnPListItem -List "Pages" -Identity $item -Values @{ {% for key,value in meta %} "{{key}}"="{{value}}"; {%endfor%} }
+Set-PnPFileCheckedIn -Url "{{siteUrl}}/Pages/{{name}}.aspx"
+{% endif %}
+{% endmacro %}
+
+{% macro SetDefaultPageLayout(title) %}
+Write-Log "Setting the default page layout to {{title}}"
+Set-PnPDefaultPageLayout -Title "{{title}}"
+{% endmacro %}
+
+{% macro SetAvailablePageLayouts(allowPageLayouts,layouts,inheritPageLayouts) %}
+Write-Log "Allowing page layouts {{layouts}}"
+    {% if allowPageLayouts %}
+    Set-PnPAvailablePageLayouts -AllowAllPageLayouts 
+    {% elif layouts %}
+    Set-PnPAvailablePageLayouts -PageLayouts {{layouts}}
+    {% elif inheritPageLayouts %}
+    Set-PnPAvailablePageLayouts -InheritPageLayouts 
+    {% endif %}
+{% endmacro %}
+
+{% macro AddMasterPage(title,path,desc) %}
+Write-Log "Adding master page {{title}}"
+Add-PnPMasterPage -SourceFilePath "{{path}}" -Title "{{title}}" -Description "{{desc}}" 
+{% endmacro %}
+
+{% macro SetMasterPage(url,customUrl) %}
+Write-Log "Setting default master page {{title}}"
+Set-PnPMasterPage -MasterPageServerRelativeUrl {{url}} 
+{% endmacro %}
+
+{% macro ClearRecycleBin(id,all,secondStageOnly,force) %}
+Write-Log "Clearing recycle bin" 
+Clear-PnpRecycleBinItem {% if id %}-Identiy {{id}} {% endif %} {% if all %}-All {% endif %} {% if hasAttr(command,'secondStageOnly','secondStage') %} -SecondStageOnly {% endif %} {% if hasAttr(command,'force') %} -Force {% endif %}
+{% endmacro %}
+
+{% macro EnableAppSideLoading(enable) %}
+Write-Log "Enabling app side loading" 
+Set-PnPAppSideLoading {% if enable %}-On {%else %} -Off {% endif %}
+{% endmacro %}
+
+{% macro SetHomePage(fileName) %}
+Write-Log "Setting home page"
+Set-PnPHomePage -RootFolderRelativeUrl Pages/{{fileName}}
+{% endmacro %}
+
+{% macro SendEmail(to,subject,body) %}
+Write-Log "Sending Email to: {{to}}" 
+Send-PnPMail -To {{to}} -Subject {{subject}} -Body {{body}} 
+{% endmacro %}
+
+{% macro Command(command) %}
+{% set type = getAttr(command,'command','commandType') %}
+{% if type == 'RemoveList' %}
+
+{{RemoveList(getAttr(command,'name','id','title'),hasAttr(command,'force'))}}
+
+{% elif type == 'AddList' %}
+
+{{AddList(getAttr(list,'name','title'),getAttr(list,'url'),getAttr(list,'template'))}}
+
+{% elif type == 'AddContentTypeToList' %}
+
+{{AddContentTypeToList(getAttr(command,'name','title','internalName','staticName'),getAttr(command,'list'))}}
+
+{% elif type == 'RemoveContentTypeFromList' %}
+
+{{RemoveContentTypeFromList(getAttr(command,'name','title','internalName','staticName'),getAttr(command,'list'))}}
+
+{% elif type == 'RemoveContentType' %}
+
+{{RemoveContentType(getAttr(command,'name','title','internalName','staticName','id'))}}
+
+{% elif type == 'SetListDefaultContentType' or type == 'ListDefaultContentType' %}
+
+{{SetListDefaultContentType(getAttr(command,'list'),getAttr(command,'contentType'))}}
+
+{% elif type == 'AddFieldToContentType' %}
+
+{{AddFieldToContentType(getAttr(command,'field'),getAttr(command,'contentType'))}}
+
+{% elif type == 'RemoveFieldFromContentType' %}
+
+{{RemoveFieldFromContentType(getAttr(command,'field'),getAttr('contentType'))}}
+
+{% elif type == 'EnableFeature' %}
+
+{{EnableFeature(getAttr(command,'id','guid'),getAttr(command,'force'))}}
+
+{% elif type == 'DisableFeature' %}
+
+{{DisableFeature(getAttr(command,'id','guid'),getAttr(command,'force'))}}
+
+{% elif type == 'AddField' %}
+
+{{AddField(command)}}
+
+{% elif type == 'RemoveField' %}
+
+{{RemoveField(getAttr(command,'displayName','name','internalName','id','staticName'),getAttr(command,'list'))}}
+
+{% elif type == 'SetMasterPage' %}
+
+{{SetMasterPage(getConfig('spHost')+getConfig('url')+getAttr(command,'fileName'))}}
+
+{% elif type == 'SetHomePage' %}
+
+{{SetHomePage(getAttr(command,'fileName'))}}
+
+{% elif type == 'AddMasterPage' %}
+
+{{AddMasterPage(getAttr(command,'title','name'),getAttr(command,'path','filePath'),getAttr(command,'desc','description'))}}
+
+{% elif type == 'DefaultPageLayout' or type == 'SetDefaultPageLayout' %}
+
+{{SetDefaultPageLayout(getAttr(command,'title','name'))}}
+
+{% elif type == 'SetAvailablePageLayouts' or type == 'AvailablePageLayouts' %}
+
+{{SetAvailablePageLayouts(getAttr(command,'allowAllPageLayouts','allowAll'),getAttr(command,'layouts','pageLayouts'),hasAttr(command,'inheritPageLayouts'))}}
+
+{% elif type == 'AddPublishingPage' %}
+
+{{AddPublishingPage(getAttr(command,'name'),getAttr(command,'layout','pageLayout'),getAttr(command,'title'),getAttr(command,'publish'),getAttr(command,'folder'),getAttr(command,'meta'))}}
+
+{% elif type == 'ClearRecycleBin' or type == 'EmptyRecycleBin' %}
+
+{{ClearRecycleBin(getAttr(command,'id','identity'),getAttr(command,'all'),getAttr(command,'secondStageOnly'),getAttr(command,'force'))}}
+
+{% elif type == 'AppSideLoading' or type == 'EnableAppSideLoading' or type == 'EnableSideLoading' %}
+
+{{EnableAppSideLoading(getAttr(command,'enable'))}}
+ 
+{% elif type == 'Email' or type == 'SendEmail' %}
+
+{{SendEmail(getAttr(command,'to'),getAttr(command,'subject'),getAttr(command,'body'))}}
+
+{% else %}
+{{CustomCommand(command)}}
+Write-Log "Unknown Command Type {{type}}"
+{% endif %}
+{% endmacro %}
+
+{% macro CustomCommand(command) %}
+{{getAttr(command,'fn')}} {% for param in getAttr(command,'params') %}{% if hasAttr(param,'name') %}-{{getAttr(param,'name')}} {% endif %} {% if getAttr(param,'isString') %}"{{getAttr(param,'value')}}"{%else%}{{getAttr(param,'value')}}{% endif %}{% endfor %} 
+{% endmacro %}
+{% macro Commands(commands) %}
+    Write-Log "Executing commands..."
+    {% for command in commands %}
+    {{Command(command)}}
+    {% endfor %}
+{% endmacro %}
+
+{% macro Sequence(seq) %}
+    <pnp:Sequence ID="{{getAttr(seq,'id')}}" 
+        SequenceType="{{getAttr(seq,'sequenceType','seqType')|default('Synchronous')}}">
+        {% if hasAttr(seq,'SiteCollections') %}
+            {% for sc in getAttr(seq,'SiteCollections') %}
+            <pnp:SiteCollection 
+                Language="{{getAttr(sc,'lang','language')|default(1033)}}"
+                SiteTemplate="{{getAttr(sc,'siteTemplate')|default('STS#0')}}"
+                PrimarySiteCollectionAdmin="{{getAttr(sc,'PrimarySiteCollectionAdmin','siteCollectionAdmin','admin')}}"
+                MembersCanShare="{{getAttr(sc,'membersCanShare')|default(true)}}"
+                {% if hasAttr(sc,'timeZone') %}
+                TimeZone="{{getAttr(sc,'timeZone')}}"
+                {% endif %}
+                Title="{{getAttr(sc,'title')}}"
+                Url="{{getAttr(sc,'url')}}">
+                <pnp:Templates>
+                    <pnp:ProvisioningTemplateReference ID="{{getAttr(sc,'templateId')}}" />
+                </pnp:Templates>
+            </pnp:SiteCollection>
+
+            {% endfor %}
+        {% endif %}
+    {% if hasAttr(seq,'sites') %}
+        {% for site in getAttr(seq,'sites') %}
+            <pnp:Site Language="{{getAttr(site,'lang','language')|default(1033)}}"
+                SiteTemplate="{{getAttr(site,'siteTemplate')|default('STS#0')}}"
+                QuickLaunchEnabled="{{getAttr(site,'quickLaunchEnabled')|default(true)}}"
+                {% if hasAttr(site,'timeZone') %}
+                TimeZone="{{getAttr(site,'timeZone')}}"
+                {% endif %}
+                Title="{{getAttr(site,'title')}}"
+                Url="{{getAttr(site,'url')}}"
+                UseSamePermissionsAsParentSite="{{getAttr(site,'UseSamePermissionsAsParentSite')|default(true)}}">
+                {% if hasAttr(site,'templates') %}
+                <pnp:Templates>
+                    {% for temp in getAttr(site,'templates') %}
+                    <pnp:ProvisioningTemplateReference ID="{{temp}}" />
+                    {% endfor %}
+                </pnp:Templates>
+                {% endif %}
+            </pnp:Site>
+        {% endfor %}
+    {% endif %}
+    <!-- Now create a Site into the previously created Site Collection -->
+    </pnp:Sequence>
+{% endmacro %}
+
+{% macro ProvisioningTemplate(template) %}
+<pnp:ProvisioningTemplate
+    ID="{{getAttr(template,'id')}}"
+    BaseSiteTemplate="{{getAttr(template,'baseSiteTemplate')|default('STS#0')}}"
+    ImagePreviewUrl="{{getAttr(template,'imagePreviewUrl')}}"
+    DisplayName="{{getAttr(template,'displayName')}}"
+    {% if hasAttr(template,'scope') %}Scope="{{getAttr(template,'scope')}}"{% endif %}
+    Description="{{getAttr(template,'desc','description')}}">
+    {% if hasAttr(template,'properties') and hasItems(template,'properties') %}{{log('Provisioning Template','Site properties')}}
+    <pnp:Properties>
+        {% for key,val in getAttr(template,'properties') %}
+        <pnp:Property Key="{{key}}" Value="{{val}}" />
+        {% endfor %}
+    </pnp:Properties>
+    {% endif %}{{log('Provisioning Template','Site navigation')}}
+    {% if hasAttr(template,'navigation') %}
+    {{Navigation(getAttr(template,'navigation'))}}
+    {% endif %}
+    {% if hasAttr(template,'sitePolicy') %}{{log('Provisioning Template','Site policy')}}
+    <pnp:SitePolicy>{{getAttr(template,'sitePolicy')}}</pnp:SitePolicy>
+    {% endif %}
+    {% if hasAttr(template,'webSettings') %}{{log('Provisioning Template','Web settings')}}
+    {{WebSettings(getAttr(template,'webSettings'))}}
+    {% endif %}
+    {% if hasAttr(template,'regionalSettings') %}{{log('Provisioning Template','Regional settings')}}
+    {{RegionalSettings(getAttr(template,'regionalSettings'))}}
+    {% endif %}
+    {% if hasAttr(template,'auditSettings') %}
+    {{AuditSettings(getAttr(template,'auditSettings'))}}
+    {% endif %}
+    {% if hasAttr(template,'supportedUILanguages') %}{{log('Provisioning Template','Supported UI languages')}}
+    <pnp:SupportedUILanguages>
+        {% for lang in getAttr(template,'supportedUILanguages') %}
+        <pnp:SupportedUILanguage LCID="{{lang}}" />
+        {% endfor %}
+    </pnp:SupportedUILanguages>
+    {% endif %}
+    {% if hasAttr(template,'features') %}{{log('Provisioning Template','Features')}}
+    {% set features = getAttr(template,'features') %}
+    <pnp:Features>
+        {% if hasAttr(features,'site') %}{{log('Provisioning Template','Site features')}}
+        <pnp:SiteFeatures>
+            {% for feature in getAttr(features,'site') %}{{log('Provisioning Template','Site feature: '+getAttr(feature,'id'))}}
+            <pnp:Feature ID="{{getAttr(feature,'id')}}" Description="{{getAttr(feature,'desc')|default('')}}" />
+            {% endfor %}
+        </pnp:SiteFeatures>
+        {% endif %}
+        {% if hasAttr(features,'web') %}{{log('Provisioning Template','Web features')}}
+        <pnp:WebFeatures>
+            {% for feature in getAttr(features,'web') %}{{log('Provisioning Template','Site feature: '+getAttr(feature,'id'))}}
+            <pnp:Feature ID="{{getAttr(feature,'id')}}" Description="{{getAttr(feature,'desc')|default('')}}" />
+            {% endfor %}
+        </pnp:WebFeatures>
+        {% endif %}
+    </pnp:Features>
+    {% endif %}
+    {% if hasAttr(template,'composedLook') %}
+    {{ComposedLook(getAttr(template,'composedLook'))}}
+    {% endif %}
+    {% if hasAttr(template,'security') %}{{log('Provisioning Template','Security')}}
+        {{SiteSecurity(getAttr(template,'security'))}}
+    {% endif %}
+    {% if hasAttr(template,'lists') and hasItems(template,'lists') %}{{log('Provisioning Template','Lists')}}
+    <pnp:Lists>
+        {% for list in getAttr(template,'lists') %}{{log('Provisioning Template','List',getAttr(list,'listTitle','title'))}}
+        {{List(list)}}
+        {% endfor %}
+    </pnp:Lists>
+    {% endif %}
+    {% if hasAttr(template,'contentTypes') and hasItems(template,'contentTypes') %}{{log('Provisioning Template','Content Types')}}
+    <pnp:ContentTypes>
+        {% for ct in getAttr(template,'contentTypes') %}{{log('Provisioning Template','Content Type '+getAttr(ct,'name'))}}
+        {{ContentType(ct)}}
+        {% endfor %}
+    </pnp:ContentTypes>
+    {% endif %}
+    {% if hasAttr(template,'fields','siteFields') and hasItems(template,'fields','siteFields') %}{{log('Provisioning Template','Site Columns')}}
+    <pnp:SiteFields>
+        {% for f in getAttr(template,'siteFields','fields') %}{{log('Provisioning Template','Site Column '+getAttr(f,'name')+' - '+getAttr(f,'id'))}}
+        {{Field(f)}}
+        {% endfor %}
+    </pnp:SiteFields>
+    {% endif %}
+    {% if hasAttr(template,'termGroups') %}{{log('Provisioning Template','Term Groups')}}
+    <pnp:TermGroups>
+        {% for group in getAttr(template,'termGroups') %}{{log('Provisioning Template','Term Group '+getAttr(group,'name'))}}
+        {{TermGroup(group)}}
+        {% endfor %}
+    </pnp:TermGroups>
+    {% endif %}
+    {% if hasAttr(template,'wikiPages') %}
+    <pnp:Pages>
+        {% for p in getAttr(template,'wikiPages') %}
+        {{Page(p)}}
+        {% endfor %}
+    </pnp:Pages>
+    {% endif %}
+    
+    {% if hasAttr(template,'files') or hasAttr(template,'directories','folders','dirs') %}{{log('Provisioning Template','Files')}}
+    <pnp:Files>
+        {% for file in getAttr(template,'files') %}{{log('Provisioning Template','File - '+getAttr(file,'src'))}}
+        {{File(file)}}
+        {% endfor %}
+        {% for folder in getAttr(template,'directories','folders','dirs') %}{{log('Provisioning Template','Folder - '+getAttr(folder,'src'))}}
+        {{Directory(folder)}}
+        {% endfor %}
+    </pnp:Files>
+    {% endif %}
+    {% if hasAttr(template,'pagelayouts') or hasAttr(template,'pagelayouts') %}{{log('Provisioning Template','Page Layouts')}}
+    <pnp:PageLayouts>
+        {% for layout in getAttr(template,'pagelayouts') %}
+        {{PageLayout(layout)}}
+        {% endfor %}
+    </pnp:PageLayouts>
+    {% endif %}
+</pnp:ProvisioningTemplate>
+{% endmacro %}
