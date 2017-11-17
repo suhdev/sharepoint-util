@@ -1,0 +1,110 @@
+function Write-Log { 
+    param 
+    ( 
+        [string]$text 
+    ) 
+
+    $msg = "$(Get-Date -format F) $text"
+    Write-Host $msg
+    Write-Output $msg | Out-File 'log.txt' -Append
+}
+
+function Write-Exception {
+    param(
+        [EXCEPTION]$ex
+    )
+
+    $msg = "$(Get-Date -format F) EXCEPTION! $ex"
+    Write-Host $msg -ForegroundColor Red
+    Write-Output $msg | Out-File 'log.txt' -Append
+}
+
+function Confirm-Continue {
+    [CmdletBinding()]
+    param
+    (
+        [string]$message
+    )
+
+    $confirmation = Read-Host "$message"
+    if ($confirmation -eq 'y') {
+      
+    }
+    else {
+        exit
+    }
+
+}
+
+function Set-UseSharedNavigation {
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true, Position = 1)]
+        [Microsoft.SharePoint.Client.ClientContext]$context,
+        
+        [Parameter(Mandatory = $true, Position = 2)]
+        [Microsoft.SharePoint.Client.Web]$web,
+        
+        [Parameter(Mandatory = $true, Position = 3)]
+        [bool]$useShared
+    )
+    
+    $web.Navigation.UseShared = $useShared
+    $web.Update()
+    $context.ExecuteQuery()
+}
+
+function Set-UseTaxonomyNavigation {
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [OfficeDevPnP.Core.PnPClientContext]$context,
+        [string]$termSetName    
+    )
+
+    $taxonomySession = Get-PnPTaxonomySession -Web $context.Web
+    $navigationSettings = New-Object Microsoft.SharePoint.Client.Publishing.Navigation.WebNavigationSettings $context, $context.Web 
+
+    $termSets = $taxonomySession.GetTermSetsByName($termSetName, 1033)
+    
+    $context.Load($termSets)
+    $context.ExecuteQuery()
+    
+    if($termSets.Count -eq 1)
+    {
+        $termSet = $termSets[0]
+        $context.Load($termSet.TermStore)
+        $context.ExecuteQuery()
+
+        $navigationSettings.GlobalNavigation.Source = "taxonomyProvider" 
+        $navigationSettings.GlobalNavigation.TermStoreId = $termSet.TermStore.Id
+        $navigationSettings.GlobalNavigation.TermSetId = $termSet.Id
+        $navigationSettings.Update($taxonomySession)
+        $context.ExecuteQuery() 
+    
+        Write-Host "Global Navigation set successfully to $termSetName" -f green               
+    }
+}
+
+
+function Set-SiteCollectionTermGroupName {
+    param
+    (
+        [string]$groupName
+    )
+
+    $ctx = Get-PnPContext
+    $termStore = Get-PnPSiteCollectionTermStore
+    $group = $termStore.GetSiteCollectionGroup($ctx.Site, $false)
+    $ctx.Load($group)
+    $ctx.ExecuteQuery()
+
+    if ($group.Name -ne $groupName)
+    {
+        $group.Name = $groupName
+        $group.Context.ExecuteQuery()
+        Write-Log "Site collection term group name changed to : $groupName" 
+    }
+}

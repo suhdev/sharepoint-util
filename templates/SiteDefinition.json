@@ -1,0 +1,541 @@
+{
+    "id": "GiftsAndConflicts",
+    "templatesId": "GCTemplates",
+    "baseSiteTemplate": "BLANKINTERNET#0",
+    "url": "GiftsandHospitalityRegister",
+    "siteCollectionGroupName": "Vodafone Registers",
+    "defaultPagesContentType": "Registers Declaration Page",
+    "navigation": {
+        "global": {
+            "navType": "Managed",
+            "termSetId": "25232664-e41b-4930-99d1-7d9bf960aafe"
+        }
+    },
+    "security": {
+        "admins": [
+            "suhail.abood@sysdocgroup.com",
+            "suhail.abood@sysdocgroup.com"
+        ],
+        "owners": [
+            "suhail.abood@sysdocgroup.com"
+        ],
+        "visitors": [
+            "suhail.abood@sysdocgroup.com"
+        ],
+        "members": [
+            "suhail.abood@sysdocgroup.com"
+        ],
+        "groups": [
+            {
+                "title": "Albania Gifts Users",
+                "description": "The users allowed to access Albania declarations",
+                "owner": "suhail.abood@sysdocgroup.com",
+                "members": [
+                    "suhail.abood@sysdocgroup.com",
+                    "valeria.maneva@sysdocgroup.com"
+                ]
+            }
+        ]
+    },
+    "features": {
+        "web": [
+            {
+                "id": "94c94ca6-b32f-4da9-a9e3-1f3d343d7ecb",
+                "enable": true
+            },
+            {
+                "id": "00bfea71-d8fe-4fec-8dad-01c19a6e4053",
+                "enable": true
+            }
+        ]
+    },
+    "preferences": {
+        "author": "Suhail Abood",
+        "version": "1.2",
+        "params": {
+            "O365TenantName": "Sysdoc",
+            "CodeProvidedParam": true,
+            "YammerNetwork": "Sysdoc.co.uk",
+            "CompanyName": "Sysdoc Inc.",
+            "lcid": 1033
+        }
+    },
+    "contentTypes": [
+        {
+            "name": "Declaration",
+            "group": "GC Registers",
+            "parent": "Item",
+            "description": "A generic declaration",
+            "id": "e753ad99-747d-4c5d-883c-630ecd806948",
+            "fields": [
+                "Employee",
+                "DeclarationStatus",
+                "DeclarationComments",
+                "DeclarationDepartment",
+                "DeclarationEntity",
+                "OnBehalfOfSomeone",
+                "ThirdPartyCompany",
+                "ThirdPartyPerson",
+                "RelationshipToPerson"
+            ]
+        },
+        {
+            "name": "Gift",
+            "group": "GC Registers",
+            "description": "A gift declaration",
+            "id": "45cda119-4f85-4ee3-8067-82efb0c4ec73",
+            "parent": "Declaration",
+            "fields": [
+                "ActionTaken",
+                "IsLimitExceeded",
+                "LimitExceedComments",
+                "IsApprovalRequired",
+                "IsCorpEventApplicable",
+                "LocalMarketValue",
+                "MarketValue",
+                "Approvers",
+                "FromGovernmentOfficial",
+                "GovernmentApprovalRequired",
+                "GovernmentApprovalComments",
+                "IsLimitExceededCorpEvents",
+                "IsLiveTender",
+                "DeclarationCurrency",
+                "WhatIsReceived",
+                "ReceiveDate",
+                "GiftDeclarationType",
+                "NumberOfGuests",
+                "GiftType"
+            ]
+        }
+    ],
+    "fields": [
+        {
+            "name": "IsApprovalApplicable",
+            "displayName": "Is Approval Applicable",
+            "description": "Is approval required for this declaration?",
+            "type": "Choice",
+            "group": "GC Registers",
+            "required": true,
+            "choices": [
+                "yes",
+                "no",
+                "n/a"
+            ],
+            "id": "9ff1d200-5b54-4c25-849c-d4346bd18386"
+        },
+        {
+            "name": "IsApprovalRequired",
+            "displayName": "Approval Required",
+            "type": "Boolean",
+            "group": "GC Registers",
+            "required": true,
+            "description": "Whether the declaration requires approval or not",
+            "id": "13ae9619-366a-455d-b32d-9d02c7d50ee0"
+        },
+        {
+            "name": "DeclarationEntity",
+            "displayName": "Entity",
+            "type": "TaxonomyFieldType",
+            "group": "GC Registers",
+            "required": false,
+            "description": "Stores the entity of the declaration",
+            "id": "d39371a5-497b-4306-b440-f19c09f04c49",
+            "termGroupName": "Vodafone Registers",
+            "termSetName": "Entities"
+        },
+        {
+            "name": "DeclarationCurrency",
+            "type": "Lookup",
+            "group": "GC Registers",
+            "required": true,
+            "listTitle": "Currencies",
+            "displayName": "Currency",
+            "showField": "Title",
+            "description": "The currency of the declaration",
+            "id": "63e33080-0e3d-4550-862e-67dd54f37abb"
+        },
+        {
+            "name": "ReceiveDate",
+            "type": "DateTime",
+            "group": "GC Registers",
+            "required": true,
+            "format": "DateOnly",
+            "description": "The date on which the gift was given or received",
+            "displayName": "Receive Date",
+            "id": "4c52928c-bb38-4db8-83b5-c61745e2bcf5"
+        },
+        {
+            "name": "NumberOfGuests",
+            "displayName": "NumberOfGuests",
+            "type": "Number",
+            "required": false,
+            "group": "GC Registers",
+            "id": "b2568561-3b74-42bd-8d18-f5ae75688cba",
+            "description": "The number of guests included in the gift declaration",
+            "default": 0
+        },
+        {
+            "name": "LimitExceedComments",
+            "displayName": "Limit Exceed Comment",
+            "type": "HTML",
+            "group": "GC Registers",
+            "required": false,
+            "richText": true,
+            "richTextMode": "FullHtml",
+            "id": "971455da-7b05-4793-ad06-fa7ecb10f45b",
+            "description": "Further comments regarding exceeding the allowed limits"
+        },
+        {
+            "name": "RelationshipToPerson",
+            "displayName": "Relationship To Person",
+            "type": "Text",
+            "group": "GC Registers",
+            "id": "737527b0-3458-45aa-93ae-a496f313b99c",
+            "required": false,
+            "showInEditForm": true,
+            "description": "To specify the relationship to the third-party person"
+        },
+        {
+            "name": "Employee",
+            "displayName": "Employee",
+            "type": "User",
+            "required": true,
+            "group": "GC Registers",
+            "id": "043cd177-41dd-4e78-a721-1502c3ea617b",
+            "description": "The employee "
+        },
+        {
+            "name": "Approvers",
+            "displayName": "Approvers",
+            "type": "UserMulti",
+            "mult": "TRUE",
+            "required": true,
+            "group": "GC Registers",
+            "description": "The people that are involved in the approval of a declaration",
+            "id": "f27143d0-4c4b-4190-b501-5d16780431d0"
+        }
+    ],
+    "lists": [
+        {
+            "title": "Currencies",
+            "description": "Used to track currencies and exchange rate",
+            "enableAttachments": true,
+            "enableContentTypes": true,
+            "id": "b36360ae-e611-4ef1-b5e7-8b2aecea297d",
+            "templateType": 100,
+            "interface": "Currency",
+            "contentTypes": [
+                "DeclarationCurrency"
+            ]
+        }
+    ],
+    "termGroups": [
+        {
+            "name": "Vodafone Registers",
+            "description": "",
+            "termSets": [
+                {
+                    "name": "Header Navigation",
+                    "id": "6b4900f8-c2e8-4ba3-ad79-6617695e2d9c",
+                    "isNavigation": true,
+                    "terms": [
+                        {
+                            "name": "Home",
+                            "id": "bcffd317-b535-414f-bfeb-37f701b45b2f",
+                            "targetUrl": "{sitecollection}/pages/Home.aspx",
+                            "linkTitle": "Home"
+                        },
+                        {
+                            "name": "Gifts",
+                            "id": "9cb0a101-2faa-4886-b858-787b0f60a8f0",
+                            "targetUrl": "{sitecollection}/pages/Gifts.aspx",
+                            "linkTitle": "Gifts"
+                        },
+                        {
+                            "name": "Conflicts",
+                            "id": "ceb59c9b-b92d-45fd-b344-7d7faebec794",
+                            "targetUrl": "{sitecollection}/pages/Conflicts.aspx",
+                            "linkTitle": "Conflicts"
+                        }
+                    ]
+                },
+                {
+                    "name": "Footer Navigation",
+                    "id": "08c38cb3-f9ff-447c-88ae-b3c8de6032b7",
+                    "isNavigation": true,
+                    "terms": []
+                },
+                {
+                    "name": "Entities",
+                    "id": "4f062c97-ca9a-4bdc-a877-9aece5428c51",
+                    "terms": [
+                        {
+                            "id": "631c389f-b5b5-4ed5-9b8e-24027fb7267d",
+                            "name": "Albania"
+                        },
+                        {
+                            "id": "08d8acb5-5f67-4732-9bd0-7d604deaf204",
+                            "name": "Australia"
+                        },
+                        {
+                            "id": "eb61c9f7-20d7-4530-99c3-3696912cdd12",
+                            "name": "Czech Republic"
+                        },
+                        {
+                            "id": "e519aaa8-f035-4e9f-936a-826560c64362",
+                            "name": "Egypt"
+                        },
+                        {
+                            "id": "b1024b06-8748-4e50-b7e0-713467ccf331",
+                            "name": "Enterprise"
+                        },
+                        {
+                            "id": "c84c42fd-d8f8-482e-a0e2-a8854e584969",
+                            "name": "Germany"
+                        },
+                        {
+                            "id": "874440b1-450b-4a8f-a519-b29ba7d4ace0",
+                            "name": "Ghana"
+                        },
+                        {
+                            "id": "57fb697b-cb1f-49d7-9490-fae9139bccef",
+                            "name": "Greece"
+                        },
+                        {
+                            "id": "fc54c8d4-f750-4a2e-abf5-efac1d0ef899",
+                            "name": "Hungary"
+                        },
+                        {
+                            "id": "427dd09c-a61d-4809-9a23-49c9eb4d892f",
+                            "name": "India"
+                        },
+                        {
+                            "id": "334ff36a-2443-4596-9984-13c869961193",
+                            "name": "Ireland"
+                        },
+                        {
+                            "id": "8966e6ff-77af-46eb-90b8-47a69a9cee9e",
+                            "name": "Italy"
+                        },
+                        {
+                            "id": "5318abcd-55d6-4f92-85e8-05ded66e8f4e",
+                            "name": "Malta"
+                        },
+                        {
+                            "id": "12ea84fb-a76f-47c6-8e47-2de86d2d524d",
+                            "name": "Netherlands"
+                        },
+                        {
+                            "id": "9dd87b54-6458-4475-86fc-042b6507c85e",
+                            "name": "New Zealand"
+                        },
+                        {
+                            "id": "98e9517d-4419-4c85-81d6-7f5fcbbbd0ef",
+                            "name": "Portugal"
+                        },
+                        {
+                            "id": "6f873b88-cec9-4674-9f9b-0de1472777f4",
+                            "name": "Qatar"
+                        },
+                        {
+                            "id": "8d6cd78f-dc4a-4f37-8364-11e671da1055",
+                            "name": "Romania"
+                        },
+                        {
+                            "id": "c4c8ad31-0d98-40e9-8914-9ebde35c51ca",
+                            "name": "South Africa"
+                        },
+                        {
+                            "id": "f05ef149-c295-487c-b871-db460d3f9ecd",
+                            "name": "Spain"
+                        },
+                        {
+                            "id": "067d4bb6-cee4-4a70-8a23-e1b5c1f12dcc",
+                            "name": "Turkey"
+                        },
+                        {
+                            "id": "358d5e2d-cb3f-469b-af78-1eb5127a6464",
+                            "name": "United Kingdom"
+                        },
+                        {
+                            "id": "93b2c5ff-d535-40d8-a1e8-3cf3602a9400",
+                            "name": "Vodafone Americas"
+                        },
+                        {
+                            "id": "356a8305-fa81-45a5-a820-866177c5ee8e",
+                            "name": "Vodafone Group"
+                        },
+                        {
+                            "id": "31ae4a61-01e3-4d3c-b716-c1f666e2085b",
+                            "name": "Vodafone Procurement Company"
+                        },
+                        {
+                            "id": "3c2a5f02-a4ae-40ee-98b5-8901352ccc72",
+                            "name": "VPC"
+                        },
+                        {
+                            "id": "a9dde99c-a26e-4a40-9c3c-edb2f543ce60",
+                            "name": "VRS"
+                        },
+                        {
+                            "id": "64e598fb-db4f-467b-99c8-bbf5529f4490",
+                            "name": "VSSB"
+                        },
+                        {
+                            "id": "22ace554-7ecf-43b5-b148-12f18a5a98dd",
+                            "name": "VSSE"
+                        },
+                        {
+                            "id": "6923564c-d080-486a-81d5-4590327662f8",
+                            "name": "VSSI"
+                        },
+                        {
+                            "id": "5e13aae9-38fe-4df7-b49b-bcd8b3e8fb0c",
+                            "name": "VSSR"
+                        }
+                    ]
+                },
+                {
+                    "name": "Departments",
+                    "id": "8faeed90-8383-4d8b-b8cc-8a745096c5c1",
+                    "terms": [
+                        {
+                            "id": "6fbe7bc6-f0d4-4f67-8435-fbfb2f4a3ab9",
+                            "name": "CEO"
+                        },
+                        {
+                            "id": "f3e5ce8f-d011-4688-aaef-0c7d13218a19",
+                            "name": "Commercial"
+                        },
+                        {
+                            "id": "4d1f89ed-559e-49e8-afd6-c41c87c7942a",
+                            "name": "Consumer"
+                        },
+                        {
+                            "id": "99b3591e-6d3d-4429-8e58-895c2e097661",
+                            "name": "Customer Ops"
+                        },
+                        {
+                            "id": "81e9f986-1756-48ff-9b08-3b83809d51d5",
+                            "name": "Enterprise"
+                        },
+                        {
+                            "id": "1f88d7db-a32c-4237-b4e5-27c570e26a03",
+                            "name": "External affairs"
+                        },
+                        {
+                            "id": "50efc908-f9f7-43b0-9f4f-969fc8ff18a1",
+                            "name": "Finance"
+                        },
+                        {
+                            "id": "006a6dd0-e1f9-4d7e-91d5-32fe2d43fbe8",
+                            "name": "Group"
+                        },
+                        {
+                            "id": "3c03ea9e-f8bf-44d3-ae0f-0b8bf2675ff9",
+                            "name": "Human Resources"
+                        },
+                        {
+                            "id": "51d498b6-005e-40ee-bfbb-e3b0311e4f5f",
+                            "name": "Internal communications"
+                        },
+                        {
+                            "id": "c9730550-e72f-45e6-b89c-50b738f68788",
+                            "name": "Legal"
+                        },
+                        {
+                            "id": "b06068ac-bc51-4d17-9c8a-d6998c41ba69",
+                            "name": "Marketing"
+                        },
+                        {
+                            "id": "22718811-5eba-4f00-bf04-e6d08939da39",
+                            "name": "Regulatory"
+                        },
+                        {
+                            "id": "6decca22-506a-4496-93d7-078c2fec5243",
+                            "name": "Strategy and business development"
+                        },
+                        {
+                            "id": "5280ca27-6b22-4549-a67d-49c696d0dc24",
+                            "name": "Supply chain management"
+                        },
+                        {
+                            "id": "f4c41c2f-7e54-48eb-b7d6-9f2125ac77a1",
+                            "name": "Technology"
+                        },
+                        {
+                            "id": "42738038-d1e4-49ae-a08b-e61683322379",
+                            "name": "Terminals"
+                        },
+                        {
+                            "id": "a49add4e-1909-472c-b6d6-f681a1492dac",
+                            "name": "Wholesale"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "directories": [
+        {
+            "src": "Sysdoc",
+            "folder": "SiteAssets/Sysdoc",
+            "overwrite": true,
+            "recursive": true
+        }
+    ],
+    "files": [
+        {
+            "src": "pagelayouts/GiftsPageLayout.aspx",
+            "isPageLayout": true,
+            "overwrite": true,
+            "properties": {
+                "PublishingAssociatedContentType": "Registers Declaration Page",
+                "ContentType": "Page Layout",
+                "Title": "Gifts Page Layout",
+                "MasterPageDescription": "Gifts declaration page layout"
+            }
+        },
+        {
+            "src": "pagelayouts/ConflictsPageLayout.aspx",
+            "isPageLayout": true,
+            "overwrite": true,
+            "properties": {
+                "PublishingAssociatedContentType": "Registers Declaration Page",
+                "ContentType": "Page Layout",
+                "Title": "Conflicts Page Layout",
+                "MasterPageDescription": "Conflicts declaration page layout"
+            }
+        },
+        {
+            "src": "pagelayouts/HomePageLayout.aspx",
+            "isPageLayout": true,
+            "overwrite": true,
+            "properties": {
+                "PublishingAssociatedContentType": "Registers Declaration Page",
+                "ContentType": "Page Layout",
+                "Title": "Home Page Layout",
+                "MasterPageDescription": "Home page layout"
+            }
+        },
+        {
+            "src": "pagelayouts/AdminPageLayout.aspx",
+            "isPageLayout": true,
+            "overwrite": true,
+            "properties": {
+                "PublishingAssociatedContentType": "Registers Declaration Page",
+                "ContentType": "Page Layout",
+                "Title": "Admin Dashboard Page Layout",
+                "MasterPageDescription": "Admin page layout"
+            }
+        },
+        {
+            "src": "masterpages/vodregisters.master",
+            "isMasterPage": true,
+            "overwire": true
+        }
+    ],
+    "pagesLibraryContentTypes": [
+        "Registers Declaration Page"
+    ]
+}

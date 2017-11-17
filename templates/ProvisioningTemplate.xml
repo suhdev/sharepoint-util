@@ -1,0 +1,51 @@
+{% from 'Macros.html' import Field,ContentType,WebSettings,SiteSecurity,RegionalSettings,ProvisioningTemplate,Navigation,TermGroup,List,File,Page,Sequence,Directory,AuditSettings %}
+<pnp:Provisioning xmlns:pnp="http://schemas.dev.office.com/PnP/2016/05/ProvisioningSchema">
+    {% set prefs = getAttr(template,'preferences')|default({}) %}
+    <pnp:Preferences Author="{{getAttr(prefs,'author')}}" 
+        Version="{{getAttr(prefs,'version')|default('1.0')}}"
+        Generator="Sysdoc CLI">
+    {% if hasAttr(template,'preferences') %}{{log('Provisioning Template','Creating preferences')}}
+        {% if hasAttr(prefs,'parameters','params') %}
+            {% set params = getAttr(prefs,'parameters','params') %}
+            <pnp:Parameters>
+            {% for key,val in params %}
+                {% if key == 'CodeProvidedParam' %}
+                <pnp:Parameter Key="{{key}}" Required="true" />
+                {% else %}
+                <pnp:Parameter Key="{{key}}">{{val}}</pnp:Parameter>
+                {% endif %}
+            {% endfor %}
+            </pnp:Parameters>
+        {% endif %}
+        {% if hasAttr(prefs,'prefs','preferences') %}
+            {% set params = getAttr(prefs,'prefs','preferences') %}
+            {% for key,val in params %}
+                <pnp:Preference Key="{{key}}">{{val}}</pnp:Preference>
+            {% endfor %}
+        {% endif %}
+        
+    {% endif %}
+    </pnp:Preferences>
+    {% if hasAttr(template,'localizations') and hasItems(template,'localizations') %}{{log('Provisioning Template','Creating localizations')}}
+     <pnp:Localizations>
+        {% for item in getAttr(template,'localizations') %}
+        <pnp:Localization LCID="{{getAttr(item,'lcid')}}" Name="{{getAttr(item,'name')}}" ResourceFile="{{getAttr(item,'resourceFile','file','src')}}" />
+        {% endfor %}
+    </pnp:Localizations>
+    {% endif %} 
+    
+    <pnp:Templates ID="{{getAttr(template,'templatesId')|default('BasicTemplates')}}">
+        {{ProvisioningTemplate(template)}}
+
+    {% if hasAttr(template,'subsites') %}{{log('Provisioning Template','Subsites')}}
+        {% for site in getAttr(template,'subsites') %}{{log('Provisioning Template','Subsite '+getAttr(site,'url'))}}
+        {{ProvisioningTemplate(site)}}
+        {% endfor %}
+    {% endif %}
+    </pnp:Templates>
+    {% if hasAttr(template,'sequences') %}
+        {% for seq in getAttr(template,'sequences') %}
+        {{Sequence(seq)}}
+        {% endfor %}
+    {% endif %}
+</pnp:Provisioning>

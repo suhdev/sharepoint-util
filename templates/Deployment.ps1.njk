@@ -1,0 +1,89 @@
+{% from 'Macros.html' import AddContentTypeToPagesLibrary, CustomCommand,Command,SetListDefaultContentType,AddPublishingPage,SetPublishingPageFields %}
+
+. "{{getFilePath('functions.ps1')}}"
+
+$spHost = "{{getAttr(template,'spHost','host')|default(spHost)}}";
+{% set serverRelativeUrl = "/sites/" + getAttr(template,'url') %}
+$spGlobalSiteServerRelativeUrl = "sites/{{getAttr(template,'url')|default(url)}}";
+$siteUrl = ($spHost + $spGlobalSiteServerRelativeUrl);
+
+Write-Log "Running Fields and Content Types initialisation script"
+Confirm-Continue -message "Deploy content types and fields to $siteUrl. Press y to continue"
+
+Write-Log "Connecting to $siteUrl"
+
+{% for command in getAttr(template,'preConnectCommands') %}
+    
+    {{Command(command)}}
+
+{% endfor %}
+
+Connect-PnPOnline -Url $siteUrl
+
+{% for command in getAttr(template,'postConnectCommands') %}
+    
+    {{Command(command)}}
+
+{% endfor %}
+
+{% if getAttr(template,'setSiteCollectionTermGroupName') and getAttr(template,'siteCollectionGroupName') %}
+Set-SiteCollectionTermGroupName "{{getAttr(template,'siteCollectionGroupName')}}"
+{% endif %}
+
+Write-Log "Provisioning Fields and Content Types"
+
+Set-PnPTraceLog -On -Level Debug
+
+Write-Log "Applying SiteCollection Provisioning..."
+
+Apply-PnPProvisioningTemplate -Path "{{getFilePath('sitecollection-'+getAttr(template,'id')+'-'+postfix+'.xml')}}"
+
+{% for contentType in getAttr(template,'pagesLibrary','pagesLibraryContentTypes') %}
+{{AddContentTypeToPagesLibrary(contentType,loop.index == 0)}}
+{% endfor %}
+
+{% if hasAttr(template,'defaultPagesContentType','pagesDefaultContentType','pagesLibraryDefaultContentType') %}
+
+{{SetListDefaultContentType('Pages',getAttr(template,'defaultPagesContentType','pagesDefaultContentType','pagesLibraryDefaultContentType'))}}
+
+{% endif %}
+
+{% if hasAttr(template,'pages') %}
+{% for page in getAttr(template,'pages') %}
+{{AddPublishingPage(getAttr(page,'name','title'),getAttr(page,'layout','pageLayout'),getAttr(page,'title','name'),getAttr(page,'publish'),getAttr(page,'folder'),getAttr(page,'meta'))}}
+{{SetPublishingPageFields(getAttr(page,'meta'),serverRelativeUrl,getAttr(page,'name'))}}
+{% endfor %}
+{% endif %}
+{% for command in getAttr(template,'commands') %}
+    
+    {{Command(command)}}
+
+{% endfor %}
+
+Confirm-Continue -message "Do you want to deploy subsites?. Press y to continue"
+{% for subsite in getAttr(template,'subsites') %}
+Remove-PnPWeb -Url {{getAttr(subsite,'url')}} {% if hasAttr(subsite,'force') and getAttr(subsite,'force') %} -Force {% endif %}
+
+$web = New-PnPWeb -Title "{{getAttr(subsite,'title')}}" -Url {{getAttr(subsite,'url')}} -Description "{{getAttr(subsite,'desc','description')}}" -Locale {{getAttr(subsite,'locale','lang')|default(1033)}} -Template "{{getAttr(subsite,'template')|default("STS#0")}}"
+Apply-PnPProvisioningTemplate -Path "{{getFilePath('site-'+getAttr(subsite,'id')+'-'+postfix+'.xml')}}" -Web $web 
+
+{% for contentType in getAttr(subsite,'pagesLibrary') %}
+
+    {{AddContentTypeToPagesLibrary(contentType)}}
+
+{% endfor %}
+{% if hasAttr(template,'defaultPagesContentType','pagesDefaultContentType','pagesLibraryDefaultContentType') %}
+
+{{SetListDefaultContentType('Pages',getAttr(template,'defaultPagesContentType','pagesDefaultContentType','pagesLibraryDefaultContentType'))}}
+
+{% endif %}
+{% for command in getAttr(subsite,'commands') %}
+
+    {{Command(command)}}
+
+{% endfor %}
+{% endfor %}
+
+
+# Write-Log "Disconnecting..."
+Disconnect-PnPOnline
