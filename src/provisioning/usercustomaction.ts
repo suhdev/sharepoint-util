@@ -1,3 +1,10 @@
+export const StandardMenuGroupList = [
+    'ActionMenu',
+    'ActionsMenuForSurvey',
+    'SettingsMenuForSurvey',
+    'SiteActions' 
+];
+
 export enum StandardMenuGroup {
     ActionsMenu = 'ActionMenu', 
     ActionsMenuForSurvey = 'ActionsMenuForSurvey', 
@@ -5,19 +12,45 @@ export enum StandardMenuGroup {
     SiteActions = 'SiteActions' 
 }
 
+export const CustomActionLocationList = ["DisplayFormToolbar", "EditControlBlock", "EditFormToolbar",
+    "NewFormToolbar", "ViewToolbar",
+    "Microsoft.SharePoint.StandardMenu", "CommandUI.Ribbon.ListView",
+    "CommandUI.Ribbon.NewForm", "CommandUI.Ribbon.EditForm",
+    "CommandUI.Ribbon.DisplayForm", "CommandUI.Ribbon", "Microsoft.SharePoint.ContentTypeSettings",
+    "Microsoft.SharePoint.ContentTypeTemplateSettings", "Microsoft.SharePoint.Create",
+    "Microsoft.SharePoint.GroupsPage", "Microsoft.SharePoint.ListEdit",
+    "Microsoft.SharePoint.ListEdit.DocumentLibrary", "Microsoft.SharePoint.PeoplePage",
+    "Microsoft.SharePoint.SiteSettings", "Microsoft.SharePoint.Administration.Applications",
+    "Microsoft.SharePoint.Administration.Backups",
+    "Microsoft.SharePoint.Administration.ConfigurationWizards", "Microsoft.SharePoint.Administration.Default",
+    "Microsoft.SharePoint.Administration.GeneralApplicationSettings", "Microsoft.SharePoint.Administration.Monitoring",
+    "Microsoft.SharePoint.Administration.Security", "Microsoft.SharePoint.Administration.SystemSettings",
+    "Microsoft.SharePoint.Administration.UpgradeAndMigration"];
+
+export const ContentTypeSettingsGroupList = ['Fields','General'];
 export enum ContentTypeSettingsGroup {
     Fields = 'Fields', 
     General = 'General',    
 }
 
+export const CreateGroupList = ['WebPages'];
+
 export enum CreateGroup {
     WebPages = 'WebPages'
 }
+
+export const GroupsPageList = ['NewMenu','SettingsMenu'];
 
 export enum GroupsPage {
     NewMenu = 'NewMenu', 
     SettingsMenu = 'SettingsMenu'
 }
+
+export const ListEditGroupList = [
+    'Communications',
+    'GeneralSettings',
+    'Permissions'
+]; 
 
 export enum ListEditGroup {
     Communications = 'Communications',
@@ -25,15 +58,29 @@ export enum ListEditGroup {
     Permissions = 'Permissions'
 }
 
+export const DocumentLibraryGroupList = ['GeneralSettings']; 
 export enum DocumentLibraryGroup {
     GeneralSettings = 'GeneralSettings', 
 }
 
+export const PeoplePageGroupList = [
+    'ActionsMenu',
+    'NewMenu',
+    'SettingsMenu',   
+];
 export enum PeoplePageGroup {
     ActionsMenu = 'ActionsMenu', 
     NewMenu = 'NewMenu', 
     SettingsMenu = 'SettingsMenu',   
 }
+
+export const SiteSettingsGroupList = [
+    'Customization',
+    'Galleries',
+    'SiteAdministration',
+    'SiteCollectionAdmin',
+    'UsersAndPermissions'
+];
 
 export enum SiteSettingsGroup {
     Customization = 'Customization', 

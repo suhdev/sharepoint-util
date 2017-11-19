@@ -8,6 +8,7 @@ import { Dictionary } from 'lodash';
 import { Localization } from './localization';
 import { ComposedLook } from './composedLook';
 import { Command } from '../../lib/provisioning/command';
+import { Navigation } from './navigation';
 export interface PropertyDefinition {
     value: string;
     overwrite: boolean;
@@ -43,6 +44,7 @@ export interface SharePointSite {
     composedLook?: ComposedLook;
     preConnectCommands?: Command[];
     postConnectCommands?: Command[];
+    navigation: Navigation;
     preProvisiongCommands?: Command[];
     postProvisioningCommands?: Command[];
     regionalSettings?: RegionalSettings;
