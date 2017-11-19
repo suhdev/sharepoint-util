@@ -428,20 +428,25 @@ gulp.task('js:compile',(cb)=>{
 }); 
 
 gulp.task('js:watch',(cb)=>{
-    webpackWatch = webpackCompiler.watch({
+    return gulp.watch([
+        path.resolve(cwd,'./src/*.ts'),
+        path.resolve(cwd, './src/**/*.ts'),
+        path.resolve(cwd, './src/*.tsx'),
+        path.resolve(cwd, './src/**/*.tsx')
+    ],['js:compile']);
+    // webpackWatch = webpackCompiler.watch({
 
-    },(err,stats)=>{
-        logVerbose('js:watch',stats.toString());
-        if (err){
-            logError('js:watch',`An error has occured on JavaScript watch: ${err.message}`);
-            cb(err); 
-            return; 
-        }else if (stats.hasErrors()){
-            logError('js:watch',`An error has occured on JavaScript watch: ${stats.toString('minimal')}`);
-        }
-        logVerbose('js:watch', `Watching for JavaScript changes running`);
-        cb(); 
-    }); 
+    // },(err,stats)=>{
+    //     logVerbose('js:watch',stats.toString());
+    //     if (err){
+    //         logError('js:watch',`An error has occured on JavaScript watch: ${err.message}`);
+    //         return; 
+    //     }else if (stats.hasErrors()){
+    //         logError('js:watch',`An error has occured on JavaScript watch: ${stats.toString('minimal')}`);
+    //     }
+    //     logVerbose('js:watch', `Watching for JavaScript changes running`);
+    // }); 
+    // cb(); 
 }); 
 
 gulp.task('config:init',(cb)=>{
