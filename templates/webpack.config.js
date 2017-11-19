@@ -1,7 +1,7 @@
 const path = require('path');
 module.exports = {
     entry: {
-        "start": "./src/start.ts",
+        "start": path.resolve(__dirname,"./src/start.ts"),
     },
     output: {
         filename: "[name].js",

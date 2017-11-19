@@ -71,6 +71,30 @@ function updateConfigFromArgs(config,args){
     config.siteAssetsDrive = args.siteAssetsDrive || config.siteAssetsDrive; 
     config.styleLibraryDrive = args.styleLibraryDrive || config.styleLibraryDrive; 
     config.masterpageCatalogDrive = args.masterpageCatalogDrive || config.masterpageCatalogDrive; 
+    if (config.styleLibraryDrive){
+        try {
+            fs.readdirSync(config.styleLibraryDrive+":\\");
+        }catch(err){
+            logVerbose('init', 'Style library drive is not connected');
+            config.styleLibraryDrive = null; 
+        }
+    }
+    if (config.siteAssetsDrive) {
+        try {
+            fs.readdirSync(config.siteAssetsDrive + ":\\");
+        } catch (err) {
+            logVerbose('init', 'Site assets library drive is not connected');
+            config.siteAssetsDrive = null;
+        }
+    }
+    if (config.masterpageCatalogDrive) {
+        try {
+            fs.readdirSync(config.masterpageCatalogDrive + ":\\");
+        } catch (err) {
+            logVerbose('init', 'Master page catalog drive is not connected');
+            config.masterpageCatalogDrive = null;
+        }
+    }
 }
 
 function init(){
@@ -128,10 +152,10 @@ gulp.task('sass:compile',(cb)=>{
     ]; 
     logVerbose('sass:compile', `Sass files will be written to ${path.resolve(cwd, config.cssDistDir)}`);
     if (config.siteAssetsDrive && isDebug){
-        logVerbose('sass:compile', `Sass files to be written to mapped drives at ${(path.resolve(config.siteAssetsDrive,
+        logVerbose('sass:compile', `Sass files to be written to mapped drives at ${(path.resolve(config.siteAssetsDrive+':\\',
             config.deploymentDir,
             config.cssDistDir.split('/').pop()))}`);
-        tasks.push(gulp.dest(path.resolve(config.siteAssetsDrive,
+        tasks.push(gulp.dest(path.resolve(config.siteAssetsDrive+':\\',
             config.deploymentDir,
             config.cssDistDir.split('/').pop())));
     }
@@ -275,7 +299,7 @@ gulp.task('masterpages:compile',(cb)=>{
         gulp.dest(path.resolve(cwd, config.provisioningDir))];
         if (isDebug && config.masterpageCatalogDrive) {
             logVerbose('masterpages:compile', 'Adding masterpage catalog drive as a destination');
-            tasks.push(gulp.dest(path.resolve(config.masterpageCatalogDrive)));
+            tasks.push(gulp.dest(path.resolve(config.masterpageCatalogDrive+':\\')));
         }
         pump(
             tasks,
@@ -325,7 +349,7 @@ gulp.task('pagelayouts:compile', (cb) => {
         gulp.dest(path.resolve(cwd, config.provisioningDir))];
         if (isDebug && config.masterpageCatalogDrive) {
             logVerbose('pagelayouts:compile', 'Adding masterpage catalog drive as a destination');
-            tasks.push(config.masterpageCatalogDrive);
+            tasks.push(config.masterpageCatalogDrive+':\\');
         }
         pump(
             tasks,
@@ -353,6 +377,7 @@ gulp.task('pagelayouts:watch', (cb) => {
 
 gulp.task('js:compile',(cb)=>{
     logVerbose('js:compile','Starting to compile JavaScript files'); 
+
     webpack(webpackConfig,(err,stats)=>{
         if (err){
             cb(err);
@@ -364,6 +389,21 @@ gulp.task('js:compile',(cb)=>{
             `An error has occured while compiling JavaScript files: ${stats.toString()}`);
         }else {
             logVerbose('js:compile','Finished compiling JavaScript files'); 
+            if (config.siteAssetsDrive){
+                pump([
+                    gulp.src(path.resolve(cwd,'dist/js/*.js')),
+                    gulp.dest(path.resolve(config.siteAssetsDrive+':\\',
+                    config.deploymentDir,
+                    'js'))],(err)=>{
+                        if (err){
+                            logError('js:compile', `An error has occured while pushing files to Site Assets ${path.resolve(config.siteAssetsDrive + ':\\',
+                                config.deploymentDir,
+                                'js')}`);
+                        }
+                        cb(err);
+                    });
+                return; 
+            }
             cb();
         }
     });
