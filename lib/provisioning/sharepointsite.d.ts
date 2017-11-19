@@ -12,6 +12,13 @@ export interface PropertyDefinition {
     value: string;
     overwrite: boolean;
 }
+export interface ProvisioningFlags {
+    useSiteCollectionTermGroup?: boolean;
+}
+export interface ProvisionPreferences {
+    parameters: Dictionary<any>;
+    preferences: Dictionary<any>;
+}
 export interface SharePointSite {
     id: string;
     templatesId: string;
@@ -26,6 +33,7 @@ export interface SharePointSite {
     subsites?: SharePointSite[];
     sitePolicy?: string;
     lists?: List[];
+    flags?: ProvisioningFlags;
     setSiteCollectionTermGroupName?: boolean;
     spHost?: string;
     siteCollectionUrl?: string;
@@ -40,4 +48,5 @@ export interface SharePointSite {
     regionalSettings?: RegionalSettings;
     propertyBagEntries?: Dictionary<string | PropertyDefinition>;
     properties?: Dictionary<string | PropertyDefinition>;
+    preferences?: ProvisionPreferences;
 }
