@@ -60,10 +60,12 @@ function updateConfigFromArgs(config,args){
     config.sassDir = args.sassDir || config.sassDir || './sass';
     config.srcDir = args.srcDir || config.srcDir ||  './src'; 
     config.distDir = args.distDir || config.distDir ||  './dist';
+    config.spHost = args.spHost || config.spHost || 'https://tenant.sharepoint.com/'; 
     config.cssDistDir = args.cssDistDir || config.cssDistDir ||  './dist/css';
     config.jsDistDir = args.jsDistDir || config.jsDistDir ||  './dist/js';
+    config.siteCollectionUrl = config.spHost.endsWith('/') ? `${config.spHost}${config.url}` : `${config.spHost}/${config.url}`;
     config.templatesDir = args.templatesDir || config.templatesDir || './templates'; 
-    config.deployDir = args.deployDir || config.deployDir || './deploy';  
+    config.provisioningDir = args.provisioningDir || config.provisioningDir || './deploy';  
     config.masterPageTemplatesDir = args.masterPageTemplatesDir || config.masterPageTemplatesDir || './templates/masterpage'; 
     config.pageLayoutTemplatesDir = args.pageLayoutTemplatesDir || config.pageLayoutTemplatesDir || './templates/pagelayout'; 
     config.siteAssetsDrive = args.siteAssetsDrive || config.siteAssetsDrive; 
@@ -262,13 +264,15 @@ gulp.task('masterpages:compile',(cb)=>{
             return; 
         }
         logVerbose('masterpages:compile', 'Started compiling master page templates');
-        var tasks = [gulp.src([path.resolve(cwd, config.masterPageTemplatesDir, '*.masterpage'),
+        logVerbose('masterpages:compile',
+            `Loading master page templates ('.master','.njk') from ${path.resolve(cwd, config.masterPageTemplatesDir)}`);
+        var tasks = [gulp.src([path.resolve(cwd, config.masterPageTemplatesDir, '*.master'),
         path.resolve(cwd, config.masterPageTemplatesDir, '*.njk'),
-        path.resolve(cwd, config.masterPageTemplatesDir, '**/*.masterpage'),
+        path.resolve(cwd, config.masterPageTemplatesDir, '**/*.master'),
         path.resolve(cwd, config.masterPageTemplatesDir, '**/*.njk')]),
         data(getFileData),
         nunjucksTask.compile({ config }),
-        gulp.dest(path.resolve(cwd, config.deployDir))];
+        gulp.dest(path.resolve(cwd, config.provisioningDir))];
         if (isDebug && config.masterpageCatalogDrive) {
             logVerbose('masterpages:compile', 'Adding masterpage catalog drive as a destination');
             tasks.push(gulp.dest(path.resolve(config.masterpageCatalogDrive)));
@@ -318,7 +322,7 @@ gulp.task('pagelayouts:compile', (cb) => {
             };
         }),
         nunjucksTask.compile({ config }),
-        gulp.dest(path.resolve(cwd, config.deployDir))];
+        gulp.dest(path.resolve(cwd, config.provisioningDir))];
         if (isDebug && config.masterpageCatalogDrive) {
             logVerbose('pagelayouts:compile', 'Adding masterpage catalog drive as a destination');
             tasks.push(config.masterpageCatalogDrive);
