@@ -1,0 +1,37 @@
+# <%= config.name %>
+
+A project created using generator
+
+
+## Setup
+
+```bash
+
+npm install  
+
+```
+
+## Gulp Tasks
+
+* Environment Flag
+
+  To change the environment from 'dev' to 'production', you can:
+  1. Change the `env` field in the `.yo-rc.json` file to `dev` or `production` 
+  2. To force development mode, pass an argument to `gulp` using the `dev` flag e.g. `gulp sass:compile --dev` 
+
+* Sass Tasks
+
+  1. Compile sass files using `gulp sass:compile` 
+  2. Run a sass watch using `gulp sass:watch`
+
+* JS Tasks
+
+  1. Compile JS files using `gulp js:compile` 
+  2. Run a watch using `gulp js:watch` 
+
+* Library (External libraries) Tasks 
+
+  1. Download cdn files using `gulp lib:download` 
+  2. To force download files use the `--force` flag using `gulp lib:download --force` 
+  3. Compile JS libraries into `vendor.js` using `gulp lib:compile:js` 
+  4. Compile CSS libraries into `vendor.css` using `gulp lib:compile:css`

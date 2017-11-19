@@ -8,6 +8,7 @@ const gulp = require('gulp'),
     request = require('request'), 
     data = require('gulp-data'),
     webpack = require('webpack'),
+    mkdirp = require('mkdirp'),
     nunjucks = require('nunjucks'), 
     nunjucksTask = require('gulp-nunjucks'), 
     concat = require('gulp-concat'), 
@@ -17,7 +18,6 @@ const gulp = require('gulp'),
     configFilePath = `${cwd}/config/project.json`;
 let isDebug = args.dev ? true : false,
     isVerbose = args.verbose ? true : false; 
-
 // import * as wp from 'webpack'; 
 var config = {
     env:process.env.NODE_ENV || 'dev',
@@ -55,7 +55,7 @@ function initNunjucks(config){
 }
 
 function updateConfigFromArgs(config,args){
-    config.env = args.dev || args.env || config.env || 'dev'; 
+    config.env = args.dev?'dev':(args.env || config.env || 'dev'); 
     isDebug = config.env === 'dev';
     config.sassDir = args.sassDir || config.sassDir || './sass';
     config.srcDir = args.srcDir || config.srcDir ||  './src'; 
@@ -150,43 +150,69 @@ gulp.task('sass:watch', (cb) => {
 });
 
 gulp.task('lib:download',(cb)=>{
-    logVerbose('lib:download','downloading library files');
-    return pump(config.cdn.filter((fU)=>{
-        if (!args.force){
-            return !fs.existsSync(path.resolve(cwd,config.libDir,getFileNameFromUrl(fU)))
-        }
-        return true; 
-    }).map((fileUrl)=>{
-        logVerbose('lib:download', `downloading library file ${fileUrl}`);
-        return pump([
-            request(fileUrl),
-            fs.createWriteStream(path.resolve(cwd, config.libDir, getFileNameFromUrl(fileUrl)))
-        ],(err)=>{
-            if (err){
-                logError('lib:download', 
-                `an error has occured while downloading file ${fileUrl}. ${err.message}`);
-            }
-        });
-    }),(err)=>{
+    mkdirp(path.resolve(cwd, `${config.libDir}`),(err)=>{
         if (err){
-            logError('lib:download', `an error has occured while downloading files ${err.message}`); 
-            cb(err); 
+            logError('lib:download',
+                `An error has occured while creating lib folder at ${config.libDir}: ${err.message}`);
+            cb(err);
             return; 
         }
-        logVerbose('lib:download','downloading libraries finished successfully'); 
-        cb(err); 
-    });
+        
+        logVerbose('lib:download','downloading library files');
+        var files = config.cdn.filter((fU) => {
+            if (!args.force) {
+                return !fs.existsSync(path.resolve(cwd, config.libDir, getFileNameFromUrl(fU)))
+            }
+            return true;
+        }); 
+        var count = 0; 
+        if (!files.length){
+            cb(); 
+            return; 
+        }
+        
+        function done(fileUrl){
+            count++; 
+            logVerbose('lib:download', `finished downloading library file ${fileUrl}`);
+            if (count === files.length){
+                logVerbose('lib:download', 'downloading libraries finished successfully'); 
+                cb(); 
+            }
+        }
+        files.map((fileUrl)=>{
+            logVerbose('lib:download', `downloading library file ${fileUrl}`);
+            pump([
+                request(fileUrl),
+                fs.createWriteStream(path.resolve(cwd, config.libDir, getFileNameFromUrl(fileUrl)))
+            ],(err)=>{
+                if (err){
+                    logError('lib:download', 
+                    `an error has occured while downloading file ${fileUrl}. ${err.message}`);
+                }
+                done(fileUrl); 
+            });
+        });
+        
+    }); 
 });
 
 gulp.task('lib:compile:js',(cb)=>{
     logVerbose('lib:compile:js', 'compiling library js files');
-    return pump(
-        [gulp.src(config.cdn.map((fileUrl)=>{
-            return getFileNameFromUrl(getFileNameFromUrl(fileUrl))
+    let files = config.cdn.map((fileUrl) => {
+            return getFileNameFromUrl(fileUrl)
         })
-        .filter((e)=>{
+        .filter((e) => {
             return path.extname(e) === '.js';
-        })),
+        })
+        .map((e)=>{
+            return path.resolve(cwd,config.libDir,e); 
+        }); 
+    if (!files.length){
+        cb(); 
+        return; 
+    }
+    return pump(
+        [gulp.src(files),
         concat('vendor.js'),
         gulp.dest(path.resolve(cwd,config.jsDistDir))],
         (err)=>{
@@ -206,7 +232,7 @@ gulp.task('lib:compile:css', (cb) => {
     logVerbose('lib:compile:css', 'compiling library css files');
     return pump(
         [gulp.src(config.cdn.map((fileUrl) => {
-            return getFileNameFromUrl(getFileNameFromUrl(fileUrl))
+            return getFileNameFromUrl(fileUrl)
         })
             .filter((e) => {
                 return path.extname(e) === '.css';
@@ -229,36 +255,37 @@ gulp.task('lib:compile:css', (cb) => {
 
 gulp.task('masterpages:compile',(cb)=>{
     const fullPath = path.resolve(cwd, config.masterPageTemplatesDir); 
-    fs.exists(fullPath,(exists)=>{
-        if (exists){
-            logError('masterpages:compile', `Folder ${fullPath} does not exist`);
-            cb(new Error(`Folder ${fullPath} does not exist`));
+    mkdirp(fullPath,(err)=>{
+        if (err){
+            logError('masterpages:compile', `Could not create folder ${fullPath}`);
+            cb(err); 
             return; 
         }
-        logVerbose('masterpages:compile','Started compiling master page templates');
+        logVerbose('masterpages:compile', 'Started compiling master page templates');
         var tasks = [gulp.src([path.resolve(cwd, config.masterPageTemplatesDir, '*.masterpage'),
-            path.resolve(cwd, config.masterPageTemplatesDir, '*.njk'),
-            path.resolve(cwd, config.masterPageTemplatesDir, '**/*.masterpage'),
-            path.resolve(cwd, config.masterPageTemplatesDir, '**/*.njk')]),
-            data(getFileData),
-            nunjucksTask.compile({ config }),
-            gulp.dest(path.resolve(cwd, config.deployDir))];
-        if (isDebug && config.masterpageCatalogDrive){
-            logVerbose('masterpages:compile', 'Adding masterpage catalog drive as a destination'); 
+        path.resolve(cwd, config.masterPageTemplatesDir, '*.njk'),
+        path.resolve(cwd, config.masterPageTemplatesDir, '**/*.masterpage'),
+        path.resolve(cwd, config.masterPageTemplatesDir, '**/*.njk')]),
+        data(getFileData),
+        nunjucksTask.compile({ config }),
+        gulp.dest(path.resolve(cwd, config.deployDir))];
+        if (isDebug && config.masterpageCatalogDrive) {
+            logVerbose('masterpages:compile', 'Adding masterpage catalog drive as a destination');
             tasks.push(gulp.dest(path.resolve(config.masterpageCatalogDrive)));
         }
         pump(
             tasks,
-            (err)=>{
-                if (err){
-                    logError('masterpages:compile',`An error has occured while compiling master page templates ${err.message}`);
-                    cb(err); 
-                    return; 
+            (err) => {
+                if (err) {
+                    logError('masterpages:compile', `An error has occured while compiling master page templates ${err.message}`);
+                    cb(err);
+                    return;
                 }
                 logVerbose(`masterpages:compile`, `Finished compiling master page templates`);
                 cb(err);
             }
         );
+
     });
 });
 
@@ -273,27 +300,27 @@ gulp.task('masterpages:watch', (cb) => {
 
 gulp.task('pagelayouts:compile', (cb) => {
     const fullPath = path.resolve(cwd, config.pageLayoutTemplatesDir);
-    fs.exists(fullPath, (exists) => {
-        if (exists) {
-            logError('pagelayouts:compile', `Folder ${fullPath} does not exist`);
-            cb(new Error(`Folder ${fullPath} does not exist`));
+    mkdirp(fullPath,(err)=>{
+        if (err) {
+            logError('pagelayouts:compile', `Could not create folder ${fullPath}`);
+            cb(err);
             return;
         }
         logVerbose('pagelayouts:compile', 'Started compiling page layout templates');
         var tasks = [gulp.src([path.resolve(cwd, config.pageLayoutTemplatesDir, '*.aspx'),
-            path.resolve(cwd, config.pageLayoutTemplatesDir, '*.njk'),
-            path.resolve(cwd, config.pageLayoutTemplatesDir, '**/*.aspx'),
-            path.resolve(cwd, config.pageLayoutTemplatesDir, '**/*.njk')]),
-            data((file) => {
-                return {
-                    config,
-                    env: process.env
-                };
-            }),
-            nunjucksTask.compile({ config }),
-            gulp.dest(path.resolve(cwd, config.deployDir))]; 
-        if (isDebug && config.masterpageCatalogDrive){
-            logVerbose('pagelayouts:compile','Adding masterpage catalog drive as a destination'); 
+        path.resolve(cwd, config.pageLayoutTemplatesDir, '*.njk'),
+        path.resolve(cwd, config.pageLayoutTemplatesDir, '**/*.aspx'),
+        path.resolve(cwd, config.pageLayoutTemplatesDir, '**/*.njk')]),
+        data((file) => {
+            return {
+                config,
+                env: process.env
+            };
+        }),
+        nunjucksTask.compile({ config }),
+        gulp.dest(path.resolve(cwd, config.deployDir))];
+        if (isDebug && config.masterpageCatalogDrive) {
+            logVerbose('pagelayouts:compile', 'Adding masterpage catalog drive as a destination');
             tasks.push(config.masterpageCatalogDrive);
         }
         pump(
@@ -308,7 +335,7 @@ gulp.task('pagelayouts:compile', (cb) => {
                 cb(err);
             }
         );
-    });
+    })
 });
 
 gulp.task('pagelayouts:watch', (cb) => {
