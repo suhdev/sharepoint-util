@@ -1,0 +1,298 @@
+.ms-core-listMenu-root {
+    padding-left: 0px;
+}
+
+.navigation-widebar {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 62px;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 112;
+}
+
+.o365cs-nav-o365Branding {
+    display: none !important;
+}
+
+.navigation-mobile-toggle-btn {
+    display: block;
+    padding: 0px;
+    text-align: center;
+    width: 40px;
+    line-height: 40px;
+    cursor: pointer;
+    @include MediumDevice() {
+        display: none;
+    }
+}
+
+#s4-titlerow {
+    position: relative;
+    padding: 0px;
+    background: #fcfbf7;
+    &:before {
+        position: absolute;
+        right: 0px;
+        width: 50%;
+        height: 100%;
+        content: ' ';
+        display: block;
+        z-index: 0;
+        background-repeat: no-repeat;
+        background-image: url(GetAsset('header-image.png'));
+        background-position: left top;
+        background-size: cover;
+    }
+}
+
+#GreetingWrapper{ 
+    position:relative;
+    text-align:right;
+    display:block;
+}
+
+#primary-nav {
+    display:none;
+    height: 60px;
+    z-index: 10;
+    position: relative;
+    padding: 10px 0px;
+    ul li.static.selected {
+        background: $brand-color-1;
+        color: #fff;
+    }
+    ul li.static {
+        background: $brand-color-2;
+    }
+}
+
+#VodafonePageTitle {
+    color: #333;
+    a:visited,
+    a:hover,
+    a:active,
+    a:focus {
+        color: #333;
+        text-decoration: none;
+    }
+}
+
+.user-welcome-first-name,
+.user-welcome-last-name {
+    font-weight: bold;
+}
+
+.header-user-welcome {
+    position: absolute;
+    bottom: 72px;
+    left:0px;
+    width:100%;
+    text-align:right;
+}
+
+.greeting {
+    // height: 105px;
+    color: #333333;
+    font-size: 16px;
+    text-align: right;
+}
+
+.ms-core-listMenu-horizontalBox li.static>.ms-core-listMenu-item {
+    padding: 7px 25px 7px 25px;
+    margin-right: 0;
+    text-align: center;
+}
+
+.ms-core-listMenu-horizontalBox li.selected>.ms-core-listMenu-item {
+    color: #fff;
+}
+
+.ms-srch-sb>input {
+    height: 35px;
+}
+
+#titleAreaRow {
+    display: block;
+}
+
+.header-page-title {
+    position: absolute;
+    bottom: 112px;
+    left: 0px;
+    width: 100%
+}
+
+.navigation-search-wrapper {
+    position: relative;
+    float: right;
+}
+
+#searchInputBox {
+    background: none;
+}
+
+.ms-mpSearchBox {
+    width: 100%;
+}
+
+#SearchBox {
+    height: 40px;
+    margin-top: 11px;
+    width: 100%;
+    min-width: 240px;
+    max-width: 240px;
+    position: relative;
+    &>.ms-srch-sb-border,
+    &>.ms-srch-sb {
+        border: none;
+        width: 100%;
+    }
+    .ms-srch-sb-searchLink {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+    @include MediumDevice() {
+        // width: 280px;
+        max-width: 410px;
+    }
+}
+
+#SearchBox input.ms-textSmall[type="text"] {
+    height: 40px;
+    width: 100%;
+    background: white;
+    margin: 0px;
+    outline: none;
+    padding: 0px 10px;
+    display: block;
+}
+
+.navigation-menu-wrapper {
+    float: left;
+    position: relative;
+    padding-top: 11px;
+}
+
+#titleAreaBox {
+    margin: 0px auto;
+}
+
+#DeltaTopNavigation {
+    position: absolute;
+    display: none;
+    width: 150px;
+    top: 100%;
+    z-index: 111;
+    left: 0px;
+    -webkit-box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.2);
+    &[data-visible="true"] {
+        display: block;
+    }
+    .ms-core-listMenu-horizontalBox {
+        display: block;
+    }
+    .ms-core-listMenu-root {
+        display: block;
+        &>li {
+            background: #ebebeb;
+            color: #333333;
+            padding: 0.4em 0.2em;
+            font-size: 18px;
+            display: block;
+            text-align: left;
+            width: 100%;
+            // width: 120px;
+            .menu-item.ms-core-listMenu-item {
+                display: block;
+                padding-left: 20px;
+                text-align: left;
+                &:visited,
+                &:active,
+                &:focus,
+                &:hover {
+                    text-decoration: none;
+                    color: #333333;
+                }
+            }
+            &:hover {
+                background-color: darken(#ebebeb, 20%);
+            }
+            &.selected {
+                background: $brand-color-1;
+                color: white;
+                font-weight: bold;
+                .menu-item.ms-core-listMenu-item {
+                    &:visited,
+                    &:active,
+                    a:focus {
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.header-vodafone-triangle {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 56%;
+    width: 100%;
+    z-index: 32;
+    background-repeat: no-repeat;
+    background-image: url(GetAsset('header-vodafone-triangle.png'));
+    background-size: auto 100%;
+    @include MediumDevice() {
+        width: 50%;
+    }
+}
+
+#SearchBox .ms-srch-sb-searchLink {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+    background-color: $brand-color-1;
+    background-image: url(GetAsset('icon-search.png'));
+    background-repeat: no-repeat;
+    background-position: center center;
+    img {
+        display: none;
+    }
+}
+
+@include MediumDevice() {
+    .o365cs-nav-o365Branding {
+        display: inline-block !important;
+    }
+    #DeltaTopNavigation {
+        display: block;
+        position: relative;
+        width: auto;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        .ms-core-listMenu-horizontalBox {
+            display: inline-block;
+        }
+        .ms-core-listMenu-root {
+            &>li {
+                display: inline-block;
+                width: 180px;
+                padding: 0.35em 0.3em;
+                text-align: center;
+                margin-right: 2px;
+                .menu-item.ms-core-listMenu-item {
+                    display: inline-block;
+                    padding: 0px;
+                    text-align: center;
+                    // padding:
+                }
+            }
+        }
+    }
+}

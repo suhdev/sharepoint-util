@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src",
+        "module": "commonjs", 
+        "outDir": "./dist/ts", 
+        "jsx": "react",
+        "lib": [
+            "dom",
+            "es5",
+            "es2015.promise"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

@@ -1,0 +1,149 @@
+$tab-manager-tabbar-button-bg:#ddd !default; 
+$tab-manager-tabbar-button-fg:#333 !default; 
+$tab-manager-tabbar-button-selected-bg:#999 !default;
+$tab-manager-tabbar-button-selected-fg:#000 !default;
+$tab-manager-tabbar-selected-fontsize:16px !default;
+$tab-manager-tabbutton-fontsize:20px !default;
+$tab-manager-tabbar-button-selected-padding:1.3em 0px !default;
+
+%box{
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+%clearfix{
+    &:after,&:before{
+        content:' ';
+        display:block;
+        clear:both;
+    }
+}
+.sysdoc-tab-manager{
+    @extend %box;
+
+    .tab-bar{
+        @extend %box;
+        @extend %clearfix;
+        position:relative;
+    }
+
+    .tab-bar-selected{
+        @extend %box;
+        display:block;
+        position:relative;
+        display:block;
+        font-size:$tab-manager-tabbar-selected-fontsize;
+        padding:$tab-manager-tabbar-button-selected-padding; 
+        text-align:center;
+        cursor:pointer;
+        color:$tab-manager-tabbar-button-fg;
+        background:$tab-manager-tabbar-button-bg;
+
+        &:after{
+            content:' '; 
+            position:absolute;
+            display:block;
+            border:10px solid transparent; 
+            border-top:10px solid $tab-manager-tabbar-button-selected-bg; 
+            right:10px;
+            top:50%;
+            margin-top:-5px;
+            z-index:120;
+            -webkit-transition: border-color 0.7s cubic-bezier(0,0,0,1);
+            -o-transition: border-color 0.7s cubic-bezier(0,0,0,1);
+            transition: border-color 0.7s cubic-bezier(0,0,0,1);
+        }
+    }
+
+    .tab-bar-menu{
+        @extend %box;
+        position:absolute;
+        display:none;
+        top:100%;
+        left:0px;
+        width:100%;
+        min-height:150px;
+        z-index:100;
+        overflow:auto;
+        background-color:white; 
+    }
+
+    .tab-button{
+        @extend %box;
+        position:relative;
+        display:block;
+        font-size:$tab-manager-tabbar-selected-fontsize;
+        padding:$tab-manager-tabbar-button-selected-padding; 
+        text-align:center;
+        cursor:pointer;
+        color:$tab-manager-tabbar-button-fg;
+        background:$tab-manager-tabbar-button-bg;
+        -webkit-transition: background-color 0.7s cubic-bezier(0,0,0,1);
+        -o-transition: background-color 0.7s cubic-bezier(0,0,0,1);
+        transition: background-color 0.7s cubic-bezier(0,0,0,1);
+
+        &:visited,&:active,&:hover,&:focus{
+            text-decoration: none;
+            color:$tab-manager-tabbar-button-fg;
+        }
+
+        &:hover{
+            background-color: darken($tab-manager-tabbar-button-bg,10%);
+        }
+        
+    }
+
+    .tab-bar[data-active="true"]{
+        .tab-bar-menu{
+            display:block;
+        }
+    }
+
+    @media(min-width:768px){ 
+        .tab-bar-selected{
+            display:none;
+        }
+
+        .tab-bar-menu{
+            display:block; 
+            position:relative;
+            top:auto; 
+            height:auto;
+            min-height:auto;
+            max-height:none;
+            overflow:visible;
+        }
+
+        .tab-button{
+            font-size:$tab-manager-tabbutton-fontsize;
+            width:calc(25% - 1.5px);
+            margin-right:2px;
+            float:left;
+            margin-bottom:2px;
+
+           &:nth-child(4n){
+               margin-right:0px;
+           }
+
+            &[data-selected="true"]{
+                color:$tab-manager-tabbar-button-selected-fg; 
+                background:$tab-manager-tabbar-button-selected-bg;
+
+                &:after{
+                    position:absolute;
+                    content:' ';
+                    display:block;
+                    height:0px;
+                    width:0px;
+                    border:10px solid transparent; 
+                    border-top:10px solid $tab-manager-tabbar-button-selected-bg; 
+                    left:50%;
+                    top:100%;
+                    margin-left:-10px;
+                    z-index:11;
+                }
+            }
+        }
+    }
+}

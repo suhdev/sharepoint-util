@@ -1,0 +1,54 @@
+@import "basics";
+@import "icons";
+@import "resets";
+@import "typography";
+@import "pageheader";
+@import "pagefooter"; 
+@import "introbox";
+@import "buttons";
+
+body,html{
+    font-family:$brand-font-1;
+}
+
+p{
+    line-height:1.5em;
+}
+
+.ms-TextField{
+    margin-bottom:0px !important; 
+}
+
+.reports-filters-wrapper{
+    .form-control{
+        height:32px;
+    }
+
+    .ms-DatePicker{
+        margin-bottom:0px !important;
+    }
+}
+
+
+.gifts-admin-view{
+    .ms-DatePicker{
+        margin-bottom:0px !important;
+    }
+
+    .form-control{
+        height:32px;
+    }
+}
+
+.row-tag{
+    display: inline-block;
+    padding: 1px 5px 0px;
+    background: $brand-color-1;
+    line-height: 2em;
+    color: white;
+    font-size: 10px;
+    text-transform: capitalize;
+    margin-left: 10px;
+    margin-right:10px;
+    letter-spacing: 1px;
+}

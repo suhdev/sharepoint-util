@@ -1,0 +1,34 @@
+%box{
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+%clearfix{
+    &:before,&:after{
+        content:' ';
+        display:block;
+        clear:both;
+    }
+}
+
+.rte-toolbar-custom button{
+    min-width:auto;
+}
+
+.list-view-container:first-of-type h2 {
+  margin-top:0px; 
+}
+
+.intro-box h2:first-of-type {
+  margin-top:0px;
+} 
+
+.download-link{
+    text-decoration:underline;
+    color:$brand-color-1;
+} 
+
+.error-asterisk{
+    color:$brand-color-1;
+}

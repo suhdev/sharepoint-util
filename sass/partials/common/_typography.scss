@@ -1,0 +1,65 @@
+$h1-font-family:sans-serif !default;
+$h2-font-family:$h1-font-family !default;
+$h3-font-family:$h2-font-family !default;
+$h1-fg:#000 !default;
+$h2-fg:$h1-fg !default;
+$h3-fg:$h2-fg !default;
+$heading-indicator-bg:$brand-color-1;
+p {
+    font-size: 16px;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: $h1-font-family;
+    letter-spacing: -0.61px;
+    color: $h1-fg;
+    @include SmallDevice() {
+        font-size: 38px;
+    }
+}
+
+h2 {
+    position: relative;
+    font-family: $h2-font-family;
+    letter-spacing: -0.4px;
+    font-size: 25px;
+    padding-left: 18px;
+    height: 50px;
+    color: $h2-fg;
+    margin-top: 40px;
+    margin-bottom: 25px;
+    &:before {
+        position: absolute;
+        display: block;
+        content: ' ';
+        width: 4px;
+        height: 100%;
+        left: 0px;
+        top: 0px;
+        background-color: $heading-indicator-bg;
+        -webkit-border-radius: 2px 2px 2px 2px;
+        -moz-border-radius: 2px 2px 2px 2px;
+        -ms-border-radius: 2px 2px 2px 2px;
+        -o-border-radius: 2px 2px 2px 2px;
+        border-radius: 2px 2px 2px 2px;
+    }
+}
+
+p{
+    // font-family:VodafoneRg-Regular;
+    font-size:16px;
+    color:#333333;
+    letter-spacing:0;
+    line-height:1.2em;
+    text-align:left;
+    p + p{
+        margin-top:20px;
+    }
+}
+.public-DraftEditor-content { 
+    
+        font-family:$brand-font-1 !important;
+
+}

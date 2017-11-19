@@ -1,0 +1,64 @@
+.sys-btn{
+    background:#333333;
+    height:52px;
+    display:inline-block;
+    position:relative;
+    line-height:52px;
+    color:white; 
+    padding:0px 15px;
+    cursor:pointer;
+    font-family:$brand-font-1;
+    font-size:16px;
+    letter-spacing:0;
+    &,&:visited,&:active,&:hover{
+        text-decoration: none;
+        color:white; 
+        font-family:$brand-font-1;
+    }
+
+   
+    &.wide{
+
+
+        &:after,&:before{
+            content:' ';
+            display:block; 
+            position:absolute;
+            top:50%;
+
+        }
+
+        &:before{
+            right:0px;
+            margin-top:-15px;
+            border:15px solid transparent; 
+            border-left:15px solid white; 
+        }
+
+        &:after{
+            right:4px;
+            margin-top:-13px;
+            border:13px solid transparent; 
+            border-left: 13px solid #333;
+        }
+
+         &:hover{
+            background-color:lighten(#333,10%);
+            &:after{
+                border-left-color:lighten(#333,10%);
+            }
+        }
+
+    }
+
+    @include SmallDevice(){
+        font-size:18px;
+        height:64px;
+        line-height:64px;
+    }
+}
+.ms-Button.ms-Button--default:active {
+    background-color: $brand-color-3 !important;
+    border-color: $brand-color-2 !important;
+    color:$brand-color-4 !important;
+}

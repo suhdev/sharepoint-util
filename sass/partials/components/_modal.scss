@@ -1,0 +1,120 @@
+$sysdoc-modal-content-bg:white !default;
+$sysdoc-modal-contentwrapper-padding: 0 20px 20px 20px !default; 
+
+.sysdoc-c-modal{
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:100vw;
+    height:100vh;
+    z-index:200;
+    display:none;
+
+    .modal-button-wrapper {
+        .ms-Button.ms-Button--default {
+            background-color: $brand-color-3;
+            border: none;
+            min-width: 80px;
+            color: #fff;
+        
+            &:hover {
+               background-color: darken($brand-color-3,10%); 
+            }
+        }
+
+        .confirm {
+            background-color: $brand-color-1 !important;
+            color: $brand-color-4 !important;
+            border: none !important;
+            
+            &:hover {
+                background-color: darken($brand-color-1,10%) !important;
+            }
+        }
+    }   
+
+
+    .form-line-sep {
+        margin-bottom: 14px;
+    }
+
+    .sysdoc-backdrop{
+        position:fixed;
+        left:0px;
+        top:0px;
+        width:100vw; 
+        height:100vw;
+        z-index:200; 
+        background-color:rgba(0,0,0,0.4); 
+    }
+
+    .content-container{
+        position:absolute;
+        top:50%;
+        left:50%;
+        width:300px;
+        margin-left:-150px;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        -o-transform: translateY(-50%);
+        transform: translateY(-50%);
+        background-color:$sysdoc-modal-content-bg; 
+        -webkit-box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
+        box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.3);
+        z-index:250;
+    }
+
+    .content-wrapper{
+        padding:$sysdoc-modal-contentwrapper-padding; 
+        
+
+        .message {
+            font-size:16px;
+
+            .message-title {
+                margin: 1px;
+             }
+             .modal-label {
+                 margin-bottom:10px;
+             }
+        }   
+
+            .buttons-wrapper {
+                text-align: left;
+                margin-top: 20px;
+                &.ms-Button.ms-Button--default {
+                        border: 1px solid #f4f4f4;
+                }
+            } 
+    }
+
+    .close-button{
+        position:absolute;
+        top:10px;
+        height:2em;
+        display:none;
+        width:2em;
+        line-height:2em;
+        right:10px;
+        cursor:pointer;
+        text-align:center;
+        z-index:150; 
+    }
+
+    &[data-hasclose="true"]{
+        .close-button{
+            display:block;
+        }
+    }
+
+    &[data-visible="true"]{
+        display:block;
+    }
+
+    @include SmallDevice(){
+        .content-container{
+            width:450px;
+            margin-left:-225px;
+        }
+    }
+}

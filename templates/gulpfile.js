@@ -2,23 +2,23 @@ const gulp = require('gulp'),
     pump = require('pump'),
     fs = require('fs'), 
     url = require('url'), 
-    path = require('path'),
-    cdnjs = require('cdnjs'), 
+    path = require('path'), 
     colors = require('colors'),
     args = require('yargs').argv, 
     request = require('request'), 
     data = require('gulp-data'),
+    webpack = require('webpack'),
     nunjucks = require('nunjucks'), 
     nunjucksTask = require('gulp-nunjucks'), 
     concat = require('gulp-concat'), 
     sass = require('gulp-sass'), 
     uglify = require('gulp-uglify'), 
     cwd = process.cwd(),
-    configFilePath = `${cwd}/config/project.json`,
-    isDebug = args.dev ? true : false,
+    configFilePath = `${cwd}/config/project.json`;
+let isDebug = args.dev ? true : false,
     isVerbose = args.verbose ? true : false; 
 
-import * as wp from 'webpack'; 
+// import * as wp from 'webpack'; 
 var config = {
     env:process.env.NODE_ENV || 'dev',
     assetsDir:'./assets', 
@@ -73,13 +73,14 @@ function updateConfigFromArgs(config,args){
 
 function init(){
     if (fs.existsSync(configFilePath)) {
-        config = {
-            ...config, ...require(configFilePath)
-        };
+        config = Object.assign({},config,require(configFilePath));
+    }else if (fs.existsSync(path.resolve(cwd,'.yo-rc.json'))){
+        var yoConfig = require(path.resolve(cwd, '.yo-rc.json')); 
+        config = Object.assign({}, config, yoConfig["generator-sharepoint-app"]||{}); 
     }
     updateConfigFromArgs(config,args); 
     initNunjucks(config);
-    if (fs.exists(path.resolve(cwd,'webpack.config.js'))){
+    if (fs.existsSync(path.resolve(cwd,'webpack.config.js'))){
         webpackConfig = require(path.resolve(cwd, 'webpack.config.js'));
         webpackCompiler = webpack(webpackConfig); 
     }else {
@@ -113,15 +114,21 @@ function getFileData(fileName){
 
 gulp.task('sass:compile',(cb)=>{
     logVerbose('sass:compile','compiling sass files');
+    logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '*.scss')}`);
+    logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '**/*.scss')}`);
     var tasks = [
-        gulp.src([path.resolve(cwd, config.sassDir, '*.sass'),
-            path.resolve(cwd, config.sassDir, '**/*.sass')]),
+        gulp.src([path.resolve(cwd, config.sassDir, '*.scss'),
+            path.resolve(cwd, config.sassDir, '**/*.scss')]),
         sass({
             compress: !isDebug
         }),
         gulp.dest(path.resolve(cwd, config.cssDistDir))
     ]; 
+    logVerbose('sass:compile', `Sass files will be written to ${path.resolve(cwd, config.cssDistDir)}`);
     if (config.siteAssetsDrive && isDebug){
+        logVerbose('sass:compile', `Sass files to be written to mapped drives at ${(path.resolve(config.siteAssetsDrive,
+            config.deploymentDir,
+            config.cssDistDir.split('/').pop()))}`);
         tasks.push(gulp.dest(path.resolve(config.siteAssetsDrive,
             config.deploymentDir,
             config.cssDistDir.split('/').pop())));

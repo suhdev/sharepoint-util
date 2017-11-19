@@ -1,0 +1,28 @@
+$sysdoc-pagination-border-color:#979797 !default; 
+$sysdoc-pagination-selected-bg:#ebebeb !default; 
+$sysdoc-pagination-selected-border-color:#333 !default; 
+.sysdoc-pagination {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    margin-top:20px;
+    .page-item,.page-prev,.page-next{
+        border:1px solid $sysdoc-pagination-border-color;
+        width:38px;
+        height:38px;
+        cursor:pointer;
+        display:inline-block;
+        line-height:38px;
+        text-align:center;
+    }
+
+    .page-item{
+        // display:
+        &[data-selected="true"]{
+            background:$sysdoc-pagination-selected-bg;
+            border:1px solid $sysdoc-pagination-selected-border-color;
+        }
+    }
+}

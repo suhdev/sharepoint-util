@@ -1,0 +1,17 @@
+@mixin SmallDevice(){
+    @media(min-width:$screen-sm-min){
+        @content;
+    }
+}
+
+@mixin MediumDevice(){
+    @media(min-width:$screen-md-min){
+        @content; 
+    }
+}
+
+@mixin LargeDevice(){
+    @media(min-width:$screen-lg-min){
+        @content; 
+    }
+}

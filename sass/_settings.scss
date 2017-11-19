@@ -1,0 +1,71 @@
+//variables overrides go here. 
+@import "siteurl";
+$assetsUrl:'#{$siteUrl}/SiteAssets/Sysdoc/assets';
+
+$brand-primary: #00488f;
+$brand-color-1:#e60000;
+$brand-color-2:#ebebeb;
+$brand-color-3:#333333; 
+$brand-color-4:white; 
+$brand-color-5:#d9d9d9; 
+
+$brand-color-list-a:#027C92 #3396A8 #66B0BE #80BDC8 #99CBD3 #B2D8DE;
+$brand-color-list-b:#EB9700 #EFAC32 #F3C066 #F5CB80 #F7D599 #F9E0B2;
+$brand-color-list-c:#5E2750 #7E5273 #9E7D96 #AE93A7 #BFA9B9 #CFBECA;
+$brand-color-list-d:#64050A #83373B #A2696C #B18284 #C19B9D #D0B4B5;
+
+$brand-color-list-all: #00B0CA #007C92 #FECB00 #EB9700 #5E2750 #9C2AA0 #64050A #e60000;
+// $brand-font-1:'VodafoneRg-Regular',sans-serif; 
+// $brand-font-2:'VodafoneRg-Bold',sans-serif; 
+$brand-font-1:'VodafoneRg-Regular', Arial, Tahoma, sans-serif; 
+$brand-font-2:'VodafoneRg-Bold', Arial, Tahoma, sans-serif; 
+
+//typography
+$h1-font-family:$brand-font-1; 
+$h2-font-family:$h1-font-family;
+$h3-font-family:$h2-font-family; 
+
+$tab-manager-tabbar-button-bg:$brand-color-2; 
+$tab-manager-tabbar-button-fg:$brand-color-3; 
+$tab-manager-tabbar-button-selected-bg:$brand-color-1;
+$tab-manager-tabbar-button-selected-fg:$brand-color-4;
+$tab-manager-tabbar-selected-fontsize:16px !default;
+$tab-manager-tabbutton-fontsize:20px !default;
+
+$sysdoc-listview-item-heading-fg:$brand-color-3 !default;
+$sysdoc-listview-item-body-fg:$brand-color-3 !default;
+$sysdoc-listview-item-heading-font-size:18px !default;
+$sysdoc-listview-item-heading-font-family:$brand-font-1 !default; 
+$sysdoc-listivew-item-body-font-size:16px !default;
+$sysdoc-listview-item-body-font-family:$brand-font-2 !default; 
+
+$sysdoc-page-header-border:1px solid $brand-color-5;
+$sysdoc-page-header-padding-mobile:10px !default;
+$sysdoc-page-header-padding-desktop:20px !default;
+
+$sysdoc-modal-content-bg:$brand-color-4 !default;
+$sysdoc-modal-contentwrapper-padding:20px !default; 
+
+$sysdoc-menu-label-color:#4a4a4a !default;
+$sysdoc-menu-label-padding: 5px 10px !default;
+$sysdoc-menu-label-fontsize: 16px !default;
+$sysdoc-menu-label-bordertop-color-before:$brand-color-3  !default; 
+$sysdoc-menu-label-bordertop-color-after:$brand-color-2 !default; 
+
+$sysdoc-pagination-border-color:#979797 !default; 
+$sysdoc-pagination-selected-bg:$brand-color-2 !default; 
+$sysdoc-pagination-selected-border-color:$brand-color-3 !default; 
+
+$sysdoc-people-picker-item-bg:#eee !default;
+$sysdoc-people-picker-circle-bg:#444 !default;
+$sysdoc-people-picker-circle-color:$brand-color-4 !default;
+$sysdoc-people-picker-circle-text-fontsize:0.7em !default;
+$sysdoc-people-picker-item-padding: 5px 10px !default;
+
+$footer-text-color: $brand-color-4 !default;
+$footer-link-group-title-fontsize: 18px !default; 
+$footer-link-fontsize:16px !default;
+
+$sysdoc-barchart-tooltip-bg:$brand-color-4 !default;
+$sysdoc-barchart-tooltip-fontsize:12px !default;
+$sysdoc-barchart-border-color: #ccc !default;

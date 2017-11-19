@@ -1,0 +1,17 @@
+$available-icons:'search' 'menu-toggle';
+.sysdoc-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
+}
+
+@each $icon in $available-icons {
+    .sysdoc-icon {
+        &.#{$icon} {
+            background-image:url(GetAsset('#{$icon}.png'));
+        }
+    }
+}
