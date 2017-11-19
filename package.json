@@ -1,7 +1,7 @@
 {
-  "name": "sysdoc-util",
+  "name": "sharepoint-util",
   "version": "1.0.0",
-  "description": "Sysdoc utility library",
+  "description": "A utility library for SharePoint solutions",
   "main": "index.js",
   "typings": "./typings",
   "types": "./typings",
@@ -9,12 +9,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "Sysdoc",
     "Utility",
     "PowerShell",
     "Provisioning",
     "SharePoint"
   ],
+  "repository": {
+    "url": "https://github.com/suhdev/sharepoint-util",
+    "type": "git"
+  },
   "author": "Suhail Abood <suhail.abood@gmail.com>",
   "license": "ISC",
   "dependencies": {
@@ -23,12 +26,10 @@
     "@types/mkdirp": "^0.5.1",
     "@types/node": "^8.0.53",
     "@types/nunjucks": "^3.0.0",
-    "bluebird": "^3.5.1",
     "colors": "^1.1.2",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "nunjucks": "^3.0.1",
-    "pretty-data": "^0.40.0",
-    "rxjs": "^5.5.2"
+    "pretty-data": "^0.40.0"
   }
 }
