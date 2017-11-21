@@ -768,535 +768,535 @@ export const FeaturesList = [{ id: "0000f213-c923-4c71-b260-ff8f7157b100", name:
 
 export const LocaleList = [
     {
-        "lcid": "1078",
+        "lcid": 1078,
         "name": "Afrikaans"
     },
     {
-        "lcid": "1052",
+        "lcid": 1052,
         "name": "Albanian"
     },
     {
-        "lcid": "5121",
+        "lcid": 5121,
         "name": "Arabic (Algeria)"
     },
     {
-        "lcid": "15361",
+        "lcid": 15361,
         "name": "Arabic (Bahrain)"
     },
     {
-        "lcid": "3073",
+        "lcid": 3073,
         "name": "Arabic (Egypt)"
     },
     {
-        "lcid": "2049",
+        "lcid": 2049,
         "name": "Arabic (Iraq)"
     },
     {
-        "lcid": "11265",
+        "lcid": 11265,
         "name": "Arabic (Jordan)"
     },
     {
-        "lcid": "12289",
+        "lcid": 12289,
         "name": "Arabic (Lebanon)"
     },
     {
-        "lcid": "4097",
+        "lcid": 4097,
         "name": "Arabic (Libya)"
     },
     {
-        "lcid": "6145",
+        "lcid": 6145,
         "name": "Arabic (Morocco)"
     },
     {
-        "lcid": "8193",
+        "lcid": 8193,
         "name": "Arabic (Oman)"
     },
     {
-        "lcid": "16385",
+        "lcid": 16385,
         "name": "Arabic (Qatar)"
     },
     {
-        "lcid": "1025",
+        "lcid": 1025,
         "name": "Arabic (Saudi Arabia)"
     },
     {
-        "lcid": "10241",
+        "lcid": 10241,
         "name": "Arabic (Syria)"
     },
     {
-        "lcid": "7169",
+        "lcid": 7169,
         "name": "Arabic (Tunisia)"
     },
     {
-        "lcid": "14337",
+        "lcid": 14337,
         "name": "Arabic (UAE)"
     },
     {
-        "lcid": "9217",
+        "lcid": 9217,
         "name": "Arabic (Yemen)"
     },
     {
-        "lcid": "1067",
+        "lcid": 1067,
         "name": "Armenian"
     },
     {
-        "lcid": "2092",
+        "lcid": 2092,
         "name": "Azeri (Cyrillic)"
     },
     {
-        "lcid": "1068",
+        "lcid": 1068,
         "name": "Azeri (Latin)"
     },
     {
-        "lcid": "1069",
+        "lcid": 1069,
         "name": "Basque"
     },
     {
-        "lcid": "1059",
+        "lcid": 1059,
         "name": "Belarusian"
     },
     {
-        "lcid": "1026",
+        "lcid": 1026,
         "name": "Bulgarian"
     },
     {
-        "lcid": "1027",
+        "lcid": 1027,
         "name": "Catalan"
     },
     {
-        "lcid": "3076",
+        "lcid": 3076,
         "name": "Chinese (HongKong S.A.R.)"
     },
     {
-        "lcid": "5124",
+        "lcid": 5124,
         "name": "Chinese (Macao S.A.R.)"
     },
     {
-        "lcid": "2052",
+        "lcid": 2052,
         "name": "Chinese (PRC)"
     },
     {
-        "lcid": "4100",
+        "lcid": 4100,
         "name": "Chinese (Singapore)"
     },
     {
-        "lcid": "1028",
+        "lcid": 1028,
         "name": "Chinese (Taiwan)"
     },
     {
-        "lcid": "1050",
+        "lcid": 1050,
         "name": "Croatian (Croatia)"
     },
     {
-        "lcid": "1029",
+        "lcid": 1029,
         "name": "Czech"
     },
     {
-        "lcid": "1030",
+        "lcid": 1030,
         "name": "Danish"
     },
     {
-        "lcid": "1125",
+        "lcid": 1125,
         "name": "Divehi"
     },
     {
-        "lcid": "2067",
+        "lcid": 2067,
         "name": "Dutch (Belgium)"
     },
     {
-        "lcid": "1043",
+        "lcid": 1043,
         "name": "Dutch (Netherlands)"
     },
     {
-        "lcid": "3081",
+        "lcid": 3081,
         "name": "English (Australia)"
     },
     {
-        "lcid": "10249",
+        "lcid": 10249,
         "name": "English (Belize)"
     },
     {
-        "lcid": "4105",
+        "lcid": 4105,
         "name": "English (Canada)"
     },
     {
-        "lcid": "9225",
+        "lcid": 9225,
         "name": "English (Caribbean)"
     },
     {
-        "lcid": "6153",
+        "lcid": 6153,
         "name": "English (Ireland)"
     },
     {
-        "lcid": "8201",
+        "lcid": 8201,
         "name": "English (Jamaica)"
     },
     {
-        "lcid": "5129",
+        "lcid": 5129,
         "name": "English (New Zealand)"
     },
     {
-        "lcid": "13321",
+        "lcid": 13321,
         "name": "English (Philippines)"
     },
     {
-        "lcid": "7177",
+        "lcid": 7177,
         "name": "English (South Africa)"
     },
     {
-        "lcid": "11273",
+        "lcid": 11273,
         "name": "English (Trinidad)"
     },
     {
-        "lcid": "2057",
+        "lcid": 2057,
         "name": "English (United Kingdom)"
     },
     {
-        "lcid": "1033",
+        "lcid": 1033,
         "name": "English (United States)"
     },
     {
-        "lcid": "12297",
+        "lcid": 12297,
         "name": "English (Zimbabwe)"
     },
     {
-        "lcid": "1061",
+        "lcid": 1061,
         "name": "Estonian"
     },
     {
-        "lcid": "1080",
+        "lcid": 1080,
         "name": "Faeroese"
     },
     {
-        "lcid": "1035",
+        "lcid": 1035,
         "name": "Finnish"
     },
     {
-        "lcid": "2060",
+        "lcid": 2060,
         "name": "French (Belgium)"
     },
     {
-        "lcid": "3084",
+        "lcid": 3084,
         "name": "French (Canada)"
     },
     {
-        "lcid": "1036",
+        "lcid": 1036,
         "name": "French (France)"
     },
     {
-        "lcid": "5132",
+        "lcid": 5132,
         "name": "French (Luxembourg)"
     },
     {
-        "lcid": "6156",
+        "lcid": 6156,
         "name": "French (Monaco)"
     },
     {
-        "lcid": "4108",
+        "lcid": 4108,
         "name": "French (Switzerland)"
     },
     {
-        "lcid": "1110",
+        "lcid": 1110,
         "name": "Galician"
     },
     {
-        "lcid": "1079",
+        "lcid": 1079,
         "name": "Georgian"
     },
     {
-        "lcid": "3079",
+        "lcid": 3079,
         "name": "German (Austria)"
     },
     {
-        "lcid": "1031",
+        "lcid": 1031,
         "name": "German (Germany)"
     },
     {
-        "lcid": "5127",
+        "lcid": 5127,
         "name": "German (Liechtenstein)"
     },
     {
-        "lcid": "4103",
+        "lcid": 4103,
         "name": "German (Luxembourg)"
     },
     {
-        "lcid": "2055",
+        "lcid": 2055,
         "name": "German (Switzerland)"
     },
     {
-        "lcid": "1032",
+        "lcid": 1032,
         "name": "Greek"
     },
     {
-        "lcid": "1095",
+        "lcid": 1095,
         "name": "Gujarati"
     },
     {
-        "lcid": "1037",
+        "lcid": 1037,
         "name": "Hebrew (Israel)"
     },
     {
-        "lcid": "1081",
+        "lcid": 1081,
         "name": "Hindi (India)"
     },
     {
-        "lcid": "1038",
+        "lcid": 1038,
         "name": "Hungarian"
     },
     {
-        "lcid": "1039",
+        "lcid": 1039,
         "name": "Icelandic"
     },
     {
-        "lcid": "1057",
+        "lcid": 1057,
         "name": "Indonesian"
     },
     {
-        "lcid": "1040",
+        "lcid": 1040,
         "name": "Italian (Italy)"
     },
     {
-        "lcid": "2064",
+        "lcid": 2064,
         "name": "Italian (Switzerland)"
     },
     {
-        "lcid": "1041",
+        "lcid": 1041,
         "name": "Japanese"
     },
     {
-        "lcid": "1099",
+        "lcid": 1099,
         "name": "Kannada"
     },
     {
-        "lcid": "1087",
+        "lcid": 1087,
         "name": "Kazakh"
     },
     {
-        "lcid": "1111",
+        "lcid": 1111,
         "name": "Konkani"
     },
     {
-        "lcid": "1042",
+        "lcid": 1042,
         "name": "Korean"
     },
     {
-        "lcid": "1088",
+        "lcid": 1088,
         "name": "Kyrgyz (Cyrillic)"
     },
     {
-        "lcid": "1062",
+        "lcid": 1062,
         "name": "Latvian"
     },
     {
-        "lcid": "1063",
+        "lcid": 1063,
         "name": "Lithuanian"
     },
     {
-        "lcid": "1071",
+        "lcid": 1071,
         "name": "Macedonian (FYROM)"
     },
     {
-        "lcid": "1086",
+        "lcid": 1086,
         "name": "Malay"
     },
     {
-        "lcid": "2110",
+        "lcid": 2110,
         "name": "Malay (Brunei Darussalam)"
     },
     {
-        "lcid": "1102",
+        "lcid": 1102,
         "name": "Marathi"
     },
     {
-        "lcid": "1104",
+        "lcid": 1104,
         "name": "Mongolian (Cyrillic)"
     },
     {
-        "lcid": "1044",
+        "lcid": 1044,
         "name": "Norwegian (Bokmal)"
     },
     {
-        "lcid": "2068",
+        "lcid": 2068,
         "name": "Norwegian (Nynorsk)"
     },
     {
-        "lcid": "1065",
+        "lcid": 1065,
         "name": "Persian (Iran)"
     },
     {
-        "lcid": "1045",
+        "lcid": 1045,
         "name": "Polish"
     },
     {
-        "lcid": "1046",
+        "lcid": 1046,
         "name": "Portuguese (Brazil)"
     },
     {
-        "lcid": "2070",
+        "lcid": 2070,
         "name": "Portuguese (Portugal)"
     },
     {
-        "lcid": "1094",
+        "lcid": 1094,
         "name": "Punjabi"
     },
     {
-        "lcid": "1048",
+        "lcid": 1048,
         "name": "Romanian"
     },
     {
-        "lcid": "1049",
+        "lcid": 1049,
         "name": "Russian"
     },
     {
-        "lcid": "1103",
+        "lcid": 1103,
         "name": "Sanskrit"
     },
     {
-        "lcid": "3098",
+        "lcid": 3098,
         "name": "Serbian (Cyrillic)"
     },
     {
-        "lcid": "2074",
+        "lcid": 2074,
         "name": "Serbian (Latin)"
     },
     {
-        "lcid": "1051",
+        "lcid": 1051,
         "name": "Slovak"
     },
     {
-        "lcid": "1060",
+        "lcid": 1060,
         "name": "Slovenian"
     },
     {
-        "lcid": "11274",
+        "lcid": 11274,
         "name": "Spanish (Argentina)"
     },
     {
-        "lcid": "16394",
+        "lcid": 16394,
         "name": "Spanish (Bolivia)"
     },
     {
-        "lcid": "13322",
+        "lcid": 13322,
         "name": "Spanish (Chile)"
     },
     {
-        "lcid": "9226",
+        "lcid": 9226,
         "name": "Spanish (Colombia)"
     },
     {
-        "lcid": "5130",
+        "lcid": 5130,
         "name": "Spanish (Costa Rica)"
     },
     {
-        "lcid": "7178",
+        "lcid": 7178,
         "name": "Spanish (Dominican Republic)"
     },
     {
-        "lcid": "12298",
+        "lcid": 12298,
         "name": "Spanish (Ecuador)"
     },
     {
-        "lcid": "17418",
+        "lcid": 17418,
         "name": "Spanish (El Salvador)"
     },
     {
-        "lcid": "4106",
+        "lcid": 4106,
         "name": "Spanish (Guatemala)"
     },
     {
-        "lcid": "18442",
+        "lcid": 18442,
         "name": "Spanish (Honduras)"
     },
     {
-        "lcid": "2058",
+        "lcid": 2058,
         "name": "Spanish (Mexico)"
     },
     {
-        "lcid": "19466",
+        "lcid": 19466,
         "name": "Spanish (Nicaragua)"
     },
     {
-        "lcid": "6154",
+        "lcid": 6154,
         "name": "Spanish (Panama)"
     },
     {
-        "lcid": "15370",
+        "lcid": 15370,
         "name": "Spanish (Paraguay)"
     },
     {
-        "lcid": "10250",
+        "lcid": 10250,
         "name": "Spanish (Peru)"
     },
     {
-        "lcid": "20490",
+        "lcid": 20490,
         "name": "Spanish (Puerto Rico)"
     },
     {
-        "lcid": "3082",
+        "lcid": 3082,
         "name": "Spanish (Spain)"
     },
     {
-        "lcid": "14346",
+        "lcid": 14346,
         "name": "Spanish (Uruguay)"
     },
     {
-        "lcid": "8202",
+        "lcid": 8202,
         "name": "Spanish (Venezuela)"
     },
     {
-        "lcid": "1089",
+        "lcid": 1089,
         "name": "Swahili"
     },
     {
-        "lcid": "1053",
+        "lcid": 1053,
         "name": "Swedish"
     },
     {
-        "lcid": "2077",
+        "lcid": 2077,
         "name": "Swedish (Finland)"
     },
     {
-        "lcid": "1114",
+        "lcid": 1114,
         "name": "Syriac"
     },
     {
-        "lcid": "1097",
+        "lcid": 1097,
         "name": "Tamil"
     },
     {
-        "lcid": "1092",
+        "lcid": 1092,
         "name": "Tatar"
     },
     {
-        "lcid": "1098",
+        "lcid": 1098,
         "name": "Telugu"
     },
     {
-        "lcid": "1054",
+        "lcid": 1054,
         "name": "Thai (Thailand)"
     },
     {
-        "lcid": "1055",
+        "lcid": 1055,
         "name": "Turkish"
     },
     {
-        "lcid": "1058",
+        "lcid": 1058,
         "name": "Ukrainian"
     },
     {
-        "lcid": "1056",
+        "lcid": 1056,
         "name": "Urdu (Pakistan)"
     },
     {
-        "lcid": "2115",
+        "lcid": 2115,
         "name": "Uzbek (Cyrillic)"
     },
     {
-        "lcid": "1091",
+        "lcid": 1091,
         "name": "Uzbek (Latin)"
     },
     {
-        "lcid": "1066",
+        "lcid": 1066,
         "name": "Vietnamese"
     }
 ];

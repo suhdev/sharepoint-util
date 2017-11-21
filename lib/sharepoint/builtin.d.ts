@@ -241,3 +241,7 @@ export declare const FeaturesList: {
     name: string;
     scope: string;
 }[];
+export declare const LocaleList: {
+    "lcid": number;
+    "name": string;
+}[];
