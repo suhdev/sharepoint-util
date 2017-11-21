@@ -7,12 +7,16 @@ import { BuiltInContentType, FieldTypes } from '../sharepoint/builtin';
 import { XmlFormatter } from '../xml/xmlformatter';
 import { SharePointSite } from './sharepointsite';
 import { Field } from './field';
-import { getJsTypeForField, getFieldId, isTaxonomyField, booleanToUpper, generateTaxonomyFieldId, getFieldType, validateContentType } from '../sharepoint/filters';
+import { getJsTypeForField, getFieldId, isTaxonomyField, booleanToUpper, generateTaxonomyFieldId, getFieldType, validateContentType, generateGuid } from '../sharepoint/filters';
 import { mkdirp, createDirectoryIfNotExist } from '../io/util';
 import { logError, log } from '../util/logger';
 import { List } from '../../lib/provisioning/List';
 import { ContentType } from '../../lib/provisioning/contenttype';
 import { isObject } from 'util';
+import { Dictionary } from 'lodash';
+import { TermGroup } from '../../lib/provisioning/termgroup';
+import { TermSet } from '../../lib/provisioning/termset';
+import * as _ from 'lodash';
 
 const INTERFACES_DIR = 'interfaces'; 
 const SRC_DIR = 'src'; 
@@ -304,11 +308,294 @@ export function createTransformer(config:TransformConfig) {
             }
         })
     }
+
+    function validate(site){
+        return _validate(site,{
+            lists:{},
+            contentTypes:{},
+            fields:{}, 
+            termGroups:{},
+            termSets:{},
+            errors:[],
+            cleanActions:[],
+        });
+    }
+
+    interface CleanAction {
+        name:string;
+        value:string; 
+        fn:(generator?:any)=>void;
+
+    }
+
+    interface CleanConfig {
+        fields:Dictionary<Field>; 
+        contentTypes:Dictionary<ContentType>; 
+        lists:Dictionary<List>; 
+        termGroups:Dictionary<TermGroup>;
+        termSets:Dictionary<TermSet>; 
+        cleanActions:CleanAction[];
+        errors:string[];
+    }
+
+    function _validate(site,cleanConfig:CleanConfig){
+        (site.fields||[]).forEach((f)=>{
+            cleanConfig.fields[f.name] = f; 
+        });
+        (site.contentTypes || []).forEach((f) => {
+            cleanConfig.contentTypes[f.name] = f;
+        });
+        (site.lists || []).forEach((f) => {
+            cleanConfig.lists[f.title] = f;
+        });
+        (site.termGroups || []).forEach((f) => {
+            cleanConfig.termGroups[f.name] = f;
+        });
+        const termSets = _(site.termGroups || []).map((e: any) => e.termSets).flatten().value(); 
+        termSets.forEach((f) => {
+            cleanConfig.termSets[f.name] = f;
+        });
+        if (site.navigation){
+            if (site.navigation.global){
+                if (site.navigation.global.navType && site.navigation.global.navType.toLowerCase() === 'managed'){
+                    const tset = termSets.find((e)=>{
+                        return e.id === site.navigation.global.termSetId
+                    });
+                    if (!tset){
+                        logError('Validation',
+                            `Site global navigation is using a term set that does not exist ${site.navigation.global.termSetId}`)
+                        cleanConfig.errors.push(`Site global navigation is using a term set that does not exist ${site.navigation.global.termSetId}`);
+                    }
+                }
+            }
+            if (site.navigation.current) {
+                if (site.navigation.current.navType && site.navigation.current.navType.toLowerCase() === 'managed') {
+                    const tset = termSets.find((e) => {
+                        return e.id === site.navigation.current.termSetId
+                    });
+                    if (!tset) {
+                        logError('Validation',
+                            `Site current navigation is using a term set that does not exist ${site.navigation.current.termSetId}`)
+                        cleanConfig.errors.push(`Site current navigation is using a term set that does not exist ${site.navigation.current.termSetId}`);
+                    }
+                }
+            }
+        }
+        if (hasAttr(site, 'files')) {
+            let files = getAttr(site, 'files');
+            files.forEach((file) => {
+                if (file.isPageLayout) {
+
+                }
+            })
+        }
+        (site.fields || []).forEach((field)=>{
+            if (field.type && (field.type.toLowerCase().indexOf('lookup') !== -1)) {
+                if (field.listTitle) {
+                    if (!cleanConfig.lists[field.listTitle]) {
+                        cleanConfig.cleanActions.push({
+                            name: `Delete this field ${field.name}`,
+                            value:`delete.${site.url}.${field.id}`, 
+                            fn: () => {
+                                site.fields = site.fields.filter((e)=>{
+                                    return e.name !== field.name; 
+                                });
+                            }
+                        });
+                        logError('Validation', `Lookup field ${field.name} uses a list that does not exist ${field.listTitle}`);
+                        errors.push(`Lookup field ${field.name} uses a list that does not exist ${field.listTitle}`);
+                    }
+                } else {
+                    cleanConfig.cleanActions.push({
+                        name: `Delete this field ${field.name}`,
+                        value: `delete.${site.url}.${field.name}`,
+                        fn: () => {
+                            site.fields = site.fields.filter((e) => {
+                                return e.name !== field.name;
+                            });
+                        }
+                    });
+                    logError('Validation', `Lookup field ${field.name} missing 'listTitle' field. Please specify a lookup list`);
+                    errors.push(`Lookup field ${field.name} missing 'listTitle' field. Please specify a lookup list`);
+                }
+            } else if (field.type && (field.type.toLowerCase().indexOf('taxonomy') !== -1)) {
+                if (field.termGroupName) {
+                    if (!cleanConfig.termGroups[field.termGroupName]){
+                        cleanConfig.cleanActions.push({
+                            name: `Create term set ${field.termSetName} in ${field.termGroupName}`,
+                            fn: () => {
+                                var termGroup = {
+                                    name:field.termGroupName,
+                                    termSets:[]
+                                }; 
+                                if (field.termSetName){
+                                    termGroup.termSets.push({
+                                        id:generateGuid(), 
+                                        name:field.termSetName
+                                    });
+                                }
+                                site.termGroups.push({
+                                    name:field.termGroupName, 
+                                });
+                            },
+                            value: `createTermGroup.${site.url}.${field.id}`,
+                        });
+                        logError('Validation',`Taxonomy field ${field.name} refers to a group name that does not exist ${field.termGroupName}`);
+                        errors.push(`Taxonomy field ${field.name} refers to a group name that does not exist ${field.termGroupName}`)
+                    }else {
+                        var termGroup = cleanConfig.termGroups[field.termGroupName]; 
+                        if(termGroup.termSets && termGroup.termSets.length){
+                            var tset = termGroup.termSets.find((e)=>{
+                                return e.name === field.termSetName; 
+                            });
+                            cleanConfig.cleanActions.push({
+                                name:`Remove field ${field.name}`, 
+                                fn:()=>{
+                                    site.fields = site.fields.filter((e)=>{
+                                        return e.name !== field.name; 
+                                    }); 
+                                },
+                                value: `delete.${site.url}.${field.id}`,
+                            }); 
+                            if (!tset){
+                                cleanConfig.cleanActions.push({
+                                    name: `Create term set ${field.termSetName} in ${field.termGroupName}`,
+                                    fn: () => {
+                                        termGroup.termSets.push({
+                                            name:field.termSetName,
+                                            id: generateGuid(),
+                                        });
+                                    },
+                                    value: `createTermSet.${site.url}.${field.id}`,
+                                });
+                                logError('Validation',
+                                `Taxonomy field ${field.name} refers to a term set that does not exist in term gorup ${field.termGroupname}`);
+                                cleanConfig.errors.push(`Taxonomy field ${field.name} refers to a term set that does not exist in term gorup ${field.termGroupname}`);
+                            }
+                        }else {
+                            cleanConfig.cleanActions.push({
+                                name: `Create term set ${field.termSetName} in ${field.termGroupName}`,
+                                fn: () => {
+                                    termGroup.termSets.push({
+                                        name: field.termSetName,
+                                        id: generateGuid(),
+                                    });
+                                },
+                                value: `createTermSet.${site.url}.${field.name}`,
+                            });
+                            logError('Validation',
+                                `Taxonomy field ${field.name} refers to a term set ${field.termSetName} in a term group ${field.termGroupName} that has no term sets`);
+                        }
+                    }
+                }else {
+                    logError('Validation',`Taxonomy field ${field.name} is missing a 'termGroupName' attribute.`);
+                }
+                if (!field.termSetName){
+                    logError('Validation', `Taxonomy field ${field.name} is missing a 'termSetName' attribute.`);
+                }
+            }
+        }); 
+        (site.contentTypes || []).forEach((contentType) => {
+            (contentType.fields || []).forEach((f) => {
+                if (!cleanConfig.fields[f]) {
+                    cleanConfig.cleanActions.push({
+                        name: `Remove field ${f} from content type ${contentType.name}`,
+                        value:`remove.field.${f}.contentType.${site.url}.${contentType.id}`,
+                        fn:()=>{
+                            contentType.fields = contentType.fields.filter((e)=>{
+                                return e !== f; 
+                            });
+                        }
+                    });
+                    cleanConfig.cleanActions.push({
+                        name: `Create field ${f} for content type ${contentType.name}`,
+                        value: `create.field.${f}.contentType.${site.url}.${contentType.id}`,
+                        fn: () => {
+                            return {
+                                action:'addField',
+                                param:{
+                                    name:f
+                                }
+                            };
+                        }
+                    });
+                    logError('Validation', `Content type ${contentType.name} contains field that does not exist ${f}`);
+                    errors.push(`Content type ${contentType.name} contains field that does not exist ${f}`);
+                }
+            })
+            if (contentType.parent) {
+                if (!cleanConfig.contentTypes[contentType.parent] && !BuiltInContentType[contentType.parent]) {
+                    cleanConfig.cleanActions.push({
+                        name:`Create content type ${contentType.parent}`,
+                        value:`field.${contentType.name}.${contentType.parent}`,
+                        fn:(generator)=>{
+                           return {
+                               action:'addContentType',
+                               param:{
+                                   name:contentType.parent
+                               }
+                           };
+                        }
+                    }); 
+                    logError('Validation', `Parent content type ${contentType.parent} for content type ${contentType.name} does not exist`);
+                    errors.push(`Parent content type ${contentType.parent} for content type ${contentType.name} does not exist`)
+                }
+            }
+        });
+        (site.lists || []).forEach((e) => {
+            (e.contentTypes || []).forEach((ct) => {
+                if (!cleanConfig.contentTypes[ct] && !BuiltInContentType[ct]) {
+                    cleanConfig.cleanActions.push({
+                        name: `Remove content type ${ct} from list ${e.title}`,
+                        value: `contentType.${site.url}.remove.${e.title}.${ct}`,
+                        fn: (generator) => {
+                            e.contentTypes = e.contentTypes.filter(e=>e !== ct); 
+                        }
+                    }); 
+                    cleanConfig.cleanActions.push({
+                        name: `Create content type ${ct}`,
+                        value: `contentType.${site.url}.create.${ct}`,
+                        fn: (generator) => {
+                            return {
+                                action: 'addContentType',
+                                param: {
+                                    name: ct
+                                }
+                            };
+                        }
+                    }); 
+                    logError('Validation', `List ${e.title} contains a content types that does not exist ${ct}`);
+                    errors.push(`List ${e.title} contains a content types that does not exist ${ct}`);
+                }
+            });
+        });
+        if (getAttr(site, 'subsites')) {
+            let subsites = getAttr(site, 'subsites');
+            subsites.forEach((subsite, i) => {
+                return _validate(subsite, cleanConfig);
+            })
+        }
+        return cleanConfig;
+    }
+
+    // function clean(site){
+    //     return _clean(site,{
+    //         contentTypes:{},
+    //         fields:{},
+    //         lists:{},
+    //         termSets:{},
+    //         termGroups:{},
+    //         errors:[]
+    //     });
+        
+    // }
     
     
     return {
         setConfig,
         transform,
+        validate,
+        // clean,
         get errors(){
             return errors;
         }

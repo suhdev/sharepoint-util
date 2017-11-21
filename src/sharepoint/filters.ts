@@ -52,6 +52,12 @@ export function getFieldId(field: any) {
     });
 }
 
+export function generateGuid(){
+    return 'xyzzxyey-xxzz-yxyx-zxyx-xxyyzzxyzxyz'.replace(/[xyz]/g, (e, m) => {
+        return Math.round(Math.random() * 15).toString(16);
+    });
+}
+
 export function booleanToUpper(b: boolean) {
     return b ? "TRUE" : "FALSE";
 }

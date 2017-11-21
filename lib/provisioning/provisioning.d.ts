@@ -17,5 +17,7 @@ export interface TransformConfig {
 export declare function createTransformer(config: TransformConfig): {
     setConfig: ({outputDir, rootDir, srcDir, interfacesDir, templatesPaths}: TransformConfig) => Promise<void>;
     transform: ({spHost, url}: SiteConfig, site: SharePointSite) => Promise<void>;
+    validate: (site: any, ctypes?: {}, fields?: {}, errors?: any[]) => any[];
+    clean: (site: any) => string[];
     readonly errors: string[];
 };

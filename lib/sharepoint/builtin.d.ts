@@ -236,3 +236,8 @@ export declare const ListTemplateTypeByValue: {
     '1221': string;
     '1230': string;
 };
+export declare const FeaturesList: {
+    id: string;
+    name: string;
+    scope: string;
+}[];
