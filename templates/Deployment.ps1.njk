@@ -9,24 +9,6 @@ $siteUrl = ($spHost + $spGlobalSiteServerRelativeUrl);
 
 $title = "Actions"
 $message = "What would you like to do?"
-$deployAll = New-Object System.Management.Automation.Host.ChoiceDescription "&Deploy All", `
-    "Deploy everything SiteCollection, SubSites, etc to $siteUrl"
-$setPagesLibraryContentType = New-Object System.Management.Automation.Host.ChoiceDescription "&Set Pages Library Content Type", `
-    "Set Pages Library Content Type(s)"
-$setSiteCollectionWebProperties = New-Object System.Management.Automation.Host.ChoiceDescription "Set Site Collection Web Properties", `
-    "Set Pages Library Content Type(s)"
-$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No", `
-    "Retains all the files in the folder."
-
-$options = [System.Management.Automation.Host.ChoiceDescription[]]($deployAll, $no)
-
-$result = $host.ui.PromptForChoice($title, $message, $options, 0) 
-
-switch ($result)
-    {
-        0 {"You selected Yes."}
-        1 {"You selected No."}
-    }
 
 Write-Log "Running Fields and Content Types initialisation script"
 Confirm-Continue -message "Deploy content types and fields to $siteUrl. Press y to continue"
@@ -65,14 +47,36 @@ Write-Log "Applying SiteCollection Provisioning..."
 
 Apply-PnPProvisioningTemplate -Path "{{getFilePath('sitecollection-'+getAttr(template,'id')+'-'+postfix+'.xml')}}"
 
+
+
 {% for command in getAttr(template,'postProvisiongCommands') %}
     
 {{Command(command)}}
 
 {% endfor %}
 
+{% if hasAttr(template,'homePage') %}
+
+Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(template,'homePage')}}"
+
+{% endif %}
+
+{% if hasAttr(template,'defaultPageLayout') %}
+
+Set-PnPDefaultPageLayout -Title "{{getAttr(template,'defaultPageLayout')}}"
+
+{% endif %}
+
 {% for contentType in getAttr(template,'pagesLibrary','pagesLibraryContentTypes') %}
+
 {{AddContentTypeToPagesLibrary(contentType,loop.index == 0)}}
+
+{% endfor %}
+
+{% for app in getAttr(template,'apps') %}
+
+Import-PnPAppPackage -Path "{{getAttr(app,'path')}}" {% if getAttr(app,'force') %}-Force {% else %} -LoadOnly {% endif %} 
+
 {% endfor %}
 
 {% if hasAttr(template,'defaultPagesContentType','pagesDefaultContentType','pagesLibraryDefaultContentType') %}
