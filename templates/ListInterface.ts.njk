@@ -12,6 +12,6 @@ import { CommonType } from './CommonType';
  */
 export interface {{ getAttr(list, 'interface') }} extends CommonType{
     {% for field in fields %}
-    { { getAttr(field, 'name') } } { { '?' if getAttr(field, 'required')} }: { { getJsTypeForField(getAttr(field, 'type')) } };
+    {{ getAttr(field, 'name') }} {{ '?' if getAttr(field, 'required')}}: {{ getJsTypeForField(getAttr(field, 'type')) }};
     {% endfor %}
 }
