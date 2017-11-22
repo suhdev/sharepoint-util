@@ -245,3 +245,35 @@ export declare const LocaleList: {
     "lcid": number;
     "name": string;
 }[];
+export declare const LanguagesList: {
+    "name": string;
+    "id": number;
+}[];
+export declare const ExtraLanguagesList: {
+    "id": number;
+    "name": string;
+}[];
+export declare const AllLanguagesList: {
+    "id": number;
+    "name": string;
+}[];
+export declare const TimeZonesList: {
+    "id": number;
+    "name": string;
+}[];
+export declare const CurrenciesList: {
+    "id": number;
+    "name": string;
+}[];
+export declare const LanguagesAndRegionsList: {
+    "language": string;
+    "region": string;
+    "id": number;
+}[];
+export declare const RegionsList: string[];
+export declare const LanguagesWithStringLcids: {
+    "language": string;
+    "languageCode": string;
+    "lcidString": string;
+    "lcid": number;
+}[];

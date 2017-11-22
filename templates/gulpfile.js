@@ -434,20 +434,19 @@ gulp.task('js:watch',(cb)=>{
         path.resolve(cwd, './src/*.tsx'),
         path.resolve(cwd, './src/**/*.tsx')
     ],['js:compile']);
-    // webpackWatch = webpackCompiler.watch({
-
-    // },(err,stats)=>{
-    //     logVerbose('js:watch',stats.toString());
-    //     if (err){
-    //         logError('js:watch',`An error has occured on JavaScript watch: ${err.message}`);
-    //         return; 
-    //     }else if (stats.hasErrors()){
-    //         logError('js:watch',`An error has occured on JavaScript watch: ${stats.toString('minimal')}`);
-    //     }
-    //     logVerbose('js:watch', `Watching for JavaScript changes running`);
-    // }); 
-    // cb(); 
 }); 
+
+gulp.task('resources:compile',()=>{
+    return gulp.src([
+        path.resolve(cwd,`${config.resourcesDir||'./resources'}/*.resx`),
+        path.resolve(cwd,`${config.resourcesDir||'./resources'}/*.spfont`),
+        path.resolve(cwd,`${config.resourcesDir||'./resources'}/*.spcolor`),
+        path.resolve(cwd,`${config.resourcesDir||'./resources'}/**/*.resx`),
+        path.resolve(cwd,`${config.resourcesDir||'./resources'}/**/*.spfont`),
+        path.resolve(cwd,`${config.resourcesDir||'./resources'}/**/*.spcolor`)])
+        .pipe(gulp.dest(path.resolve(cwd,`${config.provisioningDir || './deploy'}`)));
+});
+
 
 gulp.task('config:init',(cb)=>{
     logVerbose('config:init', `Creating configuration file at ${path.resolve(cwd, './config.json')}`);
