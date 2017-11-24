@@ -16,6 +16,7 @@ const gulp = require('gulp'),
     uglify = require('gulp-uglify'), 
     rename = require('gulp-rename'),
     cwd = process.cwd(),
+    autoprefixer = require('gulp-autoprefixer'), 
     configFilePath = `${cwd}/config/project.json`;
 let isDebug = args.dev ? true : false,
     isVerbose = args.verbose ? true : false,
@@ -195,6 +196,7 @@ gulp.task('sass:compile',(cb)=>{
         sass({
             compress: !isDebug
         }),
+        autoprefixer(),
         gulp.dest(path.resolve(cwd, config.cssDistDir))
     ]; 
     logVerbose('sass:compile', `Sass files will be written to ${path.resolve(cwd, config.cssDistDir)}`);
@@ -235,6 +237,7 @@ gulp.task('sass:compile',(cb)=>{
                 sass({
                     compress:!isDebug,
                 }),
+                autoprefixer(),
                 gulp.dest(path.resolve(cwd,config.prototypeDir,'css'))],
                 (err)=>{
                     if (err){
@@ -577,6 +580,46 @@ gulp.task('prototype:compile', (cb) => {
     });
 });
 
+gulp.task('assets:build',(cb)=>{
+    logVerbose(`assets:build`,`Copying asset files`); 
+    const srcs = [
+        path.resolve(config.assetsDir, '*.png'),
+        path.resolve(config.assetsDir, '*.jpg'),
+        path.resolve(config.assetsDir, '*.ico'),
+        path.resolve(config.assetsDir, '*.svg'),
+        path.resolve(config.assetsDir, '*.ttf'),
+        path.resolve(config.assetsDir, '*.eot'),
+        path.resolve(config.assetsDir, '*.woff'),
+        path.resolve(config.assetsDir, '*.woff2'),
+        path.resolve(config.assetsDir, '**/*.png'),
+        path.resolve(config.assetsDir, '**/*.jpg'),
+        path.resolve(config.assetsDir, '**/*.ico'),
+        path.resolve(config.assetsDir, '**/*.svg'),
+        path.resolve(config.assetsDir, '**/*.ttf'),
+        path.resolve(config.assetsDir, '**/*.eot'),
+        path.resolve(config.assetsDir, '**/*.woff'),
+        path.resolve(config.assetsDir, '**/*.woff2')
+    ];
+    pump([gulp.src(srcs),
+    gulp.dest(path.resolve(config.provisioningDir,config.deploymentDir,'assets'))],(err)=>{
+        if (err){
+            logError(`assets:build`,`An error has occured while copying files to provision directory assets folder: ${err.message}`);
+            cb(err); 
+            return; 
+        }
+        logVerbose('assets:build', `Finished building assets folder to provision directory at: ${path.resolve(config.provisioningDir, config.deploymentDir, 'assets')}`); 
+    });
+    pump([gulp.src(srcs),
+        gulp.dest(path.resolve(config.prototypeDir,'assets'))],(err)=>{
+            if (err){
+                logError('assets:build',`An error has occured while copying files to prototype assets folder: ${err.message}`);
+                cb(err); 
+                return; 
+            }
+            logVerbose('assets:build', `Finished building assets folder for prototypes at: ${path.resolve(config.prototypeDir, 'assets')}`); 
+        });
+});
+
 gulp.task('prototype:watch',['prototype:compile'],()=>{
     let inputDir = args.inputDir || `${config.templatesDir}`;
     gulp.watch([
@@ -620,6 +663,7 @@ gulp.task('prototype',(cb)=>{
                 cb();
                 return;
             }
+            gulp.start('assets:build');
             gulp.start('prototype:watch'); 
             gulp.start('js:watch'); 
             gulp.start('sass:watch');
