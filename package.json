@@ -1,6 +1,6 @@
 {
   "name": "sharepoint-util",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "description": "A utility library for SharePoint solutions",
   "main": "index.js",
   "typings": "./typings",
@@ -29,6 +29,7 @@
     "bootstrap": "^4.0.0-beta.2",
     "bootstrap-sass": "^3.3.7",
     "colors": "^1.1.2",
+    "gulp-rename": "^1.2.2",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "nunjucks": "^3.0.1",

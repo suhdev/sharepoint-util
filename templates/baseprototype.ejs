@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%= config.name %> Prototype</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css" />
+        <link href="css/main.min.css" rel="stylesheet">
+    </head>
+    <body>
+    <div class="list-group">
+        {% for pt in prototypes %}
+        <a href="/{{pt.baseName}}/{{pt.baseName}}.html" class="list-group-item list-group-item-action">
+            {{pt.name}}
+        </a>
+        {% endfor %}
+    </div>
+    </body>
+</html>

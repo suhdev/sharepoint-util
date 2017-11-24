@@ -14,11 +14,15 @@ const gulp = require('gulp'),
     concat = require('gulp-concat'), 
     sass = require('gulp-sass'), 
     uglify = require('gulp-uglify'), 
+    rename = require('gulp-rename'),
     cwd = process.cwd(),
     configFilePath = `${cwd}/config/project.json`;
 let isDebug = args.dev ? true : false,
-    isVerbose = args.verbose ? true : false; 
-// import * as wp from 'webpack'; 
+    isVerbose = args.verbose ? true : false,
+    isPrototyping = args.prototype?true:false,
+    liveUpdate = args.liveUpdate?true:false,
+    prototypes = [],
+    prototypeDefinitionCache = {}; 
 var config = {
     env:process.env.NODE_ENV || 'dev',
     assetsDir:'./assets', 
@@ -29,8 +33,10 @@ var config = {
     cssDistDir:'./dist/css',
     libDir:'./lib', 
     templatesDir:'./templates', 
+    prototypeDir:'./prototype',
     masterPageTemplatesDir:'./templates/masterpage', 
     pageLayoutTemplatesDir:'./templates/pagelayout',
+    prototypeTemplatesDir:'./templates/prototypes', 
     deploymentDir:'Sysdoc',
     provisioningDir:'./deploy',
     cdn:[],
@@ -66,8 +72,10 @@ function updateConfigFromArgs(config,args){
     config.siteCollectionUrl = config.spHost.endsWith('/') ? `${config.spHost}${config.url}` : `${config.spHost}/${config.url}`;
     config.templatesDir = args.templatesDir || config.templatesDir || './templates'; 
     config.provisioningDir = args.provisioningDir || config.provisioningDir || './deploy';  
-    config.masterPageTemplatesDir = args.masterPageTemplatesDir || config.masterPageTemplatesDir || './templates/masterpage'; 
-    config.pageLayoutTemplatesDir = args.pageLayoutTemplatesDir || config.pageLayoutTemplatesDir || './templates/pagelayout'; 
+    config.masterPageTemplatesDir = args.masterPageTemplatesDir || config.masterPageTemplatesDir || './templates/masterpages'; 
+    config.pageLayoutTemplatesDir = args.pageLayoutTemplatesDir || config.pageLayoutTemplatesDir || './templates/pagelayouts'; 
+    config.prototypeDir = args.prototypeDir || config.prototypeDir || './prototype'; 
+    config.prototypeTemplatesDir = args.prototypeTemplatesDir || config.prototypeTemplatesDir || './templates/prototypes';
     config.siteAssetsDrive = args.siteAssetsDrive || config.siteAssetsDrive; 
     config.styleLibraryDrive = args.styleLibraryDrive || config.styleLibraryDrive; 
     config.masterpageCatalogDrive = args.masterpageCatalogDrive || config.masterpageCatalogDrive; 
@@ -108,11 +116,21 @@ function init(){
     initNunjucks(config);
     if (fs.existsSync(path.resolve(cwd,'webpack.config.js'))){
         webpackConfig = require(path.resolve(cwd, 'webpack.config.js'));
-        webpackCompiler = webpack(webpackConfig); 
+        webpackConfig.output = webpackConfig.output || {};
+        try{
+            webpackConfig.output.path = path.resolve(cwd, config.jsDistDir);
+            webpackCompiler = webpack(webpackConfig); 
+        }catch(err){
+            logError('init',`An error has occured while initializing Webpack ${err.message}`)
+        }
     }else {
         logError('init', 
             `Could not find webpack configuration file at ${path.resolve(cwd, 'webpack.config.js')}`);
     }
+}
+
+function log(operation,msg){
+    console.log(`${colors.magenta(new Date().toISOString())} - ${colors.blue(operation)} - ${colors.gray(msg)}`);
 }
 
 function logVerbose(operation,msg){
@@ -131,7 +149,35 @@ function getFileNameFromUrl(u){
     return vv; 
 }
 
-function getFileData(fileName){
+function getFileData(file){
+    const fileName = file.path; 
+    if (prototypeDefinitionCache[fileName]){
+        return prototypeDefinitionCache[fileName]; 
+    }
+    if ((fileName.indexOf('/prototypes') !== -1) && (path.extname(fileName) === '.njk' || path.extname(fileName) === '.html')){
+        let definition = {
+            baseName:path.basename(fileName,path.extname(fileName)),
+            dirName:path.dirname(fileName)
+        }; 
+        const fileDefinitionPath = path.resolve(path.dirname(fileName), path.basename(fileName, path.extname(fileName)))+'.json'; 
+        if (fs.existsSync(fileDefinitionPath)){
+            try{
+                definition = require(fileDefinitionPath);
+                definition.baseName = path.basename(fileName, path.extname(fileName));
+                definition.dirName = path.dirname(fileName);
+                prototypes.push(definition);
+            }catch(err){
+                logError(`getFileData`,`Could not load definition for prototype ${err.message}`);
+            }
+        }
+        
+        return prototypeDefinitionCache[fileName] = Object.assign({}, {
+            config,
+            env: process.env,
+            definition,
+            prototypes
+        });
+    }
     return {
         config,
         env:process.env
@@ -144,7 +190,8 @@ gulp.task('sass:compile',(cb)=>{
     logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '**/*.scss')}`);
     var tasks = [
         gulp.src([path.resolve(cwd, config.sassDir, '*.scss'),
-            path.resolve(cwd, config.sassDir, '**/*.scss')]),
+            path.resolve(cwd, config.sassDir, '**/*.scss'),
+            '!'+path.resolve(cwd,config.sassDir,'./prototypes')]),
         sass({
             compress: !isDebug
         }),
@@ -155,10 +202,18 @@ gulp.task('sass:compile',(cb)=>{
         logVerbose('sass:compile', `Sass files to be written to mapped drives at ${(path.resolve(config.siteAssetsDrive+':\\',
             config.deploymentDir,
             config.cssDistDir.split('/').pop()))}`);
-        tasks.push(gulp.dest(path.resolve(config.siteAssetsDrive+':\\',
+        if (fs.existsSync(path.resolve(config.siteAssetsDrive + ':\\',
             config.deploymentDir,
-            config.cssDistDir.split('/').pop())));
+            config.cssDistDir.split('/').pop()))){
+            tasks.push(gulp.dest(path.resolve(config.siteAssetsDrive+':\\',
+                config.deploymentDir,
+                config.cssDistDir.split('/').pop())));
+        }
     }
+    // if (isPrototyping){
+    //     logVerbose('sass:compile', `Compiling sass files into prototype output directory ${path.resolve(config.prototypeDir, './css')}`);
+    //     // tasks.push(gulp.dest(path.resolve(config.prototypeDir,'./css')));
+    // }
     pump(tasks,(err)=>{
         if (err){
             logError('sass:compile',`an error has occured while compiling sass files ${err.message}`);
@@ -166,13 +221,40 @@ gulp.task('sass:compile',(cb)=>{
             return; 
         }
         logVerbose('sass:compile',`finished compiling sass files successfully.`);
-        cb(err);
+        if (isPrototyping){
+            logVerbose('sass:compile', `Compiling prototype sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
+            pump([gulp.src(path.resolve(cwd, config.cssDistDir, '*.css')),
+            gulp.dest(path.resolve(cwd, config.prototypeDir, 'css'))], () => {
+                logVerbose('sass:compile', `Finished copying main css into prototype css directory`);
+            });
+            logVerbose('sass:compile', `Attempting to compile prototypes sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
+            pump([
+                gulp.src([
+                    path.resolve(cwd, config.sassDir, './prototypes/*.scss'),
+                    path.resolve(cwd, config.sassDir, './prototypes/**/*.scss')]),
+                sass({
+                    compress:!isDebug,
+                }),
+                gulp.dest(path.resolve(cwd,config.prototypeDir,'css'))],
+                (err)=>{
+                    if (err){
+                        logError('sass:compile',`An error has occured while compiling prorotypes sass files: ${err.message}`);
+                    }else {
+                        logVerbose('sass:compile',`Finished compiling prototypes sass files`);
+                    }
+                    cb(err);
+                });
+        }else {
+            cb(err);
+        }
     }); 
 });
 
 gulp.task('sass:watch', (cb) => {
-    gulp.watch([path.resolve(cwd, config.sassDir) + './*.scss',
-    path.resolve(cwd, config.sassDir) + './**/*.scss'], ['sass:compile']);
+    logVerbose('sass:watch', `Watching for sass file changes on ${path.resolve(cwd, config.sassDir, './*.scss')}`);
+    logVerbose('sass:watch', `Watching for sass file changes on ${path.resolve(cwd, config.sassDir, './**/*.scss')}`);
+    gulp.watch([path.resolve(cwd, config.sassDir,'./*.scss'),
+    path.resolve(cwd, config.sassDir, './**/*.scss')], ['sass:compile']);
 });
 
 gulp.task('lib:download',(cb)=>{
@@ -295,7 +377,7 @@ gulp.task('masterpages:compile',(cb)=>{
         path.resolve(cwd, config.masterPageTemplatesDir, '**/*.master'),
         path.resolve(cwd, config.masterPageTemplatesDir, '**/*.njk')]),
         data(getFileData),
-        nunjucksTask.compile({ config }),
+        nunjucksTask.compile({ config },{name:file=>`${path.basename(file.name,path.extname(file.name))}.html`}),
         gulp.dest(path.resolve(cwd, config.provisioningDir))];
         if (isDebug && config.masterpageCatalogDrive) {
             logVerbose('masterpages:compile', 'Adding masterpage catalog drive as a destination');
@@ -389,9 +471,21 @@ gulp.task('js:compile',(cb)=>{
             `An error has occured while compiling JavaScript files: ${stats.toString()}`);
         }else {
             logVerbose('js:compile','Finished compiling JavaScript files'); 
-            if (config.siteAssetsDrive){
+            if (isPrototyping){
                 pump([
-                    gulp.src(path.resolve(cwd,'dist/js/*.js')),
+                    gulp.src([path.resolve(cwd, config.jsDistDir, '*.js'),
+                        path.resolve(cwd, config.jsDistDir, '**/*.js')]),
+                    gulp.dest(path.resolve(cwd,config.prototypeDir,'js'))
+                ],(err)=>{
+                    if (err){
+                        logError('js:compile',`Could not copy files to prototye directory: ${err.message}`);
+                    }
+                });
+            }
+            if (config.siteAssetsDrive && isDebug){
+                pump([
+                    gulp.src([path.resolve(cwd,`${config.jsDistDir}/*.js`),
+                        [path.resolve(cwd, `${config.distDir}/*.js`)]]),
                     gulp.dest(path.resolve(config.siteAssetsDrive+':\\',
                     config.deploymentDir,
                     'js'))],(err)=>{
@@ -402,30 +496,12 @@ gulp.task('js:compile',(cb)=>{
                         }
                         cb(err);
                     });
-                return; 
+                return;
             }
             cb();
         }
     });
 });
-
-gulp.task('js:compile',(cb)=>{
-    if (!webpackCompiler){
-        logError('js:compile',`Could not run webpack this may be due to missing webpack configuration`);
-        cb(new Error(`js:compile Could not run webpack this may be due to missing webpack configuration`));
-        return; 
-    }
-    webpackCompiler.run((err,stats)=>{
-        if (err){
-            logError('js:compile',`An error has occured while compiling JavaScript files: ${err.message}`); 
-            cb(err); 
-        }else if (stats.hasErrors()){
-            logError('js:compile',`An error has occured while compiling JavaScript files: ${stats.toString('minimal')}`)
-        }
-        logVerbose('js:compile',`Finished compiling JavaScript files`);
-        cb(); 
-    });
-}); 
 
 gulp.task('js:watch',(cb)=>{
     return gulp.watch([
@@ -461,6 +537,109 @@ gulp.task('config:init',(cb)=>{
 }); 
 
 gulp.task('watch',['js:watch','sass:watch','pagelayouts:watch','masterpages:watch']);
+
+gulp.task('prototype:compile', (cb) => {
+    const fullPath = path.resolve(cwd, config.masterPageTemplatesDir);
+    mkdirp(fullPath, (err) => {
+        if (err) {
+            logError('prototype:compile', `Could not create folder ${fullPath}`);
+            cb(err);
+            return;
+        }
+        logVerbose('prototype:compile', 'Started compiling prototype templates');
+        logVerbose('prototype:compile',
+            `Loading prototype templates ('.html','.njk') from ${path.resolve(cwd, config.prototypeTemplatesDir)}`);
+        var tasks = [gulp.src([path.resolve(cwd, config.prototypeTemplatesDir, '*.html'),
+        path.resolve(cwd, config.prototypeTemplatesDir, '*.njk'),
+        path.resolve(cwd, config.prototypeTemplatesDir, '**/*.html'),
+        path.resolve(cwd, config.prototypeTemplatesDir, '**/*.njk')]),
+        data(getFileData),
+        nunjucksTask.compile({ config },{
+            name:file=>`${path.basename(file.name,path.extname(file.name))}.html`
+        }),
+        rename({
+            extname:'.html'
+        }),
+        gulp.dest(path.resolve(cwd, config.prototypeDir))];
+        pump(
+            tasks,
+            (err) => {
+                if (err) {
+                    logError('prototype:compile', `An error has occured while compiling prototype templates ${err.message}`);
+                    cb(err);
+                    return;
+                }
+                logVerbose(`prototype:compile`, `Finished compiling prototype templates`);
+                cb(err);
+            }
+        );
+
+    });
+});
+
+gulp.task('prototype:watch',['prototype:compile'],()=>{
+    let inputDir = args.inputDir || `${config.templatesDir}`;
+    gulp.watch([
+        path.resolve(inputDir, '*.njk'),
+        path.resolve(inputDir, '**/*.njk'),
+        path.resolve(inputDir, '*.html'),
+        path.resolve(inputDir, '**/*.html')
+    ], ['prototype:compile']);
+});
+
+gulp.task('prototype',(cb)=>{
+    try{
+        isPrototyping = true;
+        let express = require('express'); 
+        let staticFiles = require('serve-static');
+        outputDir = args.output || `${config.prototypeDir}`;
+        let inputDir = args.inputDir || `${config.templatesDir}`;
+        let port = args.port || 6565; 
+        if (isPrototyping) {
+            const prototypesSrcDir = path.resolve(cwd, config.srcDir, './prototypes');
+            logVerbose('js:compile', `In prototype mode. Attempting to add prototype source files from ${prototypesSrcDir}`);
+            try {
+                if (fs.existsSync(prototypesSrcDir)) {
+                    logVerbose('js:compile', `Prototypes directory ${prototypesSrcDir} exists. Attempting to directory contents`);
+                    let prototypes = fs.readdirSync(prototypesSrcDir);
+                    prototypes = prototypes.filter((e) => path.extname(e) === '.ts' || path.extname(e) === '.tsx');
+                    logVerbose('js:compile', `Prototypes directory content read successfully in total ${prototypes.length} source files`);
+                    prototypes.forEach((file) => {
+                        logVerbose('js:compile', `Adding prototype source file ${file} to webpack configuration object`);
+                        webpackConfig.entry[path.basename(file,path.extname(file))] = path.resolve(prototypesSrcDir, file);
+                    });
+                    webpackCompiler = webpack(webpackConfig);
+                }
+            } catch (err) {
+                logError(`js:compile`, `An error has occured while reading prototypes directory ${prototypesSrcDir}. Not compiling any prototype source files: ${err.message}`);
+            }
+        }
+        function done(err) {
+            if (err) {
+                logError(`Prototyping`, `An error has occured while creating prototype folder at ${path.resolve(cwd, inputDir)}: ${err.message}`);
+                cb();
+                return;
+            }
+            gulp.start('prototype:watch'); 
+            gulp.start('js:watch'); 
+            gulp.start('sass:watch');
+
+            let app = express();
+            app.use(staticFiles(path.resolve(outputDir)));
+            app.listen(port,()=>{
+                log('Prototyping',`Prototyping server has started on port ${port}. You can access the server on http://localhost:${port}`);
+            });
+
+        }
+        if (fs.existsSync(path.resolve(cwd, inputDir))) {
+            mkdirp(path.resolve(cwd, inputDir), done);
+        } else {
+            done(null);
+        }
+    }catch(err){
+        console.log(`Prototyping`,`Could not start prototyping server because of missing depenendencies: ${err.message}`)
+    } 
+});
 
 
 process.on('exit',()=>{
