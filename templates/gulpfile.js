@@ -154,7 +154,7 @@ function getFileData(file){
     if (prototypeDefinitionCache[fileName]){
         return prototypeDefinitionCache[fileName]; 
     }
-    if ((fileName.indexOf('/prototypes') !== -1) && (path.extname(fileName) === '.njk' || path.extname(fileName) === '.html')){
+    if ((fileName.indexOf(`${path.sep}prototypes`) !== -1) && (path.extname(fileName) === '.njk' || path.extname(fileName) === '.html')){
         let definition = {
             baseName:path.basename(fileName,path.extname(fileName)),
             dirName:path.dirname(fileName)
