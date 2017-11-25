@@ -53,6 +53,8 @@ var webpackConfig = null;
 var webpackCompiler = null; 
 var webpackWatch = null; 
 
+var uploadingPrototypes = false;
+
 function initNunjucks(config){
     var env = nunjucks.configure([path.resolve(cwd,config.templatesDir),
         path.resolve(cwd, config.masterPageTemplatesDir),
@@ -706,6 +708,7 @@ gulp.task('prototype',(cb)=>{
 });
 
 gulp.task('prototype:upload',(cb)=>{
+    uploadingPrototypes = true; 
     const gzip = require('gulp-gzip'),
     tar = require('gulp-tar');
     if (!config.prototypeServerUrl){
@@ -726,11 +729,12 @@ gulp.task('prototype:upload',(cb)=>{
             return; 
         }
         logVerbose('prototype:upload', `Attempting to upload your prototypes to: ${config.prototypeServerUrl}`);
-        const zipFileName = path.resolve(cwd,'./zip',`${config.name}.tar`);
+        const zipFileName = path.resolve(cwd,'./zip',`${config.name}.tar.gz`);
         const readStream = fs.createReadStream(zipFileName); 
         request.post({
-            url:config.prototypeServerUrl,
+            url: config.prototypeServerUrl + `${config.prototypeServerUrl.endsWith('/')?'':'/'}upload`,
             formData:{
+                projectName:config.name,
                 prototypes:readStream
             }
         },(err)=>{

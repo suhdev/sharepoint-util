@@ -8,12 +8,33 @@
         <link href="css/main.min.css" rel="stylesheet">
     </head>
     <body>
-    <div class="list-group">
-        {% for pt in prototypes %}
-        <a href="/{{pt.baseName}}/{{pt.baseName}}.html" class="list-group-item list-group-item-action">
-            {{pt.name}}
-        </a>
-        {% endfor %}
-    </div>
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h1 class="display-3">{{config.name}}</h1>
+                <p class="lead">{{config.description}}</p>
+            </div>
+        </div>
+        <div class="container">
+            <p class="lead">Below is a list of the prototypes in this project</p>
+            <div class="list-group">
+                {% for pt in prototypes %}
+                <a href="{{pt.baseName}}/{{pt.baseName}}.html" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{pt.name}} 
+                        {% if pt.status == 'Done' %}
+                        <span class="badge badge-success badge-pill">Done</span>
+                        {% elif pt.status == 'In Progress' %}
+                        <span class="badge badge-warning badge-pill">In Progress</span>
+                        {% else %}
+                        <span class="badge badge-warning badge-pill">Pending</span>
+                        {% endif %}</h5>
+                    </div>
+                    <p class="mb-1">{{pt.description}}</p>
+                    {% if pt.subtitle %}<small class="text-muted">{{pt.subtitle}}</small>{% endif %}
+                    
+                </a>
+                {% endfor %}
+            </div>
+        </div>
     </body>
 </html>
