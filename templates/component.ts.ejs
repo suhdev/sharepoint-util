@@ -1,0 +1,21 @@
+import * as React from 'react'; 
+export interface <%= component.name %>Props{
+
+}
+
+export interface <%= component.name %>State{
+
+}
+
+export class <%= component.name %> extends React.<%= component.isPure?'Pure':'' %>Component<<%= component.name %>Props,<%= component.name %>State>{
+    constructor(props){
+        super(props); 
+    }
+
+    render(){
+        return (
+            <div className="<%= component.name.replace(/([a-z])([A-Z])/g,'$1-$2').toLowerCase() %>">
+            </div>
+        );
+    }
+}

@@ -1,0 +1,13 @@
+import * as React from 'react'; 
+import * as ReactDOM from 'react-dom';
+import {createStore} from 'strikejs-react';  
+import {<%= component.name %>Ctrl} from '../controllers/<%= component.name %>'; 
+
+(function(){
+    const store = createStore({}); 
+    ReactDOM.render(
+        <<%= component.name %>Ctrl store={store} />,
+        document.getElementById('Prototype')
+    );
+
+}())

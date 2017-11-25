@@ -333,7 +333,23 @@ gulp.task('lib:compile:js',(cb)=>{
                 cb(err);
                 return; 
             }
-            logVerbose('lib:compile:js','Finished compiling library js files successfully'); 
+            if (isPrototyping){
+                logVerbose('lib:compile:js',`Protoyping mode detected, copying vendor files into prototype folder`);
+                pump(
+                    [gulp.src(path.resolve(cwd,config.jsDistDir,'*.js')),
+                    gulp.dest(path.resolve(cwd,config.prototypeDir,'js'))],(err)=>{
+                        if (err){
+                            logError('lib:compile:js', `An error has occured while copying vendor files into prototype directory: ${err.message}`);
+                            cb(err); 
+                            return; 
+                        }
+                        logVerbose('lib:compile:js',`Finished copying vendor js files into prototype directory`);
+                        logVerbose('lib:compile:js', 'Finished compiling library js files successfully'); 
+                    }
+                )
+            }else {
+                logVerbose('lib:compile:js','Finished compiling library js files successfully'); 
+            }
         }
     );
 });
@@ -663,6 +679,9 @@ gulp.task('prototype',(cb)=>{
                 cb();
                 return;
             }
+            gulp.start('lib:download');
+            gulp.start('lib:compile:js');
+            gulp.start('lib:compile:css'); 
             gulp.start('assets:build');
             gulp.start('prototype:watch'); 
             gulp.start('js:watch'); 

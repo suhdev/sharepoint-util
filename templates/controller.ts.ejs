@@ -1,0 +1,28 @@
+import * as React from 'react'; 
+import {createControllerView} from 'strikejs-react'; 
+import {<%= controller.name %>State,<%= controller.name %>Props, 
+<%= controller.name %>InitialState, <%= controller.name %>StateKey as stateKey} from './StateAndProps'; 
+import {<%= controller.name %>Actions,<%= controller.name %>ActionTypes} from './Actions'; 
+import {Reducer} from './Reducer'; 
+
+export const <%= controller.name %>Ctrl = createControllerView({
+    initialState:<%= controller.name %>InitialState,
+    reducer:Reducer, 
+    propsToPropagate:[],
+    stateKey,
+    component:(function(){
+        return class <%= controller.name %> extends React.Component<<%= controller.name %>Props,any>{
+            constructor(props){
+                super(props);
+            }
+
+            render(){
+                return (
+                    <div id="<%= controller.name %>Ctrl" className="<%= controller.name.replace(/([a-z])([A-Z])/g,'$1-$2').toLowerCase() %>-ctrl">
+                        
+                    </div>
+                ); 
+            }
+        }
+    }())
+});
