@@ -9,7 +9,15 @@
         <script type="text/javascript" src="../js/vendor.js"></script>
     </head>
     <body>
-        <div id="Prototype"></div>
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h1 class="display-3">{{definition.name | replace(r/([a-z])([A-Z])/g,'$1 $2')}}</h1>
+                <p class="lead">{{definition.description}}</p>
+            </div>
+        </div>
+        <div class="container">
+            <div id="Prototype"></div>
+        </div>
         <script type="text/javascript" src="../js/<%= baseName %>.js"></script>
     </body>
 </html>
