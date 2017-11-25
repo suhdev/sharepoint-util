@@ -1,6 +1,6 @@
 import {IManagedState,Action} from 'strikejs-react'; 
 import {<%= controller.name %>ActionTypes} from './Actions'; 
-import {<%= controller.name %>State>} from './StateAndProps'; 
+import {<%= controller.name %>State} from './StateAndProps'; 
 
 export function Reducer(state:IManagedState<<%= controller.name %>State>,action:Action){
     switch(action.type){
