@@ -78,6 +78,7 @@ function updateConfigFromArgs(config,args){
     config.prototypeDir = args.prototypeDir || config.prototypeDir || './prototype'; 
     config.prototypeTemplatesDir = args.prototypeTemplatesDir || config.prototypeTemplatesDir || './templates/prototypes';
     config.siteAssetsDrive = args.siteAssetsDrive || config.siteAssetsDrive; 
+    config.prototypeServerUrl = args.prototypeServerUrl || config.prototypeServerUrl || null; 
     config.styleLibraryDrive = args.styleLibraryDrive || config.styleLibraryDrive; 
     config.masterpageCatalogDrive = args.masterpageCatalogDrive || config.masterpageCatalogDrive; 
     if (config.styleLibraryDrive){
@@ -702,6 +703,47 @@ gulp.task('prototype',(cb)=>{
     }catch(err){
         console.log(`Prototyping`,`Could not start prototyping server because of missing depenendencies: ${err.message}`)
     } 
+});
+
+gulp.task('prototype:upload',(cb)=>{
+    const gzip = require('gulp-gzip'),
+    tar = require('gulp-tar');
+    if (!config.prototypeServerUrl){
+        logError('prototype:upload',`Cannot upload your prototypes, no prototyep server has been setup. Use 'yo sharepoint-app' to setup the prototype server`); 
+        cb(); 
+        return; 
+    }
+    logVerbose('prototype:upload', `Attempting to zip your prototypes to: ${path.resolve(cwd, './zip')}`);
+    pump([
+        gulp.src([`./${config.prototypeDir}/**`]),
+        tar(`${config.name}.tar`),
+        gzip(),
+        gulp.dest(path.resolve(cwd,'./zip'))
+    ],(err)=>{
+        if (err){
+            logError('prototype:upload', `Could not zip your prototypes to ${path.resolve(cwd, './zip')} because: ${err.message}`);
+            cb(err);
+            return; 
+        }
+        logVerbose('prototype:upload', `Attempting to upload your prototypes to: ${config.prototypeServerUrl}`);
+        const zipFileName = path.resolve(cwd,'./zip',`${config.name}.tar`);
+        const readStream = fs.createReadStream(zipFileName); 
+        request.post({
+            url:config.prototypeServerUrl,
+            formData:{
+                prototypes:readStream
+            }
+        },(err)=>{
+            if (err){
+                logError('prototype:upload',`Could not upload your prototypes to ${config.prototypeServerUrl} because: ${err.message}`);
+                cb(err);
+                return; 
+            }
+            logVerbose('prototype:upload',`Your prototypes have been uploaded to ${config.prototypeServerUrl} successfully`);
+        });;
+
+    });
+    ;
 });
 
 
