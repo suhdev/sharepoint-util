@@ -716,6 +716,7 @@ gulp.task('prototype:upload',(cb)=>{
         cb(); 
         return; 
     }
+    fs.writeFileSync(path.resolve(cwd,config.prototypeDir,'project.json'),JSON.stringify(config,null,'    '));
     logVerbose('prototype:upload', `Attempting to zip your prototypes to: ${path.resolve(cwd, './zip')}`);
     pump([
         gulp.src([`./${config.prototypeDir}/**`]),
