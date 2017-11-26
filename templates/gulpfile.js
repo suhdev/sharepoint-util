@@ -195,7 +195,7 @@ gulp.task('sass:compile',(cb)=>{
     var tasks = [
         gulp.src([path.resolve(cwd, config.sassDir, '*.scss'),
             path.resolve(cwd, config.sassDir, '**/*.scss'),
-            '!'+path.resolve(cwd,config.sassDir,'./prototypes')]),
+            '!'+path.resolve(cwd,config.sassDir,'./prototypes/**')]),
         sass({
             compress: !isDebug
         }),
