@@ -747,6 +747,7 @@ gulp.task('prototype:upload',(cb)=>{
                 cb(err);
                 return; 
             }
+            cb();
             logVerbose('prototype:upload',`Your prototypes have been uploaded to ${config.prototypeServerUrl} successfully`);
         });;
 
