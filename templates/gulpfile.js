@@ -508,8 +508,7 @@ gulp.task('js:compile',(cb)=>{
                     }
                     cb();
                 });
-            }
-            if (config.siteAssetsDrive && isDebug){
+            } else if (config.siteAssetsDrive && isDebug){
                 pump([
                     gulp.src([path.resolve(cwd,`${config.jsDistDir}/*.js`),
                         [path.resolve(cwd, `${config.distDir}/*.js`)]]),
@@ -524,6 +523,8 @@ gulp.task('js:compile',(cb)=>{
                         cb(err);
                     });
                 return;
+            }else {
+                cb();
             }
         }
     });
