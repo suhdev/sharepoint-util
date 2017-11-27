@@ -1,0 +1,13 @@
+import * as React from 'react'; 
+import * as ReactDOM from 'react-dom';
+import {<%= component.name %>Store} from '../controllers/<%= component.name %>/Store'; 
+import {<%= component.name %>Ctrl} from '../controllers/<%= component.name %>'; 
+
+(function(){
+    const store = new <%= component.name %>Store(); 
+    ReactDOM.render(
+        <<%= component.name %>Ctrl store={store} />,
+        document.getElementById('Prototype')
+    );
+
+}())

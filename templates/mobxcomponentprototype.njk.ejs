@@ -1,0 +1,11 @@
+import * as React from 'react'; 
+import * as ReactDOM from 'react-dom';  
+import {<%= component.name %>} from '../components/<%= component.name %>'; 
+
+(function(){
+    ReactDOM.render(
+        <<%= component.name %> />,
+        document.getElementById('Prototype')
+    );
+
+}())

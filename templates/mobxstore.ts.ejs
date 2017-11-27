@@ -1,0 +1,14 @@
+import {observable,computed,action} from 'mobx'; 
+
+export class <%= controller.name %>Store{
+    @observable test:string;
+    @observable list:any[] = [];
+
+    @computed listLength(){
+        return this.test + this.list.length;
+    } 
+
+    @action myAction(){
+
+    }
+}

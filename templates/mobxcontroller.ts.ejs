@@ -1,0 +1,19 @@
+import * as React from 'react'; 
+import {observer} from 'mobx-react'; 
+import {<%= controller.name %>State,<%= controller.name %>Props, 
+<%= controller.name %>InitialState, <%= controller.name %>StateKey as stateKey} from './StateAndProps'; 
+
+@observer
+export class <%= controller.name %>Ctrl extends React.Component<<%= controller.name %>Props,any>{
+    constructor(props){
+        super(props);
+    }
+
+    render(){
+        return (
+            <div id="<%= controller.name %>Ctrl" className="<%= controller.name.replace(/([a-z])([A-Z])/g,'$1-$2').toLowerCase() %>-ctrl">
+                
+            </div>
+        );
+    }
+}

@@ -488,9 +488,9 @@ gulp.task('js:compile',(cb)=>{
             logError('js:compile',
             `An error has occured while compiling JavaScript files: ${err.message}`);
         }else if (stats.hasErrors()){
-            cb(new Error(stats.toString()));
             logError('js:compile',
-            `An error has occured while compiling JavaScript files: ${stats.toString()}`);
+            `Compile stats have errors: ${stats.toString()}`);
+            cb();
         }else {
             logVerbose('js:compile','Finished compiling JavaScript files'); 
             if (isPrototyping){
@@ -692,6 +692,9 @@ gulp.task('prototype',(cb)=>{
 
             let app = express();
             app.use(staticFiles(path.resolve(outputDir)));
+            if (fs.existsSync(path.resolve(cwd,'./extension/index.js'))){
+                require(path.resolve(cwd, './extension/index.js'))(app,config); 
+            }
             app.listen(port,()=>{
                 log('Prototyping',`Prototyping server has started on port ${port}. You can access the server on http://localhost:${port}`);
             });
