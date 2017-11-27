@@ -55,7 +55,7 @@
                 <pnp:User Name="{{admin}}" />
             {% endfor %}
         </pnp:AdditionalVisitors>
-        {% if hasAttr(security,'siteGroups','groups') %}
+        {% if hasAttr(security,'siteGroups','groups') and hasItems(security,'siteGroups','groups') %}
         <pnp:SiteGroups>
             {% for group in getAttr(security,'siteGroups','groups') %}
             <pnp:SiteGroup
@@ -363,14 +363,14 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     DisplayFormUrl="{{getAttr(contentType,'displayFormUrl')}}"
     {% endif %}
     >
-    {% if hasAttr(contentType,'pnp:fieldRefs') %}
+    {% if hasAttr(contentType,'fieldRefs') and hasItems(contentType,'fieldRefs') %}
         <pnp:FieldRefs>
-        {% for field in getAttr(contentType,'pnp:fieldRefs') %}
+        {% for field in getAttr(contentType,'fieldRefs') %}
             <pnp:FieldRef ID="{{getFieldId(field)|parenthesize}}" />
         {% endfor %}
         </pnp:FieldRefs>
     {% endif %}
-    {% if hasAttr(contentType,'fields') %}
+    {% if hasAttr(contentType,'fields') and hasItems(contentType,'fields') %}
         <pnp:FieldRefs>
         {% for fieldName in getAttr(contentType,'fields') %}
             <pnp:FieldRef ID="{{getFieldIdByName(fieldName)|parenthesize}}" />

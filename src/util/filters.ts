@@ -51,7 +51,7 @@ export function isObject(val:any){
     return typeof val === "object";
 }
 
-export function hasItems(obj:any,key:string){
-    var val = (obj && getAttr(obj,key));
+export function hasItems(obj:any,...fieldNames:string[]){
+    let val = getAttr(obj,...fieldNames); 
     return (val && val.length > 0)?true:false; 
 }
