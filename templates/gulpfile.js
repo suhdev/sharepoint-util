@@ -488,8 +488,10 @@ gulp.task('js:compile',(cb)=>{
             logError('js:compile',
             `An error has occured while compiling JavaScript files: ${err.message}`);
         }else{
-            logError('js:compile',
-            `Compile stats have errors: ${stats.toString()}`);
+            if (stats.hasErrors()){
+                logError('js:compile',
+                `Compile stats have errors: ${stats.toString()}`);
+            }
             logVerbose('js:compile','Finished compiling JavaScript files'); 
             if (isPrototyping){
                 pump([
