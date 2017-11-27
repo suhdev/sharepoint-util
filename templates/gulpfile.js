@@ -487,11 +487,9 @@ gulp.task('js:compile',(cb)=>{
             cb(err);
             logError('js:compile',
             `An error has occured while compiling JavaScript files: ${err.message}`);
-        }else if (stats.hasErrors()){
+        }else{
             logError('js:compile',
             `Compile stats have errors: ${stats.toString()}`);
-            cb();
-        }else {
             logVerbose('js:compile','Finished compiling JavaScript files'); 
             if (isPrototyping){
                 pump([
@@ -657,24 +655,22 @@ gulp.task('prototype',(cb)=>{
         outputDir = args.output || `${config.prototypeDir}`;
         let inputDir = args.inputDir || `${config.templatesDir}`;
         let port = args.port || 6565; 
-        if (isPrototyping) {
-            const prototypesSrcDir = path.resolve(cwd, config.srcDir, './prototypes');
-            logVerbose('js:compile', `In prototype mode. Attempting to add prototype source files from ${prototypesSrcDir}`);
-            try {
-                if (fs.existsSync(prototypesSrcDir)) {
-                    logVerbose('js:compile', `Prototypes directory ${prototypesSrcDir} exists. Attempting to directory contents`);
-                    let prototypes = fs.readdirSync(prototypesSrcDir);
-                    prototypes = prototypes.filter((e) => path.extname(e) === '.ts' || path.extname(e) === '.tsx');
-                    logVerbose('js:compile', `Prototypes directory content read successfully in total ${prototypes.length} source files`);
-                    prototypes.forEach((file) => {
-                        logVerbose('js:compile', `Adding prototype source file ${file} to webpack configuration object`);
-                        webpackConfig.entry[path.basename(file,path.extname(file))] = path.resolve(prototypesSrcDir, file);
-                    });
-                    webpackCompiler = webpack(webpackConfig);
-                }
-            } catch (err) {
-                logError(`js:compile`, `An error has occured while reading prototypes directory ${prototypesSrcDir}. Not compiling any prototype source files: ${err.message}`);
+        const prototypesSrcDir = path.resolve(cwd, config.srcDir, './prototypes');
+        logVerbose('Prototyping', `In prototype mode. Attempting to add prototype source files from ${prototypesSrcDir}`);
+        try {
+            if (fs.existsSync(prototypesSrcDir)) {
+                logVerbose('Prototyping', `Prototypes directory ${prototypesSrcDir} exists. Attempting to directory contents`);
+                let prototypes = fs.readdirSync(prototypesSrcDir);
+                prototypes = prototypes.filter((e) => path.extname(e) === '.ts' || path.extname(e) === '.tsx');
+                logVerbose('Prototyping', `Prototypes directory content read successfully in total ${prototypes.length} source files`);
+                prototypes.forEach((file) => {
+                    logVerbose('Prototyping', `Adding prototype source file ${file} to webpack configuration object`);
+                    webpackConfig.entry[path.basename(file,path.extname(file))] = path.resolve(prototypesSrcDir, file);
+                });
+                webpackCompiler = webpack(webpackConfig);
             }
+        } catch (err) {
+            logError(`Prototyping`, `An error has occured while reading prototypes directory ${prototypesSrcDir}. Not compiling any prototype source files: ${err.message}`);
         }
         function done(err) {
             if (err) {
