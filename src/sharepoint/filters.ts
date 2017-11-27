@@ -39,7 +39,8 @@ export function getJsTypeForField(fieldType: string) {
 export function isTaxonomyField(field: Field) {
     // return true; 
     // console.log(`field`,field);
-    return getAttr(field, 'type') === 'TaxonomyFieldType';//.toLowerCase().indexOf('taxonomy') !== -1; 
+    return getAttr(field, 'type') === 'TaxonomyFieldType' || 
+        getAttr(field,'type') === 'TaxonomyFieldTypeMulti';//.toLowerCase().indexOf('taxonomy') !== -1; 
 }
 
 export function getFieldId(field: any) {

@@ -55,3 +55,8 @@ export function hasItems(obj:any,...fieldNames:string[]){
     let val = getAttr(obj,...fieldNames); 
     return (val && val.length > 0)?true:false; 
 }
+
+export function hasKeys(obj:any,...fieldNames:string[]){
+    let val = getAttr(obj, ...fieldNames);
+    return val && Object.keys(val).length? true : false; 
+}

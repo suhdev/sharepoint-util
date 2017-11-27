@@ -183,14 +183,14 @@
         {% endfor %}
     </pnp:Terms>
     {% endif %}
-    {% if hasAttr(t,'customProperties') %}
+    {% if hasAttr(t,'customProperties') and hasKeys(t,'customProperties') %}
     <pnp:CustomProperties>
         {% for key,val in getAttr(t,'customProperties') %}
         <pnp:Property Key="{{key}}" Value="{{val}}" />
         {% endfor %}
     </pnp:CustomProperties>
     {% endif %}
-    {% if hasAttr(t,'localCustomProperties') or hasAttr(t,'linkUrl','url','targetUrl','linkTitle') %}
+    {% if hasAttr(t,'localCustomProperties') and hasKeys(t,'customProperties') or hasAttr(t,'linkUrl','url','targetUrl','linkTitle') %}
     <pnp:LocalCustomProperties>
         {% for key,val in getAttr(t,'localCustomProperties') %}
         <pnp:Property Key="{{key}}" Value="{{val}}" />
@@ -218,7 +218,7 @@
         {% endfor %}
     </pnp:Terms>
     {% endif %}
-    {% if hasAttr(tset,'customProperties') or hasAttr(tset,'navigation','nav') %}
+    {% if hasAttr(tset,'customProperties') and hasKeys(t,'customProperties') or hasAttr(tset,'navigation','nav') %}
     <pnp:CustomProperties>
         {% for key,val in getAttr(tset,'customProperties') %}
         <pnp:Property Key="{{key}}" Value="{{val}}" />

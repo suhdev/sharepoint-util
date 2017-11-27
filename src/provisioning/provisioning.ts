@@ -2,7 +2,7 @@ import * as nunjucks from 'nunjucks';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as pretty from 'pretty-data';
-import { removeSpaces, parenthesize, capitalize, lowerize, getAttr, hasAttr, isString, hasItems } from '../util/filters';
+import { removeSpaces, parenthesize, capitalize, lowerize, getAttr, hasAttr, isString, hasItems, hasKeys } from '../util/filters';
 import { BuiltInContentType, FieldTypes } from '../sharepoint/builtin';
 import { XmlFormatter } from '../xml/xmlformatter';
 import { SharePointSite } from './sharepointsite';
@@ -91,6 +91,7 @@ export function createTransformer(config:TransformConfig) {
         env.addGlobal('isString',isString); 
         env.addGlobal('isObject',isObject); 
         env.addGlobal('hasItems',hasItems);
+        env.addGlobal('hasKeys', hasKeys);
         env.addGlobal('validateContentType', validateContentType);
         env.addGlobal('addError',addError);
     }
