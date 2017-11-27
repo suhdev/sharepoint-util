@@ -494,6 +494,7 @@ gulp.task('js:compile',(cb)=>{
             }
             logVerbose('js:compile','Finished compiling JavaScript files'); 
             if (isPrototyping){
+                logVerbose('js:compile','Attempting to copy compiled JavaScript files into prototype directory');
                 pump([
                     gulp.src([path.resolve(cwd, config.jsDistDir, '*.js'),
                         path.resolve(cwd, config.jsDistDir, '**/*.js')]),
@@ -501,7 +502,11 @@ gulp.task('js:compile',(cb)=>{
                 ],(err)=>{
                     if (err){
                         logError('js:compile',`Could not copy files to prototye directory: ${err.message}`);
+                        return; 
+                    }else {
+                        logVerbose('js:compile', 'Finished copying JavaScript files into prototype directory');
                     }
+                    cb();
                 });
             }
             if (config.siteAssetsDrive && isDebug){
@@ -520,7 +525,6 @@ gulp.task('js:compile',(cb)=>{
                     });
                 return;
             }
-            cb();
         }
     });
 });
