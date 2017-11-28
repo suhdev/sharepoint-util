@@ -20,7 +20,7 @@ const gulp = require('gulp'),
     configFilePath = `${cwd}/config/project.json`;
 let isDebug = args.dev ? true : false,
     isVerbose = args.verbose ? true : false,
-    isPrototyping = args.prototype?true:false,
+    isPrototyping = args.prototype || args.isPrototyping?true:false,
     liveUpdate = args.liveUpdate?true:false,
     prototypes = [],
     prototypeDefinitionCache = {}; 
@@ -47,6 +47,25 @@ var config = {
 }; 
 var nunjucksEngine = null; 
 var webpackConfig = null;
+var siteDefinition = null;
+const AssetSources = [
+     '*.png',
+     '*.jpg',
+     '*.ico',
+     '*.svg',
+     '*.ttf',
+     '*.eot',
+     '*.woff',
+     '*.woff2',
+     '**/*.png',
+     '**/*.jpg',
+     '**/*.ico',
+     '**/*.svg',
+     '**/*.ttf',
+     '**/*.eot',
+     '**/*.woff',
+     '**/*.woff2'
+];
 /**
  * @type {wp.Compiler}
  */
@@ -56,7 +75,10 @@ var webpackWatch = null;
 var uploadingPrototypes = false;
 
 function initNunjucks(config){
-    var env = nunjucks.configure([path.resolve(cwd,config.templatesDir),
+    logVerbose('initNunjucks', `Going to load nunjucks templates from ${path.resolve(cwd, config.templatesDir)}`);
+    logVerbose('initNunjucks', `Going to load nunjucks templates from ${path.resolve(cwd, config.masterPageTemplatesDir)}`);
+    logVerbose('initNunjucks', `Going to load nunjucks templates from ${path.resolve(cwd, config.pageLayoutTemplatesDir)}`)
+    nunjucksEngine = nunjucks.configure([path.resolve(cwd,config.templatesDir),
         path.resolve(cwd, config.masterPageTemplatesDir),
         path.resolve(cwd, config.pageLayoutTemplatesDir)],{
         noCache:true
@@ -69,9 +91,24 @@ function updateConfigFromArgs(config,args){
     config.sassDir = args.sassDir || config.sassDir || './sass';
     config.srcDir = args.srcDir || config.srcDir ||  './src'; 
     config.distDir = args.distDir || config.distDir ||  './dist';
-    config.spHost = args.spHost || config.spHost || 'https://tenant.sharepoint.com/'; 
+    if (config.useSharePoint){
+        config.spHost = args.spHost || config.spHost || 'https://tenant.sharepoint.com/'; 
+        if (!args.spHost || config.spHost){
+            logWarning('Configuration',`No spHost has been provided in your configuration
+            To fix this: you can rerun your gulp task with --spHost YOUR_SP_HOST
+            Going to use: https://tenant.sharepoint.com/ for now.`);
+        }
+        config.url = args.url || config.url || 'test-site'; 
+        if (!args.url && !config.url){
+            logWarning('Configuration', `No Site URL has been provided in your configuration
+            To fix this: you can rerun your gulp task with --url YOUR_URL
+            Going to use: 'test-site' for now.`);
+        }
+    }
+    
     config.cssDistDir = args.cssDistDir || config.cssDistDir ||  './dist/css';
     config.jsDistDir = args.jsDistDir || config.jsDistDir ||  './dist/js';
+    config.useSharePoint = args.useSharePoint || config.useSharePoint || false; 
     config.siteCollectionUrl = config.spHost.endsWith('/') ? `${config.spHost}${config.url}` : `${config.spHost}/${config.url}`;
     config.templatesDir = args.templatesDir || config.templatesDir || './templates'; 
     config.provisioningDir = args.provisioningDir || config.provisioningDir || './deploy';  
@@ -82,7 +119,12 @@ function updateConfigFromArgs(config,args){
     config.siteAssetsDrive = args.siteAssetsDrive || config.siteAssetsDrive; 
     config.prototypeServerUrl = args.prototypeServerUrl || config.prototypeServerUrl || null; 
     config.styleLibraryDrive = args.styleLibraryDrive || config.styleLibraryDrive; 
-    config.masterpageCatalogDrive = args.masterpageCatalogDrive || config.masterpageCatalogDrive; 
+    config.masterpageCatalogDrive = args.masterpageCatalogDrive || config.masterpageCatalogDrive;
+    if (config.useSharePoint){
+        if (fs.existsSync(path.resolve(cwd,'./SiteDefinition.json'))){
+            siteDefinition = require(path.resolve(cwd, './SiteDefinition.json')); 
+        }
+    } 
     if (config.styleLibraryDrive){
         try {
             fs.readdirSync(config.styleLibraryDrive+":\\");
@@ -147,6 +189,10 @@ function logError(operation, msg) {
     console.log(`${colors.red(new Date().toISOString())} - ${colors.red(operation)} - ${colors.red(msg)}`);
 }
 
+function logWarning(operation,msg){
+    console.log(`${colors.yellow(new Date().toISOString())} - ${colors.yellow(operation)} - ${colors.yellow(msg)}`);
+}
+
 function getFileNameFromUrl(u){
     const uu = new url.URL(u); 
     const vv = uu.pathname.split('/').pop();
@@ -188,6 +234,30 @@ function getFileData(file){
     }; 
 }
 
+
+function getDataForPageLayout(file) {
+    var layouts = (siteDefinition && siteDefinition.pageLayoutsDefinitions) || []; 
+    var pageLayout = layouts.find((e)=>{
+        return e.src === file.name; 
+    });
+    return {
+        pageLayout, 
+        config
+    };
+}
+
+function getDataForMasterPage(file) {
+    var masterPages = (siteDefinition && siteDefinition.masterPageDefinitions) || [];
+    var masterPage = masterPages.find((e) => {
+        return e.src === file.name;
+    });
+    if (config.siteCollectionUrl)
+    return {
+        masterPage,
+        config
+    };
+}
+
 gulp.task('sass:compile',(cb)=>{
     logVerbose('sass:compile','compiling sass files');
     logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '*.scss')}`);
@@ -215,10 +285,7 @@ gulp.task('sass:compile',(cb)=>{
                 config.cssDistDir.split('/').pop())));
         }
     }
-    // if (isPrototyping){
-    //     logVerbose('sass:compile', `Compiling sass files into prototype output directory ${path.resolve(config.prototypeDir, './css')}`);
-    //     // tasks.push(gulp.dest(path.resolve(config.prototypeDir,'./css')));
-    // }
+   
     pump(tasks,(err)=>{
         if (err){
             logError('sass:compile',`an error has occured while compiling sass files ${err.message}`);
@@ -399,12 +466,11 @@ gulp.task('masterpages:compile',(cb)=>{
         path.resolve(cwd, config.masterPageTemplatesDir, '**/*.master'),
         path.resolve(cwd, config.masterPageTemplatesDir, '**/*.njk')]),
         data(getFileData),
-        nunjucksTask.compile({ config },{name:file=>`${path.basename(file.name,path.extname(file.name))}.html`}),
+        nunjucksTask.compile({ config },{env:nunjucksEngine}),
+        rename({
+            extname: '.master'
+        }),
         gulp.dest(path.resolve(cwd, config.provisioningDir))];
-        if (isDebug && config.masterpageCatalogDrive) {
-            logVerbose('masterpages:compile', 'Adding masterpage catalog drive as a destination');
-            tasks.push(gulp.dest(path.resolve(config.masterpageCatalogDrive+':\\')));
-        }
         pump(
             tasks,
             (err) => {
@@ -413,8 +479,24 @@ gulp.task('masterpages:compile',(cb)=>{
                     cb(err);
                     return;
                 }
-                logVerbose(`masterpages:compile`, `Finished compiling master page templates`);
-                cb(err);
+                if (isDebug && config.masterpageCatalogDrive) {
+                    logVerbose('masterpages:compile', 'Adding masterpage catalog drive as a destination');
+                    pump([
+                        gulp.src(path.resolve(cwd, config.provisioningDir,'*.master')),
+                        gulp.dest(`${config.masterpageCatalogDrive}:\\`)
+                    ],(err)=>{
+                        if (err){
+                            logError('masterpages:compile',`Failed to copy master pages to mapped drived ${config.masterpageCatalogDrive}: ${err.message}`);
+                            cb(err); 
+                            return; 
+                        }
+                        logVerbose('masterpages:compile',`Master pages copied to mapped drive successfuly ${config.masterpageCatalogDrive}`);
+                        cb();
+                    });
+                }else {
+                    logVerbose(`masterpages:compile`, `Finished compiling master page templates`);
+                    cb(err);
+                }
             }
         );
 
@@ -449,12 +531,11 @@ gulp.task('pagelayouts:compile', (cb) => {
                 env: process.env
             };
         }),
-        nunjucksTask.compile({ config }),
+        nunjucksTask.compile({ config }, { env: nunjucksEngine }),
+        rename({
+            extname:'.aspx'
+        }),
         gulp.dest(path.resolve(cwd, config.provisioningDir))];
-        if (isDebug && config.masterpageCatalogDrive) {
-            logVerbose('pagelayouts:compile', 'Adding masterpage catalog drive as a destination');
-            tasks.push(config.masterpageCatalogDrive+':\\');
-        }
         pump(
             tasks,
             (err) => {
@@ -463,8 +544,29 @@ gulp.task('pagelayouts:compile', (cb) => {
                     cb(err);
                     return;
                 }
-                logVerbose(`pagelayouts:compile`, `Finished compiling page layout templates`);
-                cb(err);
+                if (isDebug && config.masterpageCatalogDrive) {
+                    logVerbose('pagelayouts:compile', `Attempting to copy page layouts to mapped drive: ${config.masterpageCatalogDrive}`);
+                    if (fs.existsSync(config.masterpageCatalogDrive+':\\')){
+                        pump([
+                            gulp.src(path.resolve(config.provisioningDir,'*.aspx')),
+                            gulp.dest(`${config.masterpageCatalogDrive}:\\`)
+                        ],(err)=>{
+                            if (err){
+                                logError('pagelayouts:compile',`An error has occured while copying your page layouts to mapped drive ${config.masterpageCatalogDrive}: ${err.message}`);
+                                cb(err); 
+                                return; 
+                            }
+                            logVerbose('pagelayouts:compile',`Page layouts have been copied to mapped drive ${config.masterpageCatalogDrive} successfully.`);
+                            cb(); 
+                        })
+                    }else {
+                        logWarning('pagelayouts:compile',`Master page catalog drive (${config.masterpageCatalogDrive}:\\) is not connected`);
+                    }
+                }else {
+
+                    logVerbose(`pagelayouts:compile`, `Finished compiling page layout templates`);
+                    cb(err);
+                }
             }
         );
     })
@@ -604,44 +706,76 @@ gulp.task('prototype:compile', (cb) => {
     });
 });
 
-gulp.task('assets:build',(cb)=>{
+gulp.task('assets:build:prototype',(cb)=>{
+    if (isPrototyping) {
+        logVerbose('assets:build:prototype', `Prototyping mode detected`);
+        logVerbose('assets:build:prototype', `Attempting to copy assets to prototyping directory: ${path.resolve(cwd, config.prototypeDir, 'assets')}`);
+        pump([gulp.src(AssetSources.map(e=>{
+            logVerbose('assets:build:prototyping', `Including files in ${path.resolve(cwd, config.assetsDir, e)}`);
+            return path.resolve(cwd,config.assetsDir,e)
+        })),
+        gulp.dest(path.resolve(cwd, config.prototypeDir,'assets'))], (err) => {
+            if (err) {
+                logError('assets:build:prototype', `An error has occured while copying files to prototype assets folder: ${err.message}`);
+                cb(err);
+                return;
+            }
+            cb();
+            logVerbose('assets:build:prototype', `Finished building assets folder for prototypes at: ${path.resolve(config.prototypeDir, 'assets')}`);
+        });
+        return; 
+    }
+    cb(); 
+});
+
+gulp.task('assets:build:sharepoint',(cb)=>{
+    if (config.useSharePoint) {
+        logVerbose(`assets:build`, `SharePoint mode detected`);
+        if (config.siteAssetsDrive && fs.existsSync(`${config.siteAssetsDrive}:\\`)) {
+            logVerbose('assets:build', `SharePoint SiteAssets drive detected and is connected`);
+            logVerbose('assets:build', `Attempting to copy assets to the deployment directory ${config.deploymentDir}\\assets at ${config.siteAssetsDrive}:\\`);
+            pump([
+                gulp.src(AssetSources.map(e => path.resolve(cwd, config.assetsDir, e))),
+                gulp.dest(`${config.siteAssetsDrive}:\\${config.deploymentDir}`)
+            ], (err) => {
+                if (err) {
+                    cb(err); 
+                    logError('assets:build', `An error has occured while copy files to mapped drive at ${config.siteAssetsDrive}:\\${config.deploymentDir}\\assets: ${err.message}`);
+                } 
+                logVerbose('assets:build', `Finished copying assets to mapped drive successfully`);
+            });
+            return; 
+        }else {
+            logWarning('assets:build',`Either the siteAssets mapped drive is missing or it is not connected`);
+        }
+    }
+    cb();
+});
+gulp.task('assets:build:dist',(cb)=>{
+    logVerbose('assets:build:dist',`Copying asset files to dist folder ${config.distDir}\\assets`); 
+    pump([gulp.src(AssetSources.map(e => path.resolve(cwd, config.assetsDir, e))),
+    gulp.dest(path.resolve(config.distDir))], (err) => {
+        if (err){
+            logError(`assets:build:dist`,`An error has occured while copying assets to dist folder at ${path.resolve(cwd,config.distDir)}: ${err.message}`); 
+            cb(err); 
+            return; 
+        }
+        logVerbose('assets:build:dist', `Finished copying assets to dist directory ${path.resolve(cwd, config.distDir,'assets')}`); 
+        cb(); 
+    });
+});
+
+gulp.task('assets:build',['assets:build:prototype','assets:build:dist','assets:build:sharepoint'],(cb)=>{
     logVerbose(`assets:build`,`Copying asset files`); 
-    const srcs = [
-        path.resolve(config.assetsDir, '*.png'),
-        path.resolve(config.assetsDir, '*.jpg'),
-        path.resolve(config.assetsDir, '*.ico'),
-        path.resolve(config.assetsDir, '*.svg'),
-        path.resolve(config.assetsDir, '*.ttf'),
-        path.resolve(config.assetsDir, '*.eot'),
-        path.resolve(config.assetsDir, '*.woff'),
-        path.resolve(config.assetsDir, '*.woff2'),
-        path.resolve(config.assetsDir, '**/*.png'),
-        path.resolve(config.assetsDir, '**/*.jpg'),
-        path.resolve(config.assetsDir, '**/*.ico'),
-        path.resolve(config.assetsDir, '**/*.svg'),
-        path.resolve(config.assetsDir, '**/*.ttf'),
-        path.resolve(config.assetsDir, '**/*.eot'),
-        path.resolve(config.assetsDir, '**/*.woff'),
-        path.resolve(config.assetsDir, '**/*.woff2')
-    ];
-    pump([gulp.src(srcs),
+    pump([gulp.src(AssetSources),
     gulp.dest(path.resolve(config.provisioningDir,config.deploymentDir,'assets'))],(err)=>{
         if (err){
             logError(`assets:build`,`An error has occured while copying files to provision directory assets folder: ${err.message}`);
             cb(err); 
             return; 
         }
-        logVerbose('assets:build', `Finished building assets folder to provision directory at: ${path.resolve(config.provisioningDir, config.deploymentDir, 'assets')}`); 
+        logVerbose('assets:build', `Finished building assets folder to provision directory at: ${path.resolve(config.provisioningDir, config.deploymentDir, 'assets')}`);  
     });
-    pump([gulp.src(srcs),
-        gulp.dest(path.resolve(config.prototypeDir,'assets'))],(err)=>{
-            if (err){
-                logError('assets:build',`An error has occured while copying files to prototype assets folder: ${err.message}`);
-                cb(err); 
-                return; 
-            }
-            logVerbose('assets:build', `Finished building assets folder for prototypes at: ${path.resolve(config.prototypeDir, 'assets')}`); 
-        });
 });
 
 gulp.task('prototype:watch',['prototype:compile'],()=>{
@@ -685,13 +819,18 @@ gulp.task('prototype',(cb)=>{
                 cb();
                 return;
             }
-            gulp.start('lib:download');
-            gulp.start('lib:compile:js');
-            gulp.start('lib:compile:css'); 
-            gulp.start('assets:build');
-            gulp.start('prototype:watch'); 
-            gulp.start('js:watch'); 
-            gulp.start('sass:watch');
+            if (gulp.parallel){
+                gulp.parallel('lib:download','assets:build');
+                gulp.parallel('lib:compile:js','lib:compile:css');
+                gulp.parallel('prototype:watch','js:watch','sass:watch');
+            } else if (gulp.start) {
+                gulp.start('lib:download');
+                gulp.start('lib:compile:js');
+                gulp.start('lib:compile:css');
+                gulp.start('prototype:watch');
+                gulp.start('js:watch');
+                gulp.start('sass:watch');
+            }
 
             let app = express();
             app.use(staticFiles(path.resolve(outputDir)));
@@ -758,7 +897,6 @@ gulp.task('prototype:upload',(cb)=>{
     ;
 });
 
-
 process.on('exit',()=>{
     logVerbose('exit event','Terminating tasks');
     if (webpackWatch){
@@ -769,3 +907,4 @@ process.on('exit',()=>{
 })
 
 init(config, args);
+module.exports = gulp;

@@ -1294,6 +1294,12 @@ Write-Log "Unknown Command Type {{type}}"
     
     {% if hasAttr(template,'files') or hasAttr(template,'directories','folders','dirs') %}{{log('Provisioning Template','Files')}}
     <pnp:Files>
+        {% for pageLayout in getAttr(template,'pageLayoutDefinitions') %}
+        {{PageLayout(pageLayout)}}
+        {% endfor %}
+        {% for masterPage in getAttr(template,'masterPageDefinitions') %}
+        {{MasterPage(masterPage)}}
+        {% endfor %}
         {% for file in getAttr(template,'files') %}{{log('Provisioning Template','File - '+getAttr(file,'src'))}}
         {{File(file)}}
         {% endfor %}
@@ -1310,4 +1316,38 @@ Write-Log "Unknown Command Type {{type}}"
     </pnp:PageLayouts>
     {% endif %}
 </pnp:ProvisioningTemplate>
+{% endmacro %}
+
+{% macro PageLayout(file) %}
+<pnp:File Src="{{getAttr(file,'src')}}" 
+    Folder="_catalogs/masterpage"
+    Overwrite="{{getAttr(file,'overwrite')|default(false)}}"
+    Level="{{getAttr(file,'level')|default('Published')}}">
+    <pnp:Properties>
+        <pnp:Property Key="ContentType" Value="Page Layout" />
+        <pnp:Property Key="PublishingAssociatedContentType" Value=";#{{file.contentType}};#{{getContentTypeIdByName(file.contentType)}};#" />
+        <pnp:Property Key="Title" Value="{{file.title}}" />
+        <pnp:Property Key="MasterPageDescription" Value="{{file.description}}" />
+        {% for key,val in getAttr(file,'props','properties') %}
+            <pnp:Property Key="{{key}}" Value="{{val}}" />
+        {% endfor %}
+    </pnp:Properties>
+</pnp:File>
+{% endmacro %}
+{% macro MasterPage(file) %}
+<pnp:File Src="{{getAttr(file,'src')}}" 
+    Folder="_catalogs/masterpage"
+    Overwrite="{{getAttr(file,'overwrite')|default(false)}}"
+    Level="{{getAttr(file,'level')|default('Published')}}">
+    {% if hasAttr(file,'props','properties') %}
+    <pnp:Properties>
+        <pnp:Property Key="ContentTypeId" Value="{contenttypeid:Master Page}" />
+        <pnp:Property Key="HTML_x0020_File_x0020_Type" Value="SharePoint.WebPartPage.Document" />
+        <pnp:Property Key="ProgId" Value="SharePoint.WebPartPage.Document" />
+        {% for key,val in getAttr(file,'props','properties') %}
+            <pnp:Property Key="{{key}}" Value="{{val}}" />
+        {% endfor %}
+    </pnp:Properties>
+    {% endif %}
+</pnp:File>
 {% endmacro %}

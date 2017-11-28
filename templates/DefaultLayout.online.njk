@@ -1,0 +1,31 @@
+{% from 'pagelayoutmacros.online.njk' import PageLayoutDirectives %}
+{{PageLayoutDirectives(pageLayout)}}
+<asp:Content ContentPlaceHolderId="PlaceHolderAdditionalPageHead" runat="server">
+	<SharePoint:CssRegistration name="<% $SPUrl:~sitecollection/Style Library/~language/Core Styles/page-layouts-21.css %>" runat="server"/>
+	<PublishingWebControls:EditModePanel runat="server" id="editmodestyles">
+		<!-- Styles for edit mode only-->
+		<SharePoint:CssRegistration name="<% $SPUrl:~sitecollection/Style Library/~language/Core Styles/edit-mode-21.css %>"
+			After="<% $SPUrl:~sitecollection/Style Library/~language/Core Styles/page-layouts-21.css %>" runat="server"/>
+	</PublishingWebControls:EditModePanel>
+</asp:Content>
+
+<asp:Content ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+	<SharePoint:FieldValue id="PageTitle" FieldName="Title" runat="server"/>
+</asp:Content>
+<asp:Content ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
+</asp:Content>
+<asp:Content ContentPlaceHolderID="PlaceHolderPageImage" runat="server">
+</asp:Content>
+<asp:Content ContentPlaceHolderId="PlaceHolderTitleBreadcrumb" runat="server"/>
+
+<asp:Content ContentPlaceHolderID="PlaceHolderMain" runat="server">
+	<div id="CustomAppContainer" class="app-container"></div>
+	{% for script in pageLayout.scripts %}
+	<script type="text/javascript" src="{{script}}"></script>
+	{% endfor %}
+	<PublishingWebControls:EditModePanel runat="server" id="editmodescripts">
+		{% for script in pageLayout.editModeScripts %}
+		<script type="text/javascript" src="{{script}}"></script>
+		{% endfor %}
+	</PublishingWebControls:EditModePanel>
+</asp:Content>
