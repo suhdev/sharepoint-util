@@ -242,7 +242,10 @@ function getDataForPageLayout(file) {
     });
     return {
         pageLayout, 
-        config
+        config,
+        spHost:config.spHost,
+        siteCollectionUrl:config.siteCollectionUrl, 
+        url:config.url 
     };
 }
 
@@ -253,7 +256,10 @@ function getDataForMasterPage(file) {
     });
     return {
         masterPage,
-        config
+        config,
+        spHost: config.spHost,
+        siteCollectionUrl: config.siteCollectionUrl,
+        url: config.url 
     };
 }
 
