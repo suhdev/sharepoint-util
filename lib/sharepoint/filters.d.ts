@@ -1,6 +1,6 @@
 import { Field } from '../../typins/provisioning/field';
 import { ContentType } from '../../lib/provisioning/contenttype';
-export declare function getJsTypeForField(fieldType: string): "string" | "boolean" | "number" | "CommonType" | "CommonType[]" | "Date";
+export declare function getJsTypeForField(fieldType: string): "string" | "number" | "boolean" | "CommonType" | "CommonType[]" | "Date";
 export declare function isTaxonomyField(field: Field): boolean;
 export declare function getFieldId(field: any): string;
 export declare function generateGuid(): string;
