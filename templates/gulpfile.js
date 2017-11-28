@@ -236,7 +236,7 @@ function getFileData(file){
 
 
 function getDataForPageLayout(file) {
-    var layouts = (siteDefinition && siteDefinition.pageLayoutsDefinitions) || []; 
+    var layouts = (siteDefinition && siteDefinition.pageLayoutDefinitions) || []; 
     var pageLayout = layouts.find((e)=>{
         return e.template === path.basename(file.path); 
     });
