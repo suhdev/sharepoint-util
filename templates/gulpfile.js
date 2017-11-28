@@ -245,7 +245,8 @@ function getDataForPageLayout(file) {
         config,
         spHost:config.spHost,
         siteCollectionUrl:config.siteCollectionUrl, 
-        url:config.url 
+        url:config.url,
+        env: process.env,
     };
 }
 
@@ -259,7 +260,8 @@ function getDataForMasterPage(file) {
         config,
         spHost: config.spHost,
         siteCollectionUrl: config.siteCollectionUrl,
-        url: config.url 
+        url: config.url ,
+        env: process.env
     };
 }
 
@@ -470,7 +472,7 @@ gulp.task('masterpages:compile',(cb)=>{
         path.resolve(cwd, config.masterPageTemplatesDir, '*.njk'),
         path.resolve(cwd, config.masterPageTemplatesDir, '**/*.master'),
         path.resolve(cwd, config.masterPageTemplatesDir, '**/*.njk')]),
-        data(getFileData),
+        data(getDataForMasterPage),
         nunjucksTask.compile({ config },{env:nunjucksEngine}),
         rename({
             extname: '.master'
@@ -530,12 +532,7 @@ gulp.task('pagelayouts:compile', (cb) => {
         path.resolve(cwd, config.pageLayoutTemplatesDir, '*.njk'),
         path.resolve(cwd, config.pageLayoutTemplatesDir, '**/*.aspx'),
         path.resolve(cwd, config.pageLayoutTemplatesDir, '**/*.njk')]),
-        data((file) => {
-            return {
-                config,
-                env: process.env
-            };
-        }),
+        data(getDataForPageLayout),
         nunjucksTask.compile({ config }, { env: nunjucksEngine }),
         rename({
             extname:'.aspx'
