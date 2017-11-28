@@ -238,7 +238,7 @@ function getFileData(file){
 function getDataForPageLayout(file) {
     var layouts = (siteDefinition && siteDefinition.pageLayoutsDefinitions) || []; 
     var pageLayout = layouts.find((e)=>{
-        return e.src === file.name; 
+        return e.template === file.name; 
     });
     return {
         pageLayout, 
@@ -249,9 +249,8 @@ function getDataForPageLayout(file) {
 function getDataForMasterPage(file) {
     var masterPages = (siteDefinition && siteDefinition.masterPageDefinitions) || [];
     var masterPage = masterPages.find((e) => {
-        return e.src === file.name;
+        return e.template === file.name;
     });
-    if (config.siteCollectionUrl)
     return {
         masterPage,
         config
