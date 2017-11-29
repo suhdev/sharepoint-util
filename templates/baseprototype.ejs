@@ -35,6 +35,31 @@
                 </a>
                 {% endfor %}
             </div>
+            {% if config.todos %}
+            <br/>
+            <h2>{{config.title}} Todo List</h2>
+            <p class="lead">Here is a list of the todos in this project</p>
+            {% for todo in config.todos %}
+                <a class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{todo.content}} 
+                        {% if todo.status == 'Done' %}
+                        <span class="badge badge-success badge-pill">Done</span>
+                        {% elif todo.status == 'In Progress' %}
+                        <span class="badge badge-warning badge-pill">In Progress</span>
+                        {% else %}
+                        <span class="badge badge-warning badge-pill">Pending</span>
+                        {% endif %}</h5>
+                        {% if todo.jiraIssue %}
+                        <small>{{todo.jiraIssue.key}}</small> 
+                        {% endif %}
+                    </div>
+                    <p class="mb-1">{{todo.content}}</p>
+                    {% if todo.jiraIssue %}<small class="text-muted">{{todo.jiraIssue.fields.summary}}</small>{% endif %}
+                    
+                </a>
+            {% endfor %}
+            {% endif %}
         </div>
     </body>
 </html>
