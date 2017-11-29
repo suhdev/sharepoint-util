@@ -24,27 +24,37 @@
         <div class="container">
             {% if definition.todos %}
             <br/>
-            <h2>{{definition.title}} Todo List</h2>
-            <p class="lead">Here is a list of the todos for {{definition.name | replace(r/([a-z])([A-Z])/g,'$1 $2')}}</p>
-            {% for todo in definition.todos %}
-                <a class="list-group-item list-group-item-action">
+            <h2>{{definition.name | replace(r/([a-z])([A-Z])/g,'$1 $2')}} Todo List</h2>
+            {% for key, todos in definition.todos | groupby('status') %}
+                <h4>{{key}} Todos</h4>
+                <div class="list-group">
+                {% for todo in todos %}
+                <div class="list-group-item list-group-item-action">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{todo.content}} 
+                        <h5 class="mb-1">{{todo.content}}</h5>
+                        {% if todo.jiraIssue %}
+                        <small><a href="{{config.jira.project.self|replace(r/\/rest\/api[\S]+/g,'')}}/browse/{{todo.jiraIssue.key}}">{{todo.jiraIssue.key}}</a></small> 
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h6>
                         {% if todo.status == 'Done' %}
                         <span class="badge badge-success badge-pill">Done</span>
                         {% elif todo.status == 'In Progress' %}
                         <span class="badge badge-warning badge-pill">In Progress</span>
                         {% else %}
-                        <span class="badge badge-warning badge-pill">Pending</span>
-                        {% endif %}</h5>
-                        {% if todo.jiraIssue %}
-                        <small>{{todo.jiraIssue.key}}</small> 
+                        <span class="badge badge-danger badge-pill">Pending</span>
                         {% endif %}
+                        {% if todo.group %}<span class="badge badge-primary badge-pill">{{todo.group}}</span>{% endif %}
+                        {% if todo.priority %}<span class="badge badge-warning badge-pill">{{todo.priority}}</span>{% endif %}
+                        </h6> 
                     </div>
-                    <p class="mb-1">{{todo.content}}</p>
-                    {% if todo.jiraIssue %}<small class="text-muted">{{todo.jiraIssue.fields.summary}}</small>{% endif %}
                     
-                </a>
+                    <p>{% if todo.jiraIssue %}<small class="text-muted">{{todo.jiraIssue.fields.summary}}</small>{% endif %}</p>
+                    <p>{% if todo.jiraIssue %}<small class="text-muted">{{todo.jiraIssue.fields.description}}</small>{% endif %}</p>
+                </div>
+                {% endfor %}
+                </div>
             {% endfor %}
             {% endif %}
         </div>
