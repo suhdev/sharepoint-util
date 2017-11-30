@@ -827,6 +827,7 @@ gulp.task('prototype',(cb)=>{
                 gulp.parallel('prototype:watch','js:watch','sass:watch');
             } else if (gulp.start) {
                 gulp.start('lib:download');
+                gulp.start('assets:build'); 
                 gulp.start('lib:compile:js');
                 gulp.start('lib:compile:css');
                 gulp.start('prototype:watch');
