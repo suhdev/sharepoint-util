@@ -781,6 +781,7 @@ gulp.task('assets:build',['assets:build:prototype','assets:build:dist','assets:b
             return; 
         }
         logVerbose('assets:build', `Finished building assets folder to provision directory at: ${path.resolve(config.provisioningDir, config.deploymentDir, 'assets')}`);  
+        cb(); 
     });
 });
 
