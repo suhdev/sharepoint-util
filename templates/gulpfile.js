@@ -753,6 +753,8 @@ gulp.task('assets:build:sharepoint',(cb)=>{
             return; 
         }else {
             logWarning('assets:build',`Either the siteAssets mapped drive is missing or it is not connected`);
+            cb(); 
+            return; 
         }
     }
     cb();
