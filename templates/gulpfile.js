@@ -57,6 +57,8 @@ const AssetSources = [
      '*.eot',
      '*.woff',
      '*.woff2',
+     '*.js',
+     '*.json',
      '**/*.png',
      '**/*.jpg',
      '**/*.ico',
@@ -64,7 +66,9 @@ const AssetSources = [
      '**/*.ttf',
      '**/*.eot',
      '**/*.woff',
-     '**/*.woff2'
+     '**/*.woff2',
+     '**/*.js',
+     '**/*.json'
 ];
 /**
  * @type {wp.Compiler}
