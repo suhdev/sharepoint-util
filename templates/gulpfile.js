@@ -742,7 +742,7 @@ gulp.task('assets:build:sharepoint',(cb)=>{
             logVerbose('assets:build', `Attempting to copy assets to the deployment directory ${config.deploymentDir}\\assets at ${config.siteAssetsDrive}:\\`);
             pump([
                 gulp.src(AssetSources.map(e => path.resolve(cwd, config.assetsDir, e))),
-                gulp.dest(`${config.siteAssetsDrive}:\\${config.deploymentDir}`)
+                gulp.dest(`${config.siteAssetsDrive}:\\${config.deploymentDir}\\assets`)
             ], (err) => {
                 if (err) {
                     cb(err); 
@@ -760,7 +760,7 @@ gulp.task('assets:build:sharepoint',(cb)=>{
 gulp.task('assets:build:dist',(cb)=>{
     logVerbose('assets:build:dist',`Copying asset files to dist folder ${config.distDir}\\assets`); 
     pump([gulp.src(AssetSources.map(e => path.resolve(cwd, config.assetsDir, e))),
-    gulp.dest(path.resolve(config.distDir))], (err) => {
+    gulp.dest(path.resolve(config.distDir,'assets'))], (err) => {
         if (err){
             logError(`assets:build:dist`,`An error has occured while copying assets to dist folder at ${path.resolve(cwd,config.distDir)}: ${err.message}`); 
             cb(err); 
