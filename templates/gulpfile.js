@@ -773,7 +773,7 @@ gulp.task('assets:build:dist',(cb)=>{
 
 gulp.task('assets:build',['assets:build:prototype','assets:build:dist','assets:build:sharepoint'],(cb)=>{
     logVerbose(`assets:build`,`Copying asset files`); 
-    pump([gulp.src(AssetSources),
+    pump([gulp.src(AssetSources.map(e => path.resolve(cwd, config.assetsDir, e))),
     gulp.dest(path.resolve(config.provisioningDir,config.deploymentDir,'assets'))],(err)=>{
         if (err){
             logError(`assets:build`,`An error has occured while copying files to provision directory assets folder: ${err.message}`);
