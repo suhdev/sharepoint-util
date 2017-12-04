@@ -717,8 +717,19 @@ gulp.task('pagelayouts:watch', (cb) => {
 
 gulp.task('js:compile',(cb)=>{
     logVerbose('js:compile','Starting to compile JavaScript files'); 
-
-    webpack(webpackConfig,(err,stats)=>{
+    const newConfig = { ...webpackConfig };
+    newConfig.entry = { ...webpackConfig.entry };
+    logVerbose('js:compile', 'Starting to compile JavaScript files');
+    const files = Object.keys(webpackConfig.entry);
+    logVerbose('js:compile','Checking if any of the JS source files does not need to be compiled');
+    files.forEach((e) => {
+        let contents = fs.readFileSync(webpackConfig.entry[e]).toString();
+        if (/\/\/\/[\s]*nocompile[\s]*:[\s]*true/gi.test(contents)) {
+            logVerbose('js:compile', `Entry ${e} for file ${newConfig.entry[e]} has been removed`);
+            delete newConfig.entry[e];
+        }
+    });
+    webpack(newConfig,(err,stats)=>{
         if (err){
             cb(err);
             logError('js:compile',
@@ -924,6 +935,15 @@ gulp.task('prototype:watch',['prototype:compile'],()=>{
         path.resolve(inputDir, '**/*.html')
     ], ['prototype:compile']);
 });
+
+function getPrototypeDefinitions(){
+    let prototypesTemplateDir = path.resolve(cwd,config.prototypeTemplatesDir); 
+    if (fs.existsSync(prototypesTemplateDir)){
+        gulp.src(['*.json','**/*.json'].map(e=>path.resolve(prototypesTemplateDir,e)))
+            .pipe()
+
+    }
+}
 
 gulp.task('prototype',(cb)=>{
     try{
