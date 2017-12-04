@@ -269,7 +269,135 @@ function getDataForMasterPage(file) {
     };
 }
 
-gulp.task('sass:compile',(cb)=>{
+function extractSassVariablesFromFolder(folderPath, newLines) {
+    logVerbose('sass:variables', `Attempting to read files at ${folderPath}`);
+    let files = fs.readdirSync(folderPath);
+    let lines = [];
+    logVerbose('sass:variables', `Found ${files.length} files at ${folderPath}`);
+    files.forEach((e) => {
+        if (e.endsWith('.scss')) {
+
+            let filePath = path.resolve(folderPath, e);
+            logVerbose('sass:variables', `File ${filePath} is a sass file, attempting to read its contents.`);
+            var contents = fs.readFileSync(filePath).toString();
+            logVerbose('sass:variables', `Read contents of file ${filePath}`);
+            contents.replace(/(\$[^:;@\{\}\(\)]+):([^:;\{\}@\(\)]+);/g, (e, name, val) => {
+                logVerbose('sass:variables', `Found sass variable ${name} with value '${val}'`);
+                lines.push({
+                    type: 'variable',
+                    name,
+                    val,
+                });
+            });
+            if (lines.length) {
+                lines.unshift({
+                    type: 'comment',
+                    content: `/**
+ * Variables from file ${e} at ${path.resolve(folderPath, e)} 
+ */
+                            `
+                });
+                newLines.push(...lines);
+                lines = [];
+            }
+        }
+    });
+    return newLines;
+}
+
+
+gulp.task('sass:variables', () => {
+    logVerbose('sass:variables', `Attempting to extract variables from your sass folders`);
+    const sassFolder = path.resolve(cwd, config.sassDir);
+    if (fs.existsSync(sassFolder)) {
+        logVerbose('sass:variables', `Found sass folder at: ${sassFolder}`);
+        logVerbose('sass:variables', `Attempting to read sass folder contents`);
+        let dirs = fs.readdirSync(path.resolve(cwd, config.sassDir));
+        logVerbose('sass:variables', `Sass folder contents read successfully, found ${dirs.length} items`)
+        var lines = [];
+        let vars = {};
+        dirs.forEach((e) => {
+            logVerbose('sass:variables', `Checking if ${path.resolve(cwd, config.sassDir, e)} is a directory`);
+            if (fs.lstatSync(path.resolve(cwd, config.sassDir, e)).isDirectory()) {
+                logVerbose('sass:variables', `${path.resolve(cwd, config.sassDir, e)} is a directory, attempting to read contents`);
+                extractSassVariablesFromFolder(path.resolve(cwd, config.sassDir, e), lines);
+            }
+        });
+        lines.forEach((e) => {
+            if (e.type === 'variable') {
+                vars[e.name] = e.val;
+            }
+        });
+        let settingsVariables = {};
+        let settingsLines = [];
+        if (fs.existsSync(path.resolve(cwd, config.sassDir, './_settings.scss'))) {
+            logVerbose('sass:variables', `Found _settings.scss in the sass directory ${sassFolder}`);
+            let settings = fs.readFileSync(path.resolve(cwd, config.sassDir, './_settings.scss')).toString();
+            settings.replace(/(\$[^:;@\{\}\)\()]+):([^:;\{\}@\)\()]+);/g, (e, name, val) => {
+                logVerbose('sass:variables', `Found variable in _settings.scss ${name} with value '${val}'`);
+                settingsVariables[name] = val;
+                settingsLines.push({
+                    type: 'variable',
+                    name,
+                    val
+                });
+                if (vars[name]) {
+                    vars[name] = val;
+                } else if (name.indexOf('color') !== -1) {
+                    for (var key in vars) {
+                        if (key.indexOf('color') !== -1) {
+                            vars[key] = vars[key].replace(new RegExp(val, 'ig'), name).trim();
+                        }
+                    }
+                } else if (name.indexOf('font-size') !== -1) {
+                    for (var key in vars) {
+                        if (key.indexOf('font-size')) {
+                            vars[key] = vars[key].replace(new RegExp(val, 'ig'), name).trim();
+                        }
+                    }
+                } else if (val.startsWith('#')) {
+                    for (var key in vars) {
+                        vars[key] = vars[key].replace(new RegExp(val, 'ig'), name).trim();
+                    }
+                }
+            });
+        }
+        lines.forEach((e) => {
+            if (e.type === 'variable') {
+                e.val = vars[e.name] || e.val;
+            }
+        });
+
+        logVerbose('sass:variables', `Writing _extracedvariables.scss file to sass directory ${sassFolder}`);
+        if (args.withSettings) {
+            fs.writeFileSync(path.resolve(cwd, config.sassDir, './_extracedvariables.scss'), [...settingsLines.map((e) => {
+                if (e.type === 'comment') {
+                    return e.content;
+                } else if (e.type === 'variable') {
+                    return `${e.name}:${e.val};`
+                }
+            }), ...lines.map(e => {
+                if (e.type === 'comment') {
+                    return e.content;
+                } else if (e.type === 'variable') {
+                    return `${e.name}:${e.val};`
+                }
+            })].join('\n'));
+        } else {
+            fs.writeFileSync(path.resolve(cwd, config.sassDir, './_extracedvariables.scss'), lines.map(e => {
+                if (e.type === 'comment') {
+                    return e.content;
+                } else if (e.type === 'variable') {
+                    return `${e.name}:${e.val};`
+                }
+            }).join('\n'));
+        }
+    }
+});
+
+
+
+gulp.task('sass:compile',['sass:variables'],(cb)=>{
     logVerbose('sass:compile','compiling sass files');
     logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '*.scss')}`);
     logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '**/*.scss')}`);
