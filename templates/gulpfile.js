@@ -369,25 +369,41 @@ gulp.task('sass:variables', () => {
         });
 
         logVerbose('sass:variables', `Writing _extracedvariables.scss file to sass directory ${sassFolder}`);
+        var currentVariables = {}; 
+        if (fs.existsSync(path.resolve(cwd, config.sassDir,'./_extractedvariables.scss'))){
+            let contents = fs.readFileSync(path.resolve(cwd, config.sassDir, './_extractedvariables.scss')).toString();
+            contents.replace(/(\$[^:;@\{\}\)\()]+):([^:;\{\}@\)\()]+);/g,(c,name,val)=>{
+                currentVariables[name] = val; 
+            });
+        }
         if (args.withSettings) {
-            fs.writeFileSync(path.resolve(cwd, config.sassDir, './_extracedvariables.scss'), [...settingsLines.map((e) => {
+            fs.writeFileSync(path.resolve(cwd, config.sassDir, './_extractedvariables.scss'), [...settingsLines.map((e) => {
                 if (e.type === 'comment') {
                     return e.content;
                 } else if (e.type === 'variable') {
+                    if (currentVariables[e.name] && !args.forceReplace){
+                        return `${e.name}:${currentVariables[e.name]};`
+                    }
                     return `${e.name}:${e.val};`
                 }
             }), ...lines.map(e => {
                 if (e.type === 'comment') {
                     return e.content;
                 } else if (e.type === 'variable') {
+                    if (currentVariables[e.name] && !args.forceReplace) {
+                        return `${e.name}:${currentVariables[e.name]};`
+                    }
                     return `${e.name}:${e.val};`
                 }
             })].join('\n'));
         } else {
-            fs.writeFileSync(path.resolve(cwd, config.sassDir, './_extracedvariables.scss'), lines.map(e => {
+            fs.writeFileSync(path.resolve(cwd, config.sassDir, './_extractedvariables.scss'), lines.map(e => {
                 if (e.type === 'comment') {
                     return e.content;
                 } else if (e.type === 'variable') {
+                    if (currentVariables[e.name] && !args.forceReplace) {
+                        return `${e.name}:${currentVariables[e.name]};`
+                    }
                     return `${e.name}:${e.val};`
                 }
             }).join('\n'));
