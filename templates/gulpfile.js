@@ -307,6 +307,9 @@ function extractSassVariablesFromFolder(folderPath, newLines) {
 
 
 gulp.task('sass:variables', () => {
+    if (args.noSassVariables){
+        return false; 
+    }
     logVerbose('sass:variables', `Attempting to extract variables from your sass folders`);
     const sassFolder = path.resolve(cwd, config.sassDir);
     if (fs.existsSync(sassFolder)) {
@@ -370,10 +373,16 @@ gulp.task('sass:variables', () => {
 
         logVerbose('sass:variables', `Writing _extracedvariables.scss file to sass directory ${sassFolder}`);
         var currentVariables = {}; 
+        var currentVariablesLines = []; 
         if (fs.existsSync(path.resolve(cwd, config.sassDir,'./_extractedvariables.scss'))){
             let contents = fs.readFileSync(path.resolve(cwd, config.sassDir, './_extractedvariables.scss')).toString();
             contents.replace(/(\$[^:;@\{\}\)\()]+):([^:;\{\}@\)\()]+);/g,(c,name,val)=>{
                 currentVariables[name] = val; 
+                currentVariablesLines.push({
+                    type:'variable',
+                    name,
+                    val
+                });
             });
         }
         if (args.withSettings) {
@@ -382,7 +391,9 @@ gulp.task('sass:variables', () => {
                     return e.content;
                 } else if (e.type === 'variable') {
                     if (currentVariables[e.name] && !args.forceReplace){
-                        return `${e.name}:${currentVariables[e.name]};`
+                        var res = `${e.name}:${currentVariables[e.name]};`;
+                        delete currentVariables[e.name]; 
+                        return res; 
                     }
                     return `${e.name}:${e.val};`
                 }
@@ -391,7 +402,9 @@ gulp.task('sass:variables', () => {
                     return e.content;
                 } else if (e.type === 'variable') {
                     if (currentVariables[e.name] && !args.forceReplace) {
-                        return `${e.name}:${currentVariables[e.name]};`
+                        var res = `${e.name}:${currentVariables[e.name]};`;
+                        delete currentVariables[e.name]; 
+                        return res; 
                     }
                     return `${e.name}:${e.val};`
                 }
@@ -402,9 +415,11 @@ gulp.task('sass:variables', () => {
                     return e.content;
                 } else if (e.type === 'variable') {
                     if (currentVariables[e.name] && !args.forceReplace) {
-                        return `${e.name}:${currentVariables[e.name]};`
+                        var res = `${e.name}:${currentVariables[e.name]};`;
+                        delete currentVariables[e.name]; 
+                        return res; 
                     }
-                    return `${e.name}:${e.val};`
+                    return `${e.name}:${e.val};`;
                 }
             }).join('\n'));
         }
@@ -417,10 +432,11 @@ gulp.task('sass:compile',['sass:variables'],(cb)=>{
     logVerbose('sass:compile','compiling sass files');
     logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '*.scss')}`);
     logVerbose('sass:compile', `Searching for sass files at: ${path.resolve(cwd, config.sassDir, '**/*.scss')}`);
+    var sources = [path.resolve(cwd, config.sassDir, '*.scss'),
+    path.resolve(cwd, config.sassDir, '**/*.scss'),
+    '!' + path.resolve(cwd, config.sassDir, './prototypes/**')];
     var tasks = [
-        gulp.src([path.resolve(cwd, config.sassDir, '*.scss'),
-            path.resolve(cwd, config.sassDir, '**/*.scss'),
-            '!'+path.resolve(cwd,config.sassDir,'./prototypes/**')]),
+        gulp.src(sources),
         sass({
             compress: !isDebug
         }),

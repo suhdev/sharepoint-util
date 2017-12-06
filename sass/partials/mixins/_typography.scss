@@ -1,0 +1,7 @@
+@mixin Heading($selector,$props){
+    #{$selector}{
+        @each $key,$val in $props {
+            #{$key}:#{$val}; 
+        }
+    }
+}

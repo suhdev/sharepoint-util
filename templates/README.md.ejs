@@ -1,40 +1,318 @@
 # <%= config.name %>
 
-A project created using generator
+Another project created using `generator-sharepoint-app`. 
 
+## 1. Introduction 
 
-## Setup
+Please fill in this section as per the project you're working on. 
+
+## 2. Technologies 
+The generator uses the following technologies:
+
+1. TypeScript (2.6): for client-side code. 
+2.  Sass: For styling  
+3. AutoPrefixer: the gulp tasks for compiling sass use `autoprefixer` to add browser-specific css properties. So, no need to add all variations of a css property, it'll be taken care of for you. 
+3.  ReactJS (v16): UI library  
+4.  Gulp: task automation 
+5.  Yeoman: for project configuration 
+
+## 3. Setup
+
+To setup this project, clone the repo and then run `npm install`. 
 
 ```bash
 
-npm install  
+$ git clone __PROJECT_REPO_URL__
+$ npm install  
 
 ```
 
-## Gulp Tasks
+## 3. Gulp Tasks
 
-* Environment Flag
+The project uses `gulp` for task automation and prototyping. The following `gulp` tasks are supported:
 
-  To change the environment from 'dev' to 'production', you can:
-  1. Change the `env` field in the `.yo-rc.json` file to `dev` or `production` 
-  2. To force development mode, pass an argument to `gulp` using the `dev` flag e.g. `gulp sass:compile --dev` 
+### 3.1 `gulp sass:variables` 
 
-* Sass Tasks
+Extract all variables from all the subfolders inside the `sass` folder and generates `_extractedvariables.scss` file at the root `sass`  folder. The file will contain all the variables from all the subfolders with the values replaced with brand variables (from the `_settings.scss` file).  
 
-  1. Compile sass files using `gulp sass:compile` 
-  2. Run a sass watch using `gulp sass:watch`
+### 3.1.1 Dependencies 
 
-* JS Tasks
+The task has no dependencies. 
 
-  1. Compile JS files using `gulp js:compile` 
-  2. Run a watch using `gulp js:watch` 
+### 3.1.2 Notes
 
-* Library (External libraries) Tasks 
+1. Upon first run all the variables are compiled into the generated file `_extractedvariables.scss`. On subsequent runs, the task will add new variables while keeping old variables as is). This essentially means that changes made to `_extractedvariables.scss` will be persisted and it is safe to update the variables in that file. 
+2. You can force regenerate the file (i.e. removing all old values) using the `--forceReplace` command line argument, for example to completely replace variables do: 
 
-  1. Download cdn files using `gulp lib:download` 
-  2. To force download files use the `--force` flag using `gulp lib:download --force` 
-  3. Compile JS libraries into `vendor.js` using `gulp lib:compile:js` 
-  4. Compile CSS libraries into `vendor.css` using `gulp lib:compile:css`
+```bash
+	$ gulp sass:variables --forceReplace
+```
 
-* Resources (Localization files and SPFont and SPColor)
-  1. Run `gulp resources:compile` 
+3. You can also force the task to include the variables of the `_settings.scss` at the top of the generated file using the `--withSettings` parameter. To do that run: 
+
+```bash 
+	$ gulp sass:variables --withSettings 
+```
+
+4. You can combine the above arguments to both include the variables from `_settings.scss` and to force replace the variables. To do that run: 
+
+```bash
+	$ gulp sass:variables --withSettings --forceReplace 
+```
+
+### 3.2 `gulp sass:compile` 
+
+Compiles all files in the projects `sass` directory (based on sass compilation technique), i.e. if the file is prepended with an underscore `_` it won't produce an output. In a default configuration, the task will generate `main.min.css` in the `dist/css` folder. 
+
+#### 3.2.1 Dependencies 
+
+* `gulp sass:variables` 
+
+#### 3.2.2 Notes 
+
+1. If the task is executed while in `prototyping mode` it will also compile prototypes sass files into the `prototype` folder. You can force `prototyping mode` using the `--isPrototyping` or `--prototype` command line argument. 
+
+	```bash
+		$ gulp sass:compile --isPrototyping     #or 
+		$ gulp sass:compile --prototype 
+	```
+
+2. If the task is executing and the SharePoint drive for the SiteAssets library is mapped, it will also copy the output files into `${SiteAssetsDrive}:\\${deploymentDir}/css` folder, defaults to `Sysdoc/css` .  **Note:** you need to be working in debug mode. To force debug mode use `--dev` or use `--env dev`. To do that run: 
+
+	```bash
+		$ gulp sass:compile --dev     #or
+		$ gulp sass:compile --env dev 
+	```
+
+### 3.3 `gulp sass:watch` 
+
+Runs a watch on the `sass` folder to listen for file changes. Once a change is detected, the `gulp sass:compile` file will be executed. 
+
+```bash
+	$ gulp sass:watch 
+```
+
+#### 3.3.1 Dependencies
+
+* `gulp sass:compile`
+
+#### 3.3.2 Notes 
+
+1. You can pass the same arguments for both `gulp sass:compile` and `gulp sass:variables`, it will be propagated to the other tasks. 
+2. The watch will also listen to the files that exist at the time when the watch was started. If you add new files, you need to stop the watch and rerun it to listen for changes on the new files. 
+
+### 3.4 `gulp lib:download` 
+
+Downloads CDN files configured through the generator. The downloaded files will be moved to `lib` in the repo. 
+
+#### 3.4.1 Dependencies
+* None 
+
+#### 3.4.2 Notes
+
+1. Use the `yo generator-sharepoint-app` to add cdn files. 
+2. You can add both `css` and `js` files. The task will download both. 
+
+### 3.5 `gulp lib:compile:js` 
+
+Compiles all the `js` files from the `lib` directory into `dist/js/vendor.js`. 
+
+#### 3.5.1 Dependencies 
+* None 
+
+#### 3.5.2 Notes
+* None
+
+### 3.6 `gulp lib:compile:css` 
+
+Compiles all the `css` files from the `lib` directory into `dist/css/vendor.css`. 
+
+#### 3.6.1 Dependencies 
+* None
+
+#### 3.6.2 Notes
+* None 
+
+### 3.7 `gulp masterpages:compile` 
+
+Compiles all the master page templates into the `provisioningDir` (defaults to `deploy`). 
+
+#### 3.7.1 Dependencies
+* None
+
+#### 3.7.2 Notes
+1. If the `masterPageCatalog` drive is mapped, the task will also copy the compiled master pages to the mapped drive. 
+2. In order for the mapped drive to work, you need to be working in `debug mode` using `--dev` or `--env dev` to force debug mode. 
+
+### 3.8 `gulp masterpages:watch` 
+
+Setup a watch on the master page templates directory such that when the templates change, the `gulp masterpages:compile` task is executed.
+
+#### 3.8.1 Dependencies
+* None
+
+#### 3.8.2 Notes
+* None
+
+### 3.9 `gulp pagelayouts:compile` 
+
+Compiles all page layouts into the `provisioningDir` (defaults to `deploy`). 
+
+#### 3.9.1 Dependencies
+* None
+
+#### 3.9.2 Notes
+* None
+
+### 3.10 `gulp pagelayouts:watch` 
+
+Setup a watch on the page layouts templates directory. Once a page layout template changes it will run the `gulp pagelayouts:compile` task. 
+
+#### 3.10.1 Dependencies
+* `gulp pagelayouts:compile` 
+
+#### 3.10.2 Notes
+
+* None 
+
+### 3.11 `gulp js:compile` 
+
+Compiles TypeScript source files into `dist/js` directory. This includes all prototype source files as well. 
+
+#### 3.11.1 Dependencies
+* None 
+
+#### 3.11.2 Notes
+1. By default the task compiles all files that are added to `webpack.config.js` and all the prototypes. This can become a bit slow if you have many prototypes. So, to exclude a source file from being compiled you can add the following comment at the top of the source file. 
+ 
+	```typescript
+	//nocompile:true 
+	```
+2. If working in `prototyping mode` the compiled files will also be copied to `prototype/js`. 
+3. If the `SiteAssets` folder is mapped and the project is configured properly. The compiled files will also be copied to `${deploymentDir}/js` folder. 
+
+### 3.12 `gulp js:watch` 
+
+Setup a watch on the TypeScript source files, once a source file is changed, the `gulp js:compile` task is executed. 
+
+#### 3.12.1 Dependencies 
+* `gulp js:compile` 
+
+#### 3.12.2 Notes
+* None 
+
+### 3.13 `gulp resources:compile` 
+
+Copies all resource files i.e. `.resx`, `.spfont`, `.spcolor` files into the `${provisioningDir}` which defaults to `deploy`. 
+
+#### 3.13.1 Dependencies
+* None
+
+#### 3.13.2 Notes
+* None 
+
+### 3.14 `gulp watch` 
+
+A global watch task to wrap all other watches. 
+
+#### 3.14.1 Dependencies
+1. `gulp js:watch` 
+2.  `gulp sass:watch` 
+3.  `gulp pagelayouts:watch` 
+4.  `gulp masterpages:watch` 
+
+### 3.14 `gulp prototype:compile` 
+
+Compiles all prototype templates into the `prototype` directory. 
+
+#### 3.14.1 Dependencies 
+* None
+#### 3.14.2 Notes 
+* None 
+
+### 3.15 `gulp assets:build:prototype` 
+
+Copies all assets into `prototype/assets` directory. 
+
+#### 3.15.1 Dependencies 
+* None
+#### 3.15.2 Notes
+* None 
+
+### 3.16 `gulp assets:build:sharepoint` 
+
+Copies all assets into the `SiteAssets` mapped drive (if any). 
+
+#### 3.16.1 Dependencies
+* None
+#### 3.16.2 Notes
+* None 
+
+### 3.17 `gulp assets:build:dist` 
+
+Copies all assets into the `dist/assets` folder. 
+
+#### 3.17.1 Dependencies
+* None
+#### 3.17.2 Notes
+* None
+
+### 3.18 `gulp assets:build` 
+
+Copies all assets into `dist/assets` and `prototype/assets` and `SiteAssets/DeploymentDir/assets`. 
+
+#### 3.18.1 Dependencies 
+* `gulp assets:build:dist` 
+* `gulp assets:build:sharepoint` 
+* `gulp assets:build:prototype` 
+
+### 3.19 `gulp prototype:watch` 
+
+Setup a watch for prototype templates that will run the `gulp prototype:compile`. 
+
+#### 3.19.1 Dependencies 
+* `gulp prototype:compile`
+
+#### 3.19.2 Notes
+* None 
+
+### 3.20 `gulp prototype` 
+
+#### 3.20.1 Dependencies
+* `gulp lib:download` 
+* `gulp assets:build` 
+* `gulp lib:compile:js` 
+* `gulp lib:compile:css` 
+* `gulp prototype:watch` 
+* `gulp js:watch` 
+* `gulp sass:watch` 
+
+
+### 3.21 `gulp prototype:upload` 
+
+Uploads the contents of the `prototype` directory to the prototyping server. 
+
+## 4. Project Configuration 
+
+The project can be configured through `generator-sharepoint-app` yeoman generator. The generator provides a CLI to configure the project including:
+ 
+1. Configuring the project internals. i.e. name, title, add todos to the project todo list, etc. 
+2. Configuring external cdn libraries (either by providing a URL or by searching cdnjs.com). 
+3. Configuring SiteDefinition (for SharePoint Projects), such that you can define your fields, content types, lists, subsites, etc. 
+4. Creating source files (React Components)
+5. Configuring prototypes (for rapid application prototyping, see Prototyping section below). 
+6. Run gulp tasks 
+
+To configure the project you need to run the following: 
+
+```bash 
+	$ yo generator-sharepoint-app 
+```
+
+Then follow the CLI to select what you want to configure exactly. 
+
+
+## 5. Prototyping 
+
+The project supports rapid application prototyping through the `generator-sharepoint-app`. It provides an easy way to quickly create prototypes i.e creates sass files, js files, and html page such that the prototype can run in isolation of any other code. 
+

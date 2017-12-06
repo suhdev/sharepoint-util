@@ -1,3 +1,9 @@
+$brand-color-default:gray !default;
+$brand-color-success:green !default; 
+$brand-color-primary:cyan !default;
+$brand-color-danger:lighten(red,20%) !default;
+$brand-color-warning:orange !default;
+
 %box{
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -12,23 +18,33 @@
     }
 }
 
-.rte-toolbar-custom button{
-    min-width:auto;
+
+body,html{
+    font-family:$brand-font-1;
 }
 
-.list-view-container:first-of-type h2 {
-  margin-top:0px; 
+
+.bg-brand-danger{
+    background-color:$brand-color-danger;
+    color:invert($brand-color-danger);
 }
 
-.intro-box h2:first-of-type {
-  margin-top:0px;
-} 
+.bg-brand-success{
+    background-color:$brand-color-success;
+    color:invert($brand-color-success);
+}
 
-.download-link{
-    text-decoration:underline;
-    color:$brand-color-1;
-} 
+.bg-brand-warning{
+    background-color:$brand-color-warning;
+    color:invert($brand-color-warning);
+}
 
-.error-asterisk{
-    color:$brand-color-1;
+.bg-brand-primary{
+    background-color:$brand-color-primary;
+    color:invert($brand-color-primary);
+}
+
+.bg-brand-default{
+    background-color:$brand-color-default;
+    color:invert($brand-color-default);
 }

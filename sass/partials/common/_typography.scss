@@ -1,65 +1,141 @@
-$h1-font-family:sans-serif !default;
-$h2-font-family:$h1-font-family !default;
-$h3-font-family:$h2-font-family !default;
-$h1-fg:#000 !default;
-$h2-fg:$h1-fg !default;
-$h3-fg:$h2-fg !default;
-$heading-indicator-bg:$brand-color-1;
-p {
-    font-size: 16px;
-}
+$brand-color-default:gray !default;
+$brand-color-success:green !default; 
+$brand-color-primary:cyan !default;
+$brand-color-danger:lighten(red,20%) !default;
+$brand-color-warning:orange !default;
 
-h1 {
-    font-size: 28px;
-    font-weight: bold;
-    font-family: $h1-font-family;
-    letter-spacing: -0.61px;
-    color: $h1-fg;
-    @include SmallDevice() {
-        font-size: 38px;
-    }
+$h1-font-family:sans-serif !default;
+$h1-fg-color:#000 !default;
+$h1-font-size:initial !default;
+$h1-letter-spacing:initial !default;
+
+$h2-font-family:$h1-font-family !default;
+$h2-fg-color:$h1-fg-color !default;
+$h2-font-size:initial !default;
+$h2-letter-spacing:initial !default; 
+
+$h3-font-family:$h1-font-family !default;
+$h3-fg-color:$h1-fg-color !default;
+$h3-font-size:initial !default;
+$h3-letter-spacing:initial !default; 
+
+$h4-font-family:$h1-font-family !default;
+$h4-fg-color:$h1-fg-color !default;
+$h4-font-size:initial !default;
+$h4-letter-spacing:initial !default; 
+
+$h5-font-family:$h1-font-family !default;
+$h5-fg-color:$h1-fg-color !default;
+$h5-font-size:initial !default;
+$h5-letter-spacing:initial !default; 
+
+$h6-font-family:$h1-font-family !default;
+$h6-fg-color:$h1-fg-color !default;
+$h6-font-size:initial !default;
+$h6-letter-spacing:initial !default; 
+
+$p-font-size:initial !default; 
+$p-fg-color:#000 !default; 
+$p-letter-spacing:0px !default; 
+$p-font-family:initial !default; 
+
+h1{
+    font-size:$h1-font-szie;
+    letter-spacing:$h1-letter-spacing; 
+    color:$h1-fg-color;
+    font-family:$h1-font-family;
 }
 
 h2 {
-    position: relative;
-    font-family: $h2-font-family;
-    letter-spacing: -0.4px;
-    font-size: 25px;
-    padding-left: 18px;
-    height: 50px;
-    color: $h2-fg;
-    margin-top: 40px;
-    margin-bottom: 25px;
-    &:before {
-        position: absolute;
-        display: block;
-        content: ' ';
-        width: 4px;
-        height: 100%;
-        left: 0px;
-        top: 0px;
-        background-color: $heading-indicator-bg;
-        -webkit-border-radius: 2px 2px 2px 2px;
-        -moz-border-radius: 2px 2px 2px 2px;
-        -ms-border-radius: 2px 2px 2px 2px;
-        -o-border-radius: 2px 2px 2px 2px;
-        border-radius: 2px 2px 2px 2px;
-    }
+    font-size:$h2-font-szie;
+    letter-spacing:$h2-letter-spacing; 
+    color:$h2-fg-color;
+    font-family:$h2-font-family;
+}
+
+h3 {
+    font-size:$h3-font-szie;
+    letter-spacing:$h3-letter-spacing; 
+    color:$h3-fg-color;
+    font-family:$h3-font-family;
+}
+
+h4 {
+    font-size:$h4-font-szie;
+    letter-spacing:$h4-letter-spacing; 
+    color:$h4-fg-color;
+    font-family:$h4-font-family;
+}
+
+h5 {
+    font-size:$h5-font-szie;
+    letter-spacing:$h5-letter-spacing; 
+    color:$h5-fg-color;
+    font-family:$h5-font-family;
+}
+
+h6 {
+    font-size:$h6-font-szie;
+    letter-spacing:$h6-letter-spacing; 
+    color:$h6-fg-color;
+    font-family:$h6-font-family;
 }
 
 p{
-    // font-family:VodafoneRg-Regular;
-    font-size:16px;
-    color:#333333;
-    letter-spacing:0;
-    line-height:1.2em;
-    text-align:left;
-    p + p{
-        margin-top:20px;
-    }
+    font-size:$p-font-szie;
+    letter-spacing:$p-letter-spacing; 
+    color:$p-fg-color;
+    font-family:$p-font-family;
 }
-.public-DraftEditor-content { 
-    
-        font-family:$brand-font-1 !important;
 
+.text-brand-danger{
+    color:$brand-color-danger;
+}
+
+.text-brand-success{
+    color:$brand-color-success;
+}
+
+.text-brand-warning{
+    color:$brand-color-warning;
+}
+
+.text-brand-primary{
+    color:$brand-color-primary;
+}
+
+.text-brand-default{
+    color:$brand-color-default;
+}
+
+.text-uppercase{
+    text-transform: uppercase;
+}
+
+.text-lowercase{
+    text-transform: lowercase;
+}
+
+.text-capitalize{
+    text-transform:capitalize;
+}
+
+.text-underline{
+    text-decoration:underline;
+}
+
+.text-linethrough{
+    text-decoration:line-through;
+}
+
+.text-center{
+    text-align:center
+}
+
+.text-right{
+    text-align:right
+}
+
+.text-left{
+    text-align:left
 }
