@@ -4,6 +4,7 @@
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="wssuc" TagName="Welcome" src="~/_controltemplates/15/Welcome.ascx" %>
+<%@ Register TagPrefix="wssuc" TagName="HelpPanel" src="~/_controltemplates/15/HelpPanel.ascx" %>
 <!doctype html>
 <SharePoint:SPHtmlTag dir="<%$Resources:wss,multipages_direction_dir_value%>" ID="SPHtmlTag" runat="server">
 	<head runat="server">
@@ -11,6 +12,9 @@
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<SharePoint:IECompatibleMetaTag runat="server" />
 		<meta http-equiv="Expires" content="0" />
+		{% if masterPage.localizationPage %}
+		<script type="text/javascript" src='<asp:Literal runat="server" ID="LANG_SCRIPT" Text="<% $SPUrl:~sitecollection/SiteAssets/{{config.deploymentDir}}/assets/locale/~language%>"></asp:Literal>.js'></script>
+		{% endif %}
 		{% if masterPage.tileUrl %}
 		<SharePoint:SPPinnedSiteTile runat="server" TileUrl="{{masterPage.tileUrl}}" TileColor="{{masterPage.tileColor | default('#0072C6')}}"/>
 		{% else %}
@@ -31,10 +35,10 @@
 		<SharePoint:CssLink runat="server" Version="15" />
         {{MasterPageScriptLinks(masterPage)}}
         {% for link in masterPage.stylesheets %}
-        <link rel="stylesheet" href="{{siteCollectionUrl}}/SiteAssets/{{link}}" />
+		<link rel="stylesheet" href='<asp:Literal runat="server" ID="style_{{link|replace(r/[\s\.]+/g,'_')}}" Text="<% $SPUrl:~sitecollection/SiteAssets/{{config.deploymentDir}}/css/{{link}}%>"></asp:Literal>' />
         {% endfor %}
         {% for link in masterPage.headScripts %}
-        <script type="text/javascript" src="{{siteCollectionUrl}}/SiteAssets/{{link}}"></script>
+		<script type="text/javascript" src='<asp:Literal runat="server" ID="headscript_{{link|replace(r/[\s\.]+/g,'_')}}" Text="<% $SPUrl:~sitecollection/SiteAssets/{{config.deploymentDir}}/js/{{link}}%>"></asp:Literal>'></script>
         {% endfor %}
 		<SharePoint:CustomJSUrl runat="server" />
 		<SharePoint:SoapDiscoveryLink runat="server" />
@@ -151,8 +155,8 @@
 		<SharePoint:ScriptBlock runat="server">
 			var g_Workspace = "s4-workspace";
 		</SharePoint:ScriptBlock>
-        {% for link in masterPage.bodyScripts %}
-        <script type="text/javascript" src="{{siteCollectionUrl}}/{{link}}"></script>
+		{% for link in masterPage.headScripts %}
+		<script type="text/javascript" src='<asp:Literal runat="server" ID="bodyscript_{{link|replace(r/[\s\.]+/g,'_')}}" Text="<% $SPUrl:~sitecollection/SiteAssets/{{config.deploymentDir}}/js/{{link}}%>"></asp:Literal>'></script>
         {% endfor %}
 	</body>
 </SharePoint:SPHtmlTag>
