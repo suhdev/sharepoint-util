@@ -35,8 +35,8 @@ var config = {
     libDir:'./lib', 
     templatesDir:'./templates', 
     prototypeDir:'./prototype',
-    masterPageTemplatesDir:'./templates/masterpage', 
-    pageLayoutTemplatesDir:'./templates/pagelayout',
+    masterPageTemplatesDir:'./templates/masterpages', 
+    pageLayoutTemplatesDir:'./templates/pagelayouts',
     prototypeTemplatesDir:'./templates/prototypes', 
     deploymentDir:'Sysdoc',
     provisioningDir:'./deploy',
@@ -281,7 +281,7 @@ function extractSassVariablesFromFolder(folderPath, newLines) {
             logVerbose('sass:variables', `File ${filePath} is a sass file, attempting to read its contents.`);
             var contents = fs.readFileSync(filePath).toString();
             logVerbose('sass:variables', `Read contents of file ${filePath}`);
-            contents.replace(/(\$[^:;@\{\}\(\)]+):([^:;\{\}@\(\)]+);/g, (e, name, val) => {
+            contents.replace(/(\$[^:;@\{\}\(\)]+):([^:;\{\}@]+?);/g, (e, name, val) => {
                 logVerbose('sass:variables', `Found sass variable ${name} with value '${val}'`);
                 lines.push({
                     type: 'variable',
@@ -676,10 +676,10 @@ gulp.task('masterpages:compile',(cb)=>{
 
 gulp.task('masterpages:watch', (cb) => {
     logVerbose('masterpages:watch', 'Started watch for master page templates');
-    gulp.watch([path.resolve(cwd, config.masterPageTemplatesDir) + './*.masterpage',
-        path.resolve(cwd, config.masterPageTemplatesDir) + './**/*.masterpage',
-        path.resolve(cwd, config.masterPageTemplatesDir) + './*.njk',
-        path.resolve(cwd, config.masterPageTemplatesDir) + './**/*.njk'
+    gulp.watch([path.resolve(cwd, config.masterPageTemplatesDir, './*.master'),
+        path.resolve(cwd, config.masterPageTemplatesDir, './**/*.master'),
+        path.resolve(cwd, config.masterPageTemplatesDir, './*.njk'),
+        path.resolve(cwd, config.masterPageTemplatesDir, './**/*.njk')
     ], ['masterpages:compile']);
 });
 
