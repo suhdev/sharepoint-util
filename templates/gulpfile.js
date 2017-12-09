@@ -426,9 +426,9 @@ gulp.task('sass:variables', () => {
     }
 });
 
-gulp.task('sass:compile:provisioning',['sass:compile'],(cb)=>{
+gulp.task('sass:compile:debug',['sass:compile'],(cb)=>{
     if (config.siteAssetsDrive && isDebug) {
-        logVerbose('sass:compile:provisioning', 
+        logVerbose('sass:compile:debug', 
             `Sass files to be written to mapped drives at ${(path.resolve(config.siteAssetsDrive + ':\\',
             config.deploymentDir,
             config.cssDistDir.split('/').pop()))}`);
@@ -442,17 +442,36 @@ gulp.task('sass:compile:provisioning',['sass:compile'],(cb)=>{
                     config.cssDistDir.split('/').pop())))
             ], (err) => {
                 if (err) {
-                    logError('sass:compile:provisioning', `An error has occured while writing CSS files to mapped drive ${err.message}`);
+                    logError('sass:compile:debug', `An error has occured while writing CSS files to mapped drive ${err.message}`);
                     cb(err);
                     return;
                 }
-                logVerbose('sass:compile:provisioning', `CSS files written to mapped drive successfully`);
+                logVerbose('sass:compile:debug', `CSS files written to mapped drive successfully`);
                 cb();
             });
         }
     }else {
         cb(); 
     }
+});
+
+
+gulp.task('sass:compile:provisioning', ['sass:compile'], (cb) => {
+    logVerbose('sass:compile:provisioning',
+        `Sass files to be written to provisioning directory at ${(path.resolve(config.provisioningDir,
+            config.deploymentDir,
+            config.cssDistDir.split('/').pop()))}`);
+    pump([
+        gulp.src(path.resolve(cwd, config.cssDistDir, '*.css')),
+        gulp.dest(path.resolve(cwd,config.provisioningDir,config.deploymentDir))
+    ],(err)=>{
+        if (err){
+            logError('sass:compile:provisioning',`An error has occured while copying files to provisioning directory ${err.message}`);
+            cb(err); 
+            return;
+        }
+        cb(); 
+    });
 });
 
 gulp.task('sass:compile:prototype',['sass:compile'],(cb)=>{
@@ -525,9 +544,24 @@ gulp.task('sass:compile',['sass:variables'],(cb)=>{
 gulp.task('sass:watch', (cb) => {
     logVerbose('sass:watch', `Watching for sass file changes on ${path.resolve(cwd, config.sassDir, './*.scss')}`);
     logVerbose('sass:watch', `Watching for sass file changes on ${path.resolve(cwd, config.sassDir, './**/*.scss')}`);
+    var tasks = [];
+    if (isPrototyping){
+        tasks.push('sass:compile:prototype');
+    } 
+    if (isDebug && config.siteAssetsDrive){
+        if (fs.existsSync(`${config.siteAssetsDrive}:\\`)){
+            tasks.push('sass:compile:debug');
+        }
+    }
+    if (config.useSharePoint){
+        tasks.push('sass:compile:provisioning'); 
+    }
+    if (tasks.length){
+        tasks.push('sass:compile'); 
+    }
     gulp.watch([
         path.resolve(cwd, config.sassDir,'./*.scss'),
-        path.resolve(cwd, config.sassDir, './**/*.scss')], ['sass:compile:prototype','sass:compile:provisioning']);
+        path.resolve(cwd, config.sassDir, './**/*.scss')], tasks);
 });
 
 gulp.task('lib:download',(cb)=>{
