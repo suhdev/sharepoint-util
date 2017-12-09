@@ -97,7 +97,7 @@ function updateConfigFromArgs(config,args){
     config.distDir = args.distDir || config.distDir ||  './dist';
     if (config.useSharePoint){
         config.spHost = args.spHost || config.spHost || 'https://tenant.sharepoint.com/'; 
-        if (!args.spHost || config.spHost){
+        if (!args.spHost && !config.spHost){
             logWarning('Configuration',`No spHost has been provided in your configuration
             To fix this: you can rerun your gulp task with --spHost YOUR_SP_HOST
             Going to use: https://tenant.sharepoint.com/ for now.`);
