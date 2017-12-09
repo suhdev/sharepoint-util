@@ -475,6 +475,7 @@ gulp.task('sass:compile:provisioning', ['sass:compile'], (cb) => {
 });
 
 gulp.task('sass:compile:prototype',['sass:compile'],(cb)=>{
+    console.log(args);
     if (isPrototyping) {
         logVerbose('sass:compile:prototype', 
             `Compiling prototype sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
@@ -506,7 +507,7 @@ gulp.task('sass:compile:prototype',['sass:compile'],(cb)=>{
                 cb(err);
             });
     } else {
-        cb(err);
+        cb();
     }
 });
 
@@ -556,7 +557,7 @@ gulp.task('sass:watch', (cb) => {
     if (config.useSharePoint){
         tasks.push('sass:compile:provisioning'); 
     }
-    if (tasks.length){
+    if (tasks.length === 0){
         tasks.push('sass:compile'); 
     }
     gulp.watch([
@@ -810,6 +811,70 @@ gulp.task('pagelayouts:watch', (cb) => {
     ], ['pagelayouts:compile']);
 });
 
+gulp.task('js:compile:prototype',['js:compile'],(cb)=>{
+    if (isPrototyping) {
+        logVerbose('js:compile:prototype', 'Attempting to copy compiled JavaScript files into prototype directory');
+        pump([
+            gulp.src([path.resolve(cwd, config.jsDistDir, '*.js'),
+            path.resolve(cwd, config.jsDistDir, '**/*.js')]),
+            gulp.dest(path.resolve(cwd, config.prototypeDir, config.jsDistDir.split(/[\\\/]/g).pop()))
+        ], (err) => {
+            if (err) {
+                logError('js:compile:prototype', `Could not copy files to prototye directory: ${err.message}`);
+                return;
+            } else {
+                logVerbose('js:compile:prototype', 'Finished copying JavaScript files into prototype directory');
+            }
+            cb();
+        });
+        return; 
+    }
+    cb(); 
+});
+
+gulp.task('js:compile:debug',['js:compile'],(cb)=>{
+    if (config.siteAssetsDrive && isDebug) {
+        logVerbose('js:compile:debug',`Writing files to Site Assets mapped drive`); 
+        pump([gulp.src([path.resolve(cwd, `${config.jsDistDir}/*.js`),
+            [path.resolve(cwd, `${config.distDir}/*.js`)]]),
+            gulp.dest(path.resolve(config.siteAssetsDrive + ':\\',
+                config.deploymentDir, config.jsDistDir.split(/[\\\/]/g).pop()))], (err) => {
+                if (err) {
+                    logError('js:compile:debug', `An error has occured while writing js files to Site Assets ${path.resolve(config.siteAssetsDrive + ':\\',
+                        config.deploymentDir,
+                        config.jsDistDir.split(/[\\\/]/g).pop())}`);
+                    cb(err);
+                    return; 
+                }
+                logVerbose('js:compile:debug', `Finished writing js files to Site Assets ${path.resolve(config.siteAssetsDrive + ':\\',
+                    config.deploymentDir,
+                    config.jsDistDir.split(/[\\\/]/g).pop())}`);
+                cb();
+            });
+            return; 
+    }
+    cb(); 
+});
+
+gulp.task('js:compile:provisioning', ['js:compile'], (cb) => {
+    const outputPath = path.resolve(cwd, config.provisioningDir, config.deploymentDir, config.jsDistDir.split(/[\\\/]/g).pop()); 
+    logVerbose('js:compile:provisioning',`Writing js files to provisioning directory ${outputPath}`);
+    pump([
+        gulp.src([path.resolve(cwd, `${config.jsDistDir}/*.js`)]),
+        gulp.dest(path.resolve(outputPath))
+        ], (err) => {
+            if (err) {
+                logError('js:compile:provisioning', 
+                    `An error has occured while writing js files to provisioning directory at: ${outputPath}`);
+                cb(err);
+                return;
+            }
+            logVerbose('js:compile:provisioning', 
+                `Finished writing js files to provisioning directory at: ${outputPath}`);
+            cb();
+        });
+});
+
 gulp.task('js:compile',(cb)=>{
     logVerbose('js:compile','Starting to compile JavaScript files'); 
     const newConfig = { ...webpackConfig };
@@ -835,44 +900,27 @@ gulp.task('js:compile',(cb)=>{
                 `Compile stats have errors: ${stats.toString()}`);
             }
             logVerbose('js:compile','Finished compiling JavaScript files'); 
-            if (isPrototyping){
-                logVerbose('js:compile','Attempting to copy compiled JavaScript files into prototype directory');
-                pump([
-                    gulp.src([path.resolve(cwd, config.jsDistDir, '*.js'),
-                        path.resolve(cwd, config.jsDistDir, '**/*.js')]),
-                    gulp.dest(path.resolve(cwd,config.prototypeDir,'js'))
-                ],(err)=>{
-                    if (err){
-                        logError('js:compile',`Could not copy files to prototye directory: ${err.message}`);
-                        return; 
-                    }else {
-                        logVerbose('js:compile', 'Finished copying JavaScript files into prototype directory');
-                    }
-                    cb();
-                });
-            } else if (config.siteAssetsDrive && isDebug){
-                pump([
-                    gulp.src([path.resolve(cwd,`${config.jsDistDir}/*.js`),
-                        [path.resolve(cwd, `${config.distDir}/*.js`)]]),
-                    gulp.dest(path.resolve(config.siteAssetsDrive+':\\',
-                    config.deploymentDir,
-                    'js'))],(err)=>{
-                        if (err){
-                            logError('js:compile', `An error has occured while pushing files to Site Assets ${path.resolve(config.siteAssetsDrive + ':\\',
-                                config.deploymentDir,
-                                'js')}`);
-                        }
-                        cb(err);
-                    });
-                return;
-            }else {
-                cb();
-            }
+            cb();
         }
     });
 });
 
 gulp.task('js:watch',(cb)=>{
+    var tasks = [];
+    if (isPrototyping){
+        tasks.push('js:compile:prototype'); 
+    } 
+    if (isDebug && config.siteAssetsDrive){
+        if (fs.existsSync(`${config.siteAssetsDrive}:\\`)){
+            tasks.push('js:compile:debug'); 
+        }
+    }
+    if (config.useSharePoint){
+        tasks.push('js:compile:provisioning'); 
+    }
+    if (tasks.length === 0){
+        tasks.push('js:compile'); 
+    }
     return gulp.watch([
         path.resolve(cwd,'./src/*.ts'),
         path.resolve(cwd, './src/**/*.ts'),
