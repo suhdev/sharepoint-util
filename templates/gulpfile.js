@@ -426,6 +426,70 @@ gulp.task('sass:variables', () => {
     }
 });
 
+gulp.task('sass:compile:provisioning',['sass:compile'],(cb)=>{
+    if (config.siteAssetsDrive && isDebug) {
+        logVerbose('sass:compile:provisioning', 
+            `Sass files to be written to mapped drives at ${(path.resolve(config.siteAssetsDrive + ':\\',
+            config.deploymentDir,
+            config.cssDistDir.split('/').pop()))}`);
+        if (fs.existsSync(path.resolve(config.siteAssetsDrive + ':\\',
+            config.deploymentDir,
+            config.cssDistDir.split('/').pop()))) {
+            pump([
+                gulp.src(path.resolve(cwd, config.cssDistDir, '*.css')),
+                gulp.dest(gulp.dest(path.resolve(config.siteAssetsDrive + ':\\',
+                    config.deploymentDir,
+                    config.cssDistDir.split('/').pop())))
+            ], (err) => {
+                if (err) {
+                    logError('sass:compile:provisioning', `An error has occured while writing CSS files to mapped drive ${err.message}`);
+                    cb(err);
+                    return;
+                }
+                logVerbose('sass:compile:provisioning', `CSS files written to mapped drive successfully`);
+                cb();
+            });
+        }
+    }else {
+        cb(); 
+    }
+});
+
+gulp.task('sass:compile:prototype',['sass:compile'],(cb)=>{
+    if (isPrototyping) {
+        logVerbose('sass:compile:prototype', 
+            `Compiling prototype sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
+        pump([gulp.src(path.resolve(cwd, config.cssDistDir, '*.css')),
+            gulp.dest(path.resolve(cwd, config.prototypeDir, 'css'))], (err) => {
+                if (err){
+                    logError('sass:compile:prototype', 
+                    `An error has occured while copying css files into prototype directory ${path.resolve(cwd, config.prototypeDir, 'css')}`);
+                }
+                logVerbose('sass:compile:prototype', `Finished copying main css into prototype css directory`);
+            });
+        logVerbose('sass:compile:prototype', 
+            `Attempting to compile prototypes sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
+        pump([
+            gulp.src([
+                path.resolve(cwd, config.sassDir, './prototypes/*.scss'),
+                path.resolve(cwd, config.sassDir, './prototypes/**/*.scss')]),
+            sass({
+                compress: !isDebug,
+            }),
+            autoprefixer(),
+            gulp.dest(path.resolve(cwd, config.prototypeDir, 'css'))],
+            (err) => {
+                if (err) {
+                    logError('sass:compile:prototype', `An error has occured while compiling prorotypes sass files: ${err.message}`);
+                } else {
+                    logVerbose('sass:compile:prototype', `Finished compiling prototypes sass files`);
+                }
+                cb(err);
+            });
+    } else {
+        cb(err);
+    }
+});
 
 
 gulp.task('sass:compile',['sass:variables'],(cb)=>{
@@ -444,18 +508,7 @@ gulp.task('sass:compile',['sass:variables'],(cb)=>{
         gulp.dest(path.resolve(cwd, config.cssDistDir))
     ]; 
     logVerbose('sass:compile', `Sass files will be written to ${path.resolve(cwd, config.cssDistDir)}`);
-    if (config.siteAssetsDrive && isDebug){
-        logVerbose('sass:compile', `Sass files to be written to mapped drives at ${(path.resolve(config.siteAssetsDrive+':\\',
-            config.deploymentDir,
-            config.cssDistDir.split('/').pop()))}`);
-        if (fs.existsSync(path.resolve(config.siteAssetsDrive + ':\\',
-            config.deploymentDir,
-            config.cssDistDir.split('/').pop()))){
-            tasks.push(gulp.dest(path.resolve(config.siteAssetsDrive+':\\',
-                config.deploymentDir,
-                config.cssDistDir.split('/').pop())));
-        }
-    }
+    
    
     pump(tasks,(err)=>{
         if (err){
@@ -463,42 +516,18 @@ gulp.task('sass:compile',['sass:variables'],(cb)=>{
             cb(err);
             return; 
         }
+        cb();
         logVerbose('sass:compile',`finished compiling sass files successfully.`);
-        if (isPrototyping){
-            logVerbose('sass:compile', `Compiling prototype sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
-            pump([gulp.src(path.resolve(cwd, config.cssDistDir, '*.css')),
-            gulp.dest(path.resolve(cwd, config.prototypeDir, 'css'))], () => {
-                logVerbose('sass:compile', `Finished copying main css into prototype css directory`);
-            });
-            logVerbose('sass:compile', `Attempting to compile prototypes sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
-            pump([
-                gulp.src([
-                    path.resolve(cwd, config.sassDir, './prototypes/*.scss'),
-                    path.resolve(cwd, config.sassDir, './prototypes/**/*.scss')]),
-                sass({
-                    compress:!isDebug,
-                }),
-                autoprefixer(),
-                gulp.dest(path.resolve(cwd,config.prototypeDir,'css'))],
-                (err)=>{
-                    if (err){
-                        logError('sass:compile',`An error has occured while compiling prorotypes sass files: ${err.message}`);
-                    }else {
-                        logVerbose('sass:compile',`Finished compiling prototypes sass files`);
-                    }
-                    cb(err);
-                });
-        }else {
-            cb(err);
-        }
+        
     }); 
 });
 
 gulp.task('sass:watch', (cb) => {
     logVerbose('sass:watch', `Watching for sass file changes on ${path.resolve(cwd, config.sassDir, './*.scss')}`);
     logVerbose('sass:watch', `Watching for sass file changes on ${path.resolve(cwd, config.sassDir, './**/*.scss')}`);
-    gulp.watch([path.resolve(cwd, config.sassDir,'./*.scss'),
-    path.resolve(cwd, config.sassDir, './**/*.scss')], ['sass:compile']);
+    gulp.watch([
+        path.resolve(cwd, config.sassDir,'./*.scss'),
+        path.resolve(cwd, config.sassDir, './**/*.scss')], ['sass:compile:prototype','sass:compile:provisioning']);
 });
 
 gulp.task('lib:download',(cb)=>{
