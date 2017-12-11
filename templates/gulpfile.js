@@ -475,7 +475,7 @@ gulp.task('sass:compile:provisioning', ['sass:compile'], (cb) => {
 });
 
 gulp.task('sass:compile:prototype',['sass:compile'],(cb)=>{
-    console.log(args);
+    
     if (isPrototyping) {
         logVerbose('sass:compile:prototype', 
             `Compiling prototype sass files into prototype output director ${path.resolve(config.prototypeDir, './css')}`);
