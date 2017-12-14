@@ -804,11 +804,12 @@ gulp.task('pagelayouts:compile', (cb) => {
 
 gulp.task('pagelayouts:watch', (cb) => {
     logVerbose('pagelayouts:watch','Started watch for page layout templates');
-    gulp.watch([path.resolve(cwd, config.pageLayoutTemplatesDir) + './*.aspx',
-    path.resolve(cwd, config.pageLayoutTemplatesDir) + './**/*.aspx',
-    path.resolve(cwd, config.pageLayoutTemplatesDir) + './*.njk',
-    path.resolve(cwd, config.pageLayoutTemplatesDir) + './**/*.njk'
-    ], ['pagelayouts:compile']);
+    const paths = [path.resolve(cwd, config.pageLayoutTemplatesDir, './*.aspx'),
+    path.resolve(cwd, config.pageLayoutTemplatesDir, './**/*.aspx'),
+    path.resolve(cwd, config.pageLayoutTemplatesDir, './*.njk'),
+    path.resolve(cwd, config.pageLayoutTemplatesDir, './**/*.njk')]; 
+    logVerbose('pagelayouts:watch',`Watching files on: ${paths.join('\t')}`);
+    gulp.watch(paths, ['pagelayouts:compile']);
 });
 
 gulp.task('js:compile:prototype',['js:compile'],(cb)=>{
