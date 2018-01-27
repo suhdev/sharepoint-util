@@ -1,33 +1,42 @@
+export declare const StandardMenuGroupList: string[];
 export declare enum StandardMenuGroup {
     ActionsMenu = "ActionMenu",
     ActionsMenuForSurvey = "ActionsMenuForSurvey",
     SettingsMenuForSurvey = "SettingsMenuForSurvey",
     SiteActions = "SiteActions",
 }
+export declare const CustomActionLocationList: string[];
+export declare const ContentTypeSettingsGroupList: string[];
 export declare enum ContentTypeSettingsGroup {
     Fields = "Fields",
     General = "General",
 }
+export declare const CreateGroupList: string[];
 export declare enum CreateGroup {
     WebPages = "WebPages",
 }
+export declare const GroupsPageList: string[];
 export declare enum GroupsPage {
     NewMenu = "NewMenu",
     SettingsMenu = "SettingsMenu",
 }
+export declare const ListEditGroupList: string[];
 export declare enum ListEditGroup {
     Communications = "Communications",
     GeneralSettings = "GeneralSettings",
     Permissions = "Permissions",
 }
+export declare const DocumentLibraryGroupList: string[];
 export declare enum DocumentLibraryGroup {
     GeneralSettings = "GeneralSettings",
 }
+export declare const PeoplePageGroupList: string[];
 export declare enum PeoplePageGroup {
     ActionsMenu = "ActionsMenu",
     NewMenu = "NewMenu",
     SettingsMenu = "SettingsMenu",
 }
+export declare const SiteSettingsGroupList: string[];
 export declare enum SiteSettingsGroup {
     Customization = "Customization",
     Galleries = "Galleries",

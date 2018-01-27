@@ -2,7 +2,7 @@ import { Term } from './term';
 export interface TermSet {
     id: string;
     name: string;
-    terms: Term[];
+    terms?: Term[];
     isDeprecated?: boolean;
     language?: number;
     lang?: number;
@@ -17,10 +17,10 @@ export interface TermSet {
     labels?: {
         [idx: string]: string;
     };
-    customProperties: {
+    customProperties?: {
         [idx: string]: string;
     };
-    localCustomProperties: {
+    localCustomProperties?: {
         [idx: string]: string;
     };
 }

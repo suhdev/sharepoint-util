@@ -1,10 +1,10 @@
 export interface Term {
     id: string;
     name: string;
-    customProperties: {
+    customProperties?: {
         [idx: string]: string;
     };
-    localCustomProperties: {
+    localCustomProperties?: {
         [idx: string]: string;
     };
     linkUrl?: string;
