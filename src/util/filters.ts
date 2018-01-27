@@ -14,6 +14,28 @@ export function parenthesize(str: string) {
     return `{${str}}`;
 }
 
+export function getPowershellValue(val:any){
+    if (typeof val === "string"){
+        return `"${val}"`;
+    }else if (typeof val === "number"){
+        return val; 
+    }else if (typeof val === "boolean"){
+        return val?"$true":"$false"; 
+    }else if (typeof val === "object"){
+        if (val === null){
+            return "$null"; 
+        }else if (val && val.length && val.join){
+            return `@(val.join(','))`; 
+        }else {
+            return `@{${Object.keys(val).map((e)=>{
+                return `${e}=${getPowershellValue(val[e])}`; 
+            }).join(';')}}`;
+        }
+    }else {
+        return val; 
+    }
+}
+
 export function getAttr(field: any, ...fieldNames: string[]) {
     var name = null;
     var val = fieldNames.find((e, i) => {

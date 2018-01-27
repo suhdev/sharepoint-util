@@ -668,6 +668,12 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     {% if hasAttr(list,'removeExistingContentTypes') %}
     RemoveExistingContentTypes="{{getAttr(list,'removeExistingContentTypes')}}"
     {% endif %}
+    {% if hasAttr(list,'readSecurity') %}
+    ReadSecurity="{{getAttr(list,'readSecurity')}}"
+    {% endif %}
+    {% if hasAttr(list,'imageUrl') %}
+    ImageUrl="{{getAttr(list,'imageUrl')}}"
+    {% endif %}
     {% if hasAttr(list,'url') %}
     Url="{{getAttr(list,'url')}}"
     {% else %} 
@@ -718,6 +724,13 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
         <pnp:FieldDefault FieldName="{{key}}">{{val}}</pnp:FieldDefault>
         {% endfor %}
     </pnp:FieldDefaults>
+    {% endif %}
+    {% if hasAttr(list,'fieldDefs') %}
+    <pnp:Fields>
+        {% for field in getAttr(list,'fieldDefs') %}
+        {{Field(field)}}
+        {% endfor %}
+    </pnp:Fields>
     {% endif %}
     {% if hasAttr(list,'security') %}
     {{Security(getAttr(list,'security'))}}
@@ -1259,7 +1272,9 @@ Write-Log "Unknown Command Type {{type}}"
     {% if hasAttr(template,'lists') and hasItems(template,'lists') %}{{log('Provisioning Template','Lists')}}
     <pnp:Lists>
         {% for list in getAttr(template,'lists') %}{{log('Provisioning Template','List',getAttr(list,'listTitle','title'))}}
+        {% if getAttr(list,'scope') != 'root' or getAttr(list,'scope') != 'sitecollection' %}
         {{List(list)}}
+        {% endif %}
         {% endfor %}
     </pnp:Lists>
     {% endif %}
@@ -1290,6 +1305,14 @@ Write-Log "Unknown Command Type {{type}}"
         {{Page(p)}}
         {% endfor %}
     </pnp:Pages>
+    {% endif %}
+
+    {% if hasAttr(template,'propertyBagEntries') and hasItems(template,'propertyBagEntries') %}
+    <pnp:PropertyBagEntries>
+        {% for value in getAttr(template,'propertyBagEntries') %}
+        <pnp:PropertyBagEntry Key="{{val.key}}" Value ="{{val.value}}" {% if val.overwite %} Overwrite="true" {% endif %} />
+        {% endfor %}
+    </pnp:PropertyBagEntries>
     {% endif %}
     
     {% if hasAttr(template,'files') or hasAttr(template,'directories','folders','dirs') %}{{log('Provisioning Template','Files')}}
