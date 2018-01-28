@@ -1,10 +1,9 @@
-import { Field } from '../../typins/provisioning/field';
 import { getAttr } from '../util/filters';
 import { createHash } from 'crypto';
 import { FieldTypes } from './builtin';
-import { ContentType } from '../../lib/provisioning/contenttype';
 import { log } from '../util/logger';
-import { Field } from '../../lib/provisioning/field';
+import { Field } from '../provisioning/field';
+import { ContentType } from '../provisioning/contenttype';
 
 export function getJsTypeForField(fieldType: string) {
     fieldType = fieldType.toLowerCase();

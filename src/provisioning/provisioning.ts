@@ -10,13 +10,13 @@ import { Field } from './field';
 import { getJsTypeForField, getFieldId, isTaxonomyField, booleanToUpper, generateTaxonomyFieldId, getFieldType, validateContentType, generateGuid } from '../sharepoint/filters';
 import { mkdirp, createDirectoryIfNotExist } from '../io/util';
 import { logError, log } from '../util/logger';
-import { List } from '../../lib/provisioning/List';
-import { ContentType } from '../../lib/provisioning/contenttype';
 import { isObject } from 'util';
 import { Dictionary } from 'lodash';
-import { TermGroup } from '../../lib/provisioning/termgroup';
-import { TermSet } from '../../lib/provisioning/termset';
 import * as _ from 'lodash';
+import { ContentType } from './contenttype';
+import { List } from './List';
+import { TermGroup } from './termgroup';
+import { TermSet } from './termset';
 
 const INTERFACES_DIR = 'interfaces'; 
 const SRC_DIR = 'src'; 
@@ -30,6 +30,23 @@ export interface ProvisionOptions {
 export interface SiteConfig {
     spHost?: string;
     url?: string;
+}
+
+export interface CleanAction {
+    name:string;
+    value:string; 
+    fn:(generator?:any)=>void;
+
+}
+
+export interface CleanConfig {
+    fields:Dictionary<Field>; 
+    contentTypes:Dictionary<ContentType>; 
+    lists:Dictionary<List>; 
+    termGroups:Dictionary<TermGroup>;
+    termSets:Dictionary<TermSet>; 
+    cleanActions:CleanAction[];
+    errors:string[];
 }
 
 export interface TransformConfig {
@@ -325,22 +342,7 @@ export function createTransformer(config:TransformConfig) {
         });
     }
 
-    interface CleanAction {
-        name:string;
-        value:string; 
-        fn:(generator?:any)=>void;
-
-    }
-
-    interface CleanConfig {
-        fields:Dictionary<Field>; 
-        contentTypes:Dictionary<ContentType>; 
-        lists:Dictionary<List>; 
-        termGroups:Dictionary<TermGroup>;
-        termSets:Dictionary<TermSet>; 
-        cleanActions:CleanAction[];
-        errors:string[];
-    }
+    
 
     function _validate(site,cleanConfig:CleanConfig){
         (site.fields||[]).forEach((f)=>{

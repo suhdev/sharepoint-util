@@ -7,13 +7,17 @@
         "declaration": true
     },
     "exclude": [
-        "./lib/provisioning",
-        "./lib/sharepoint",
+        "./lib/**",
+        "./lib/provisioning/**",
+        "./lib/sharepoint/**",
+        "./lib/**",
+        "./deploy",
         "./lib/**",
         "./lib/*.d.ts",
         "./lib/**/*.d.ts",
         "./node_modules/**",
         "./templates/**",
+        "./deploy/**",
         "./lib/sharepoint/*.d.ts",
         "./lib/provisioning/*.d.ts"
     ]

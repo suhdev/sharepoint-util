@@ -6,8 +6,8 @@ import { RegionalSettings } from './regionalSettings';
 import { Dictionary } from 'lodash';
 import { Localization } from './localization';
 import { ComposedLook } from './composedLook';
-import { Command } from '../../lib/provisioning/command';
 import { Navigation } from './navigation';
+import { Command } from './command';
 export interface PropertyDefinition {
     value:string; 
     overwrite:boolean;

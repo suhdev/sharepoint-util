@@ -582,10 +582,10 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     </MAPPINGS>
     {% endif %}
     {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'formula') %}
-    <Formula>{{getAttr(field,'formula')}}</Formula>
+    <Formula>{{getAttr(field,'formula')|safe}}</Formula>
     {% endif %}
     {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'defaultFormula') %}
-    <DefaultFormula>{{getAttr(field,'defaultFormula')}}</DefaultFormula>
+    <DefaultFormula>{{getAttr(field,'defaultFormula')|safe}}</DefaultFormula>
     {% endif %}
     {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'fieldRefs') %}
     <FieldRefs>
