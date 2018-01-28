@@ -590,7 +590,7 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'fieldRefs') %}
     <pnp:FieldRefs>
         {% for ref in getAttr(field,'fieldRefs') %}
-        <pnp:FieldRef ID="{{getFieldIdByName(ref)}}" Name="{{ref.name}}" />
+        <pnp:FieldRef ID="{{getFieldIdByName(ref)}}" Name="{{ref}}" />
         {% endfor %}
     </pnp:FieldRefs>
     {% endif %}
