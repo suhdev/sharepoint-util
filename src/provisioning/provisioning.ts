@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as pretty from 'pretty-data';
 import { removeSpaces, parenthesize, capitalize, lowerize,getPowershellValue, getAttr, hasAttr, isString, hasItems, hasKeys } from '../util/filters';
-import { BuiltInContentType, FieldTypes } from '../sharepoint/builtin';
+import { BuiltInContentType, FieldTypes, BuiltInFields } from '../sharepoint/builtin';
 import { XmlFormatter } from '../xml/xmlformatter';
 import { SharePointSite } from './sharepointsite';
 import { Field } from './field';
@@ -119,6 +119,8 @@ export function createTransformer(config:TransformConfig) {
     function getFieldIdByName(name: string) {
         if (fields[name]) {
             return `${getAttr(fields[name], 'id')}`;
+        }else if (BuiltInFields[name]){
+            return BuiltInFields[name]; 
         }
         errors.push(`ERROR no field with name ${name}`);
         return `ERROR no field with name ${name}`

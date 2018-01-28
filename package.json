@@ -1,6 +1,6 @@
 {
   "name": "sharepoint-util",
-  "version": "1.0.58",
+  "version": "1.0.60",
   "description": "A utility library for SharePoint solutions",
   "main": "index.js",
   "typings": "./typings",

@@ -582,15 +582,15 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     </MAPPINGS>
     {% endif %}
     {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'formula') %}
-    <Formula>{{getAttr(field,'formula')|safe}}</Formula>
+    <Formula>{{getAttr(field,'formula')}}</Formula>
     {% endif %}
     {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'defaultFormula') %}
-    <DefaultFormula>{{getAttr(field,'defaultFormula')|safe}}</DefaultFormula>
+    <DefaultFormula>{{getAttr(field,'defaultFormula')}}</DefaultFormula>
     {% endif %}
-    {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'pnp:fieldRefs') %}
+    {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'fieldRefs') %}
     <pnp:FieldRefs>
-        {% for ref in getAttr(field,'pnp:fieldRefs') %}
-        <pnp:FieldRef Name="{{ref}}" />
+        {% for ref in getAttr(field,'fieldRefs') %}
+        <pnp:FieldRef ID="{{getFieldIdByName(ref)}}" Name="{{ref.name}}" />
         {% endfor %}
     </pnp:FieldRefs>
     {% endif %}
