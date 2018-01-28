@@ -172,14 +172,14 @@ $web = $ctx.Web
 $rootWeb = Get-PnPWeb 
 
 
-{% for s in templates.subsites %}
+{% for s in template.subsites %}
     {% if getAttr(s,'parentWeb') == 'root' or getAttr(s,'parentWeb') == '/' or not hasAttr(s,'parentWeb') %}
     {{ProvisionSubSite(s)}}
     {% endif %}
 
 {% endfor %}
 
-{% for s in templates.subsites %}
+{% for s in template.subsites %}
     {% if getAttr(s,'parentWeb') == 'root' or getAttr(s,'parentWeb') == '/' or not hasAttr(s,'parentWeb') %}
     {% else %}
     {{ProvisionSubSite(s)}}
