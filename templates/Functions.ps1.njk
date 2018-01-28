@@ -108,3 +108,26 @@ function Set-SiteCollectionTermGroupName {
         Write-Log "Site collection term group name changed to : $groupName" 
     }
 }
+
+function Get-WebByUrl {
+    param
+    (
+        [Microsoft.SharePoint.Client.Web]$Web,
+        [string]$UrlOrTitle
+    )
+
+    $webs = $Web.Webs;
+    $Web.Context.Load($webs)
+    $Web.Context.ExecuteQuery() 
+    foreach($w in $webs){
+        if ($w.Url.ToLower().EndsWith($UrlOrTitle.ToLower()))
+        {
+            return $w 
+        }
+        if ($w.Title.ToLower().Equals($UrlOrTitle.ToLower()))
+        {
+            return $w 
+        }
+    }
+    return $null
+}

@@ -588,11 +588,11 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     <DefaultFormula>{{getAttr(field,'defaultFormula')}}</DefaultFormula>
     {% endif %}
     {% if getAttr(field,'type') == "Calculated" and hasAttr(field,'fieldRefs') %}
-    <pnp:FieldRefs>
+    <FieldRefs>
         {% for ref in getAttr(field,'fieldRefs') %}
-        <pnp:FieldRef ID="{{getFieldIdByName(ref)}}" Name="{{ref}}" />
+        <FieldRef ID="{{getFieldIdByName(ref)}}" Name="{{ref}}" />
         {% endfor %}
-    </pnp:FieldRefs>
+    </FieldRefs>
     {% endif %}
     {% if isTaxonomyField(field) %}
     <Customization>
@@ -1373,4 +1373,104 @@ Write-Log "Unknown Command Type {{type}}"
     </pnp:Properties>
     {% endif %}
 </pnp:File>
+{% endmacro %}
+
+{% macro ProvisionSubSite(s) %}
+
+$parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'root' or not hasAttr(s,'parentWeb') %} $rootWeb {% else %} $null {% endif %}
+if ($parentWeb -eq $null) 
+{
+    $parentWeb = Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'title')}}" 
+    if ($parentWeb -eq $null){
+        Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'url')}}"
+    }
+    if ($parentWeb -eq $null){
+        Write-Host "Parent Web {{getAttr(s,'title')}} could not be found" 
+    }
+}
+$subweb = Get-WebByUrl -Web $parentWeb -UrlOrTitle "{{getAttr(s,'title')}}" 
+
+if ($subweb -eq $null)
+{
+    $subweb = Get-WebByUrl -Web $parentWeb -UrlOrTitle "{{getAttr(s,'url')}}" 
+}
+
+if ($subweb -eq $null)
+{
+    $subweb = New-PnPWeb -Title "{{getAttr(s,'title')}}" -Url "{{getAttr(s,'url')}}" -Template "{{getAttr(s,'template','baseSiteTemplate')}}" -Description "{{getAttr(s,'description')}}" -Web $parentWeb
+    Apply-PnPProvisioningTemplate -Path "{{getFilePath('site-'+getAttr(s,'id')+'-'+postfix+'.xml')}}"
+}
+{% for ct in getAttr(s,'pagesLibraryContentTypes','pagesLibraryContentTypes') %}
+Add-PnPContentTypeToList -List "Pages" -ContentType "{{ct}}" -Web $subweb 
+{% endfor %}
+
+{% if getAttr(s,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType') %}
+Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(s,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType')}}" -Web $subweb 
+{% endif %}
+
+{% if hasAttr(s,'pagesFieldsSettings','pagesFieldSettings') %}
+    $dict = @{}
+    {% for fieldName,fieldSettings in getAttr(list,'pagesFieldsSettings','pagesFieldSettings') %}
+        {% for settingKey, settingValue in fieldSettings %}
+
+            {% if settingKey == 'indexed' or settingKey == 'Indexed' %}
+
+            $dict["Indexed"] = {% if settingValue %}$true{% else %}$false {% endif %}
+
+            {% elif settingKey == 'enforceUniqueValues' or settingKey == 'unique' or settingKey == 'EnforceUniqueValues' %}
+
+            $dict["EnforceUniqueValues"] = {% if settingValue %}$true{% else %}$false {% endif %}
+
+            {% elif settingKey == 'required' or settingKey == 'Required' %}
+
+            $dict["Required"] = {% if settingValue %}$true{% else %}$false {% endif %}
+
+            {% else %} 
+
+            $dict["{{vkey}}"] = {{getPowershellValue(vvalue)}}
+
+            {% endif %}
+        {% endfor %}
+        Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict  -Web $subweb
+    {% endfor %}
+{% endif %}
+
+{% if s.homePage %}
+Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb 
+{% endif %}
+
+{% for list in getAttr(s,'lists') %}
+    {% if hasAttr(list,'readSecurity') or hasAttr(list,'writeSecurity') %}
+    $list = Get-PnPList -Identity $listTitle -Includes ReadSecurity,WriteSecurity -Web $subweb
+    if ($list -ne $null){
+        {% if hasAttr(list,'readSecurity') %}
+        $list.ReadSecurity = {{getAttr(list,'readSecurity')}}
+        {% endif %}
+        {% if hasAttr(list,'writeSecurity') %}
+        $list.WriteSecurity = {{getAttr(list,'writeSecurity')|default(2)}}
+        {% endif %}
+        $list.Update() 
+        $list.Context.ExecuteQuery() 
+    }
+    {% endif %}
+    {% if hasAttr(list,'fieldsSettings','fieldSettings') %}
+        $dict = @{}
+        {% for fieldName,fieldSettings in getAttr(list,'pagesFieldsSettings','pagesFieldSettings') %}
+            {% for settingKey, settingValue in fieldSettings %}
+                {% if settingKey == 'indexed' or settingKey == 'Indexed' %}
+                $dict["Indexed"] = {% if settingValue %}$true{% else %}$false {% endif %}
+                {% elif settingKey == 'enforceUniqueValues' or settingKey == 'unique' or settingKey == 'EnforceUniqueValues' %}
+                $dict["EnforceUniqueValues"] = {% if settingValue %}$true{% else %}$false {% endif %}
+                {% elif settingKey == 'required' or settingKey == 'Required' %}
+                $dict["Required"] = {% if settingValue %}$true{% else %}$false {% endif %}
+                {% else %} 
+                $dict["{{vkey}}"] = {{getPowershellValue(vvalue)}}
+                {% endif %}
+            {% endfor %}
+            Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict -Web $subweb 
+        {% endfor %}
+        Set-PnPField -Identity "{{key}}" -List "{{getAttr(list,'title')}}" -Values $dict -Web $subweb 
+    {% endif %}
+{% endfor %}
+
 {% endmacro %}

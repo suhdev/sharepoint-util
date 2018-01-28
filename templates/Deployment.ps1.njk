@@ -1,4 +1,4 @@
-{% from 'Macros.html' import AddContentTypeToPagesLibrary, CustomCommand,Command,SetListDefaultContentType,AddPublishingPage,SetPublishingPageFields %}
+{% from 'Macros.html' import ProvisionSubSite, AddContentTypeToPagesLibrary, CustomCommand,Command,SetListDefaultContentType,AddPublishingPage,SetPublishingPageFields %}
 
 . "{{getFilePath('functions.ps1')}}"
 
@@ -169,87 +169,22 @@ $ctx = Get-PnPContext
 
 $web = $ctx.Web 
 
+$rootWeb = Get-PnPWeb 
 
-{% for s in template.subsites %}
-    $subweb = Get-PnPWeb -Identity "{{s.title}}" 
 
-    if ($subweb -eq $null){
-        $subweb = New-PnPWeb -Title "{{getAttr(s,'title')}}" -Url "{{getAttr(s,'url')}}" -Template "{{getAttr(s,'template','baseSiteTemplate')}}" -Description "{{getAttr(s,'description')}}"
-        Apply-PnPProvisioningTemplate -Path "{{getFilePath('site-'+getAttr(s,'id')+'-'+postfix+'.xml')}}"
-    }
-
-    {% for ct in getAttr(s,'pagesLibraryContentTypes','pagesLibraryContentTypes') %}
-    Add-PnPContentTypeToList -List "Pages" -ContentType "{{ct}}" -Web $subweb 
-    {% endfor %}
-
-    {% if getAttr(s,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType') %}
-    Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(s,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType')}}" -Web $subweb 
+{% for s in templates.subsites %}
+    {% if getAttr(s,'parentWeb') == 'root' or getAttr(s,'parentWeb') == '/' or not hasAttr(s,'parentWeb') %}
+    {{ProvisionSubSite(s)}}
     {% endif %}
 
-    {% if hasAttr(s,'pagesFieldsSettings','pagesFieldSettings') %}
-        $dict = @{}
-        {% for fieldName,fieldSettings in getAttr(list,'pagesFieldsSettings','pagesFieldSettings') %}
-            {% for settingKey, settingValue in fieldSettings %}
+{% endfor %}
 
-                {% if settingKey == 'indexed' or settingKey == 'Indexed' %}
-
-                $dict["Indexed"] = {% if settingValue %}$true{% else %}$false {% endif %}
-
-                {% elif settingKey == 'enforceUniqueValues' or settingKey == 'unique' or settingKey == 'EnforceUniqueValues' %}
-
-                $dict["EnforceUniqueValues"] = {% if settingValue %}$true{% else %}$false {% endif %}
-
-                {% elif settingKey == 'required' or settingKey == 'Required' %}
-
-                $dict["Required"] = {% if settingValue %}$true{% else %}$false {% endif %}
-
-                {% else %} 
-
-                $dict["{{vkey}}"] = {{getPowershellValue(vvalue)}}
-
-                {% endif %}
-            {% endfor %}
-            Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict   
-        {% endfor %}
+{% for s in templates.subsites %}
+    {% if getAttr(s,'parentWeb') == 'root' or getAttr(s,'parentWeb') == '/' or not hasAttr(s,'parentWeb') %}
+    {% else %}
+    {{ProvisionSubSite(s)}}
     {% endif %}
 
-    {% if s.homePage %}
-    Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}"
-    {% endif %}
-
-    {% for list in getAttr(s,'lists') %}
-        {% if hasAttr(list,'readSecurity') or hasAttr(list,'writeSecurity') %}
-        $list = Get-PnPList -Identity $listTitle -Includes ReadSecurity,WriteSecurity
-        if ($list -ne $null){
-            {% if hasAttr(list,'readSecurity') %}
-            $list.ReadSecurity = {{getAttr(list,'readSecurity')}}
-            {% endif %}
-            {% if hasAttr(list,'writeSecurity') %}
-            $list.WriteSecurity = {{getAttr(list,'writeSecurity')|default(2)}}
-            {% endif %}
-            $list.Update() 
-            $list.Context.ExecuteQuery() 
-        }
-        {% endif %}
-        {% if hasAttr(list,'fieldsSettings','fieldSettings') %}
-            $dict = @{}
-            {% for fieldName,fieldSettings in getAttr(list,'pagesFieldsSettings','pagesFieldSettings') %}
-                {% for settingKey, settingValue in fieldSettings %}
-                    {% if settingKey == 'indexed' or settingKey == 'Indexed' %}
-                    $dict["Indexed"] = {% if settingValue %}$true{% else %}$false {% endif %}
-                    {% elif settingKey == 'enforceUniqueValues' or settingKey == 'unique' or settingKey == 'EnforceUniqueValues' %}
-                    $dict["EnforceUniqueValues"] = {% if settingValue %}$true{% else %}$false {% endif %}
-                    {% elif settingKey == 'required' or settingKey == 'Required' %}
-                    $dict["Required"] = {% if settingValue %}$true{% else %}$false {% endif %}
-                    {% else %} 
-                    $dict["{{vkey}}"] = {{getPowershellValue(vvalue)}}
-                    {% endif %}
-                {% endfor %}
-                Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict   
-            {% endfor %}
-            Set-PnPField -Identity "{{key}}" -List "{{getAttr(list,'title')}}" -Values $dict   
-        {% endif %}
-    {% endfor %}
 {% endfor %}
 
 
