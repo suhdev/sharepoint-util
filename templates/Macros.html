@@ -1378,14 +1378,17 @@ Write-Log "Unknown Command Type {{type}}"
 {% macro ProvisionSubSite(s) %}
 
 $parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'root' or not hasAttr(s,'parentWeb') %} $rootWeb {% else %} $null {% endif %}
+
 if ($parentWeb -eq $null) 
 {
-    $parentWeb = Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'title')}}" 
+    $parentWeb = Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'parentWeb')}}" 
+
     if ($parentWeb -eq $null){
-        Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'url')}}"
+        Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'parentWeb')}}"
     }
+
     if ($parentWeb -eq $null){
-        Write-Host "Parent Web {{getAttr(s,'title')}} could not be found" 
+        Write-Host "Parent Web {{getAttr(s,'parentWeb')}} could not be found" 
     }
 }
 $subweb = Get-WebByUrl -Web $parentWeb -UrlOrTitle "{{getAttr(s,'title')}}" 
