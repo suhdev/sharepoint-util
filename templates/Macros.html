@@ -1401,8 +1401,8 @@ if ($subweb -eq $null)
 if ($subweb -eq $null)
 {
     $subweb = New-PnPWeb -Title "{{getAttr(s,'title')}}" -Url "{{getAttr(s,'url')}}" -Template "{{getAttr(s,'template','baseSiteTemplate')}}" -Description "{{getAttr(s,'description')}}" -Web $parentWeb
-    Apply-PnPProvisioningTemplate -Path "{{getFilePath('site-'+getAttr(s,'id')+'-'+postfix+'.xml')}}"
 }
+Apply-PnPProvisioningTemplate -Path "{{getFilePath('site-'+getAttr(s,'id')+'-1.xml')}}" -Web $subweb 
 {% for ct in getAttr(s,'pagesLibraryContentTypes','pagesLibraryContentTypes') %}
 Add-PnPContentTypeToList -List "Pages" -ContentType "{{ct}}" -Web $subweb 
 {% endfor %}
