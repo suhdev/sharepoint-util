@@ -116,6 +116,7 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
                 $dict["{{vkey}}"] = {{getPowershellValue(vvalue)}}
 
                 {% endif %}
+                
             {% endfor %}
 
             Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict   
