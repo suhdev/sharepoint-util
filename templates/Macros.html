@@ -569,6 +569,8 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     {% endif %}
     {% if hasAttr(field,'list','listTitle') %}
     List="Lists/{{getAttr(field,'list','listTitle')}}"
+    {% elif hasAttr(field,'listId','listGuid') %}
+    List="{{getAttr(field,'listId','listGuid')}}"
     {% endif %}>
     {% if hasAttr(field,'default') %}
     <Default>{{getAttr(field,'default')}}</Default>
@@ -1390,7 +1392,7 @@ if ($parentWeb -eq $null)
     $parentWeb = Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'parentWeb')}}" 
 
     if ($parentWeb -eq $null){
-        Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'parentWeb')}}"
+        $parentWeb = Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'parentWeb')}}"
     }
 
     if ($parentWeb -eq $null){
