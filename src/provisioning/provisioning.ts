@@ -55,6 +55,7 @@ export interface TransformConfig {
     srcDir ?: string;
     interfacesDir?:string; 
     templatesPaths?:string[];
+    consumeContentType?:(name:string,id:string)=>void; 
     options?:ProvisionOptions; 
 }
 
@@ -72,7 +73,7 @@ export function createTransformer(config:TransformConfig) {
         trimBlocks: true
     });
 
-    async function setConfig({outputDir,rootDir,srcDir,interfacesDir,templatesPaths}:TransformConfig){
+    async function setConfig({outputDir,rootDir,srcDir,interfacesDir,templatesPaths,consumeContentType}:TransformConfig){
         var cwd = process.cwd();
         var rootdir = rootDir || cwd;
         await createDirectoryIfNotExist(rootdir, 'Creating Root Directory');
@@ -112,6 +113,11 @@ export function createTransformer(config:TransformConfig) {
         env.addGlobal('validateContentType', validateContentType);
         env.addGlobal('addError',addError);
         env.addGlobal('getPowershellValue',getPowershellValue); 
+        if (consumeContentType){
+            env.addGlobal('writeContentType',function(name,id){
+                consumeContentType(name,id); 
+            })
+        }
     }
     
     function clearErrors(){

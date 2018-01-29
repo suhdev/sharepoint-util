@@ -33,10 +33,11 @@ export interface TransformConfig {
     srcDir?: string;
     interfacesDir?: string;
     templatesPaths?: string[];
+    consumeContentType?: (name: string, id: string) => void;
     options?: ProvisionOptions;
 }
 export declare function createTransformer(config: TransformConfig): {
-    setConfig: ({outputDir, rootDir, srcDir, interfacesDir, templatesPaths}: TransformConfig) => Promise<void>;
+    setConfig: ({outputDir, rootDir, srcDir, interfacesDir, templatesPaths, consumeContentType}: TransformConfig) => Promise<void>;
     transform: ({spHost, url}: SiteConfig, site: SharePointSite) => Promise<void>;
     validate: (site: any) => CleanConfig;
     readonly errors: string[];

@@ -336,6 +336,7 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
 
 {% macro ContentType(contentType) %}
 {% set validation = validateContentType(contentType) %}
+{{writeContentType(getAttr(contentType,'name','internalName','staticName'),getContentTypeId(contentType))}}
 <pnp:ContentType
     ID="{{getContentTypeId(contentType)}}"
     Name="{{getAttr(contentType,'name','internalName','staticName')}}"
