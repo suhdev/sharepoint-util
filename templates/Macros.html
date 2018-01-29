@@ -558,6 +558,12 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
         NumLines="{{getAttr(field,'numLines') }}"
         {% endif %}
     {% endif %}
+    {% if hasAttr(field,'resultType') %}
+    ResultType="{{getAttr(field,'resultType')}}"
+    {% endif %}
+    {% if getAttr(field,'readOnly') %}
+    ReadOnly="TRUE"
+    {% endif %}
     {% if hasAttr(field,'list','showField') %}
     ShowField="{{getAttr(field,'showField')|default('Title')}}"
     {% endif %}
@@ -1413,7 +1419,7 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(s,'default
 
 {% if hasAttr(s,'pagesFieldsSettings','pagesFieldSettings') %}
     $dict = @{}
-    {% for fieldName,fieldSettings in getAttr(list,'pagesFieldsSettings','pagesFieldSettings') %}
+    {% for fieldName,fieldSettings in getAttr(s,'pagesFieldsSettings','pagesFieldSettings') %}
         {% for settingKey, settingValue in fieldSettings %}
 
             {% if settingKey == 'indexed' or settingKey == 'Indexed' %}
@@ -1458,7 +1464,7 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
     {% endif %}
     {% if hasAttr(list,'fieldsSettings','fieldSettings') %}
         $dict = @{}
-        {% for fieldName,fieldSettings in getAttr(list,'pagesFieldsSettings','pagesFieldSettings') %}
+        {% for fieldName,fieldSettings in getAttr(list,'fieldsSettings','fieldSettings') %}
             {% for settingKey, settingValue in fieldSettings %}
                 {% if settingKey == 'indexed' or settingKey == 'Indexed' %}
                 $dict["Indexed"] = {% if settingValue %}$true{% else %}$false {% endif %}

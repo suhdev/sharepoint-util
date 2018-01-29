@@ -97,7 +97,7 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
     {% endif %}
     {% if hasAttr(list,'fieldsSettings','fieldSettings') %}
         $dict = @{}
-        {% for fieldName,fieldSettings in getAttr(list,'pagesFieldsSettings','pagesFieldSettings') %}
+        {% for fieldName,fieldSettings in getAttr(list,'fieldsSettings','fieldSettings') %}
             {% for settingKey, settingValue in fieldSettings %}
                 {% if settingKey == 'indexed' or settingKey == 'Indexed' %}
 
