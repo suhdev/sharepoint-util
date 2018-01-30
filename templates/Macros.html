@@ -1512,7 +1512,8 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
                     $links = $ct.FieldLinks 
                     if ($ct.Name -eq "{{item}}")
                     {
-                        $found = false 
+                        $found = $false 
+                        
                         foreach($link in $links){
                             if ($link.Name -eq "{{def.name}}")
                             {

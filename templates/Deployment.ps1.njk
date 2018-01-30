@@ -128,7 +128,8 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
                     $links = $ct.FieldLinks 
                     if ($ct.Name -eq "{{item}}")
                     {
-                        $found = false 
+                        $found = $false 
+                        
                         foreach($link in $links){
                             if ($link.Name -eq "{{def.name}}")
                             {
