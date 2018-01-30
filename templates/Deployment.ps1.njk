@@ -95,6 +95,65 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
         $list.Context.ExecuteQuery() 
     }
     {% endif %}
+    {% if hasAttr(list, 'fieldDefs', 'fieldDefinitions') %}
+
+        $list = Get-PnPList -Identity "{{getAttr(list,'title')}}" 
+
+        $listContentTypes = $list.ContentTypes
+
+        $list.Context.Load($listContentTypes); 
+
+        $list.Context.ExecuteQuery()  
+
+        foreach ($ct in $listContentTypes){
+
+            $links = $ct.FieldLinks 
+
+            $list.Context.Load($links)
+
+            $list.Context.ExecuteQuery(); 
+        } 
+
+        {% for def in getAttr(list, 'fieldDefs', 'fieldDefinitions') %}
+
+            {% if def.addToContentTypes %}
+
+                $field = Get-PnPField -List "{{getAttr(list,'title')}}" -Identity "{{def.name}}"
+                
+                {% for item in def.addToContentTypes %}
+                
+                foreach ($ct in $listContentTypes){
+                    $links = $ct.FieldLinks 
+                    if ($ct.Name -eq "{{item}}")
+                    {
+                        $found = false 
+                        foreach($link in $links){
+                            if ($link.Name -eq "{{def.name}}")
+                            {
+                                $found = $true 
+                            }
+                        }
+
+                        if ($found -ne $true)
+                        {
+                            $link = new-object Microsoft.SharePoint.SPFieldLink $field
+
+                            $ct.FieldLinks.Add($link) 
+
+                            $ct.Update()
+                            
+                            $list.Context.ExecuteQuery() 
+                        }
+                    }
+                } 
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endfor %}
+
+    {% endif %}
     {% if hasAttr(list,'fieldsSettings','fieldSettings') %}
         $dict = @{}
         {% for fieldName,fieldSettings in getAttr(list,'fieldsSettings','fieldSettings') %}
@@ -116,7 +175,7 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
                 $dict["{{vkey}}"] = {{getPowershellValue(vvalue)}}
 
                 {% endif %}
-                
+
             {% endfor %}
 
             Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict   

@@ -1479,6 +1479,65 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
         $list.Context.ExecuteQuery() 
     }
     {% endif %}
+    {% if hasAttr(list, 'fieldDefs', 'fieldDefinitions') %}
+
+        $list = Get-PnPList -Identity "{{getAttr(list,'title')}}" -Web $subweb
+
+        $listContentTypes = $list.ContentTypes
+
+        $list.Context.Load($listContentTypes); 
+
+        $list.Context.ExecuteQuery()  
+
+        foreach ($ct in $listContentTypes){
+
+            $links = $ct.FieldLinks 
+
+            $list.Context.Load($links)
+
+            $list.Context.ExecuteQuery(); 
+        } 
+
+        {% for def in getAttr(list, 'fieldDefs', 'fieldDefinitions') %}
+
+            {% if def.addToContentTypes %}
+
+                $field = Get-PnPField -List "{{getAttr(list,'title')}}" -Identity "{{def.name}}" -Web $subweb
+                
+                {% for item in def.addToContentTypes %}
+                
+                foreach ($ct in $listContentTypes){
+                    $links = $ct.FieldLinks 
+                    if ($ct.Name -eq "{{item}}")
+                    {
+                        $found = false 
+                        foreach($link in $links){
+                            if ($link.Name -eq "{{def.name}}")
+                            {
+                                $found = $true 
+                            }
+                        }
+
+                        if ($found -ne $true)
+                        {
+                            $link = new-object Microsoft.SharePoint.SPFieldLink $field
+
+                            $ct.FieldLinks.Add($link) 
+
+                            $ct.Update()
+                            
+                            $list.Context.ExecuteQuery() 
+                        }
+                    }
+                } 
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endfor %}
+
+    {% endif %}
     {% if hasAttr(list,'fieldsSettings','fieldSettings') %}
 
         $dict = @{}
