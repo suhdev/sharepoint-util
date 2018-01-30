@@ -1480,7 +1480,8 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
     }
     {% endif %}
     {% if hasAttr(list, 'fieldDefs', 'fieldDefinitions') %}
-
+        [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client")
+        
         $list = Get-PnPList -Identity "{{getAttr(list,'title')}}" -Web $subweb
 
         $listContentTypes = $list.ContentTypes
@@ -1501,6 +1502,7 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
         {% for def in getAttr(list, 'fieldDefs', 'fieldDefinitions') %}
 
             {% if def.addToContentTypes %}
+            
 
                 $field = Get-PnPField -List "{{getAttr(list,'title')}}" -Identity "{{def.name}}" -Web $subweb
                 
@@ -1520,11 +1522,12 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
 
                         if ($found -ne $true)
                         {
-                            $link = new-object Microsoft.SharePoint.SPFieldLink $field
+                            $link = new-object Microsoft.SharePoint.Client.FieldLinkCreationInformation
+                            $link.Field = $field 
 
                             $ct.FieldLinks.Add($link) 
 
-                            $ct.Update()
+                            $ct.Update($false)
                             
                             $list.Context.ExecuteQuery() 
                         }

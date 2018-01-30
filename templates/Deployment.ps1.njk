@@ -97,6 +97,8 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
     {% endif %}
     {% if hasAttr(list, 'fieldDefs', 'fieldDefinitions') %}
 
+        [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client")
+
         $list = Get-PnPList -Identity "{{getAttr(list,'title')}}" 
 
         $listContentTypes = $list.ContentTypes
@@ -136,11 +138,13 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
 
                         if ($found -ne $true)
                         {
-                            $link = new-object Microsoft.SharePoint.SPFieldLink $field
+                            $link = new-object Microsoft.SharePoint.Client.FieldLinkCreationInformation
+
+                            $link.Field = $field 
 
                             $ct.FieldLinks.Add($link) 
 
-                            $ct.Update()
+                            $ct.Update($false)
                             
                             $list.Context.ExecuteQuery() 
                         }
