@@ -1362,7 +1362,6 @@ Write-Log "Unknown Command Type {{type}}"
         <pnp:Property Key="ContentType" Value="Page Layout" />
         <pnp:Property Key="PublishingAssociatedContentType" Value=";#{{file.contentType}};#{{getContentTypeIdByName(file.contentType)}};#" />
         <pnp:Property Key="Title" Value="{{file.title}}" />
-        <pnp:Property Key="Description" Value="{{file.description}}" />
         <pnp:Property Key="MasterPageDescription" Value="{{file.description}}" />
         {% for key,val in getAttr(file,'props','properties') %}
             <pnp:Property Key="{{key}}" Value="{{val}}" />
@@ -1379,7 +1378,6 @@ Write-Log "Unknown Command Type {{type}}"
         <pnp:Property Key="ContentTypeId" Value="{contenttypeid:Master Page}" />
         <pnp:Property Key="HTML_x0020_File_x0020_Type" Value="SharePoint.WebPartPage.Document" />
         <pnp:Property Key="Title" Value="{{file.title}}" />
-        <pnp:Property Key="Description" Value="{{file.description}}" />
         <pnp:Property Key="ProgId" Value="SharePoint.WebPartPage.Document" />
         {% if hasAttr(file,'props','properties') %}
             {% for key,val in getAttr(file,'props','properties') %}
