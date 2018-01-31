@@ -1374,16 +1374,16 @@ Write-Log "Unknown Command Type {{type}}"
     Folder="_catalogs/masterpage"
     Overwrite="{{getAttr(file,'overwrite')|default(false)}}"
     Level="{{getAttr(file,'level')|default('Published')}}">
-    {% if hasAttr(file,'props','properties') %}
     <pnp:Properties>
         <pnp:Property Key="ContentTypeId" Value="{contenttypeid:Master Page}" />
         <pnp:Property Key="HTML_x0020_File_x0020_Type" Value="SharePoint.WebPartPage.Document" />
         <pnp:Property Key="ProgId" Value="SharePoint.WebPartPage.Document" />
-        {% for key,val in getAttr(file,'props','properties') %}
-            <pnp:Property Key="{{key}}" Value="{{val}}" />
-        {% endfor %}
+        {% if hasAttr(file,'props','properties') %}
+            {% for key,val in getAttr(file,'props','properties') %}
+                <pnp:Property Key="{{key}}" Value="{{val}}" />
+            {% endfor %}
+        {% endif %}
     </pnp:Properties>
-    {% endif %}
 </pnp:File>
 {% endmacro %}
 
