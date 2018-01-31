@@ -568,6 +568,9 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     {% if hasAttr(field,'list','showField') %}
     ShowField="{{getAttr(field,'showField')|default('Title')}}"
     {% endif %}
+    {% if getAttr(field,'unlimitedLengthInDocumentLibrary','unlimitedLength') %}
+    UnlimitedLengthInDocumentLibrary="{{getAttr(field,'unlimitedLengthInDocumentLibrary','unlimitedLength')}}"
+    {% endif %}
     {% if hasAttr(field,'list','listTitle') %}
     List="Lists/{{getAttr(field,'list','listTitle')}}"
     {% elif hasAttr(field,'listId','listGuid') %}

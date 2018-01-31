@@ -129,7 +129,7 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
                     if ($ct.Name -eq "{{item}}")
                     {
                         $found = $false 
-                        
+
                         foreach($link in $links){
                             if ($link.Name -eq "{{def.name}}")
                             {
@@ -183,7 +183,7 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
 
             {% endfor %}
 
-            Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict   
+            Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict 
         {% endfor %}
     {% endif %}
 {% endfor %}
