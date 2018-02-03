@@ -1449,7 +1449,7 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(s,'default
             {% endif %}
         {% endfor %}
 
-        Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict  -Web $subweb
+        Set-PnPField -Identity "{{fieldName}}" -List "Pages" -Values $dict  -Web $subweb
 
     {% endfor %}
 {% endif %}
