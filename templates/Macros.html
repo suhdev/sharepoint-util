@@ -1548,9 +1548,9 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
     {% endif %}
     {% if hasAttr(list,'fieldsSettings','fieldSettings') %}
 
-        $dict = @{}
 
         {% for fieldName,fieldSettings in getAttr(list,'fieldsSettings','fieldSettings') %}
+            $dict = @{}
 
             {% for settingKey, settingValue in fieldSettings %}
 
