@@ -463,7 +463,7 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     ID="{{getFieldId(field)|parenthesize}}"
     DisplayName="{{getAttr(field,'displayName')}}"
     {% if hasAttr(field,'indexed') %}
-    Indexed="{{getAttr(field,'indexed')}}"
+    Indexed="{{booleanToUpper(getAttr(field,'indexed'))}}"
     {% endif %}
     {% if hasAttr(field,'displayImage') %}
     DisplayImage="{{getAttr(field,'displayImage')}}"
@@ -559,6 +559,13 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
         NumLines="{{getAttr(field,'numLines') }}"
         {% endif %}
     {% endif %}
+    {% if getAttr(field,'type') == "Lookup" or getAttr(field,'type') === 'LookupMulti' %}
+        {% if hasAttr(field,'sourceId') %}
+        SourceID="{{getAttr(field,'sourceId')}}"
+        {% else %}
+        SourceID="{siteid}"
+        {% endif %}
+    {% endif %}
     {% if hasAttr(field,'resultType') %}
     ResultType="{{getAttr(field,'resultType')}}"
     {% endif %}
@@ -569,11 +576,12 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     ShowField="{{getAttr(field,'showField')|default('Title')}}"
     {% endif %}
     {% if getAttr(field,'unlimitedLengthInDocumentLibrary','unlimitedLength') %}
-    UnlimitedLengthInDocumentLibrary="{{getAttr(field,'unlimitedLengthInDocumentLibrary','unlimitedLength')}}"
+    UnlimitedLengthInDocumentLibrary="{{booleanToUpper(getAttr(field,'unlimitedLengthInDocumentLibrary','unlimitedLength'))}}"
     {% endif %}
-    {% if hasAttr(field,'list','listTitle') %}
-    List="Lists/{{getAttr(field,'list','listTitle')}}"
-    {% elif hasAttr(field,'listId','listGuid') %}
+    {% if hasAttr(field,'listTitle','list') %}
+    List="{listid:{{getAttr(field,'listTitle','list')}}}"
+
+    {% else if hasAttr(field,'listId') %}
     List="{{getAttr(field,'listId','listGuid')}}"
     {% endif %}>
     {% if hasAttr(field,'default') %}

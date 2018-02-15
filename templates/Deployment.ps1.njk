@@ -47,13 +47,29 @@ Write-Log "Applying SiteCollection Provisioning..."
 
 Apply-PnPProvisioningTemplate -Path "{{getFilePath('sitecollection-'+getAttr(template,'id')+'-'+postfix+'.xml')}}"
 
+Write-Host "Disabling SiteAssets versioning..."
+
+$siteAssetsList = Get-PnPList -Identity SiteAssets
+
+$siteAssetsList.EnableVersioning = $false
+
+$siteAssetsList.Update()
+
+$siteAssetsList.Context.ExecuteQuery()
+
+Write-Host "Adding content types to pages library" 
+
 {% for ct in getAttr(template,'pagesLibraryContentTypes','pagesLibraryContentTypes') %}
 Add-PnPContentTypeToList -List "Pages" -ContentType "{{ct}}"  
 {% endfor %}
 
+Write-Host "Setting default content type on pages library" 
+
 {% if getAttr(template,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType') %}
 Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType')}}"
 {% endif %}
+
+Write-Host "Updating page library fieldss settings"
 
 {% if hasAttr(template,'pagesFieldsSettings','pagesFieldSettings') %}
     {% for fieldName,fieldSettings in getAttr(template,'pagesFieldsSettings','pagesFieldSettings') %}
@@ -80,6 +96,9 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'
 
     {% endfor %}
 {% endif %}
+
+
+Write-Host "Updating lists security and fields" 
 
 {% for list in getAttr(template,'lists') %}
     {% if hasAttr(list,'readSecurity') or hasAttr(list,'writeSecurity') %}
