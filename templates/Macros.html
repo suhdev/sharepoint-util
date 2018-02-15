@@ -581,7 +581,7 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
     {% if hasAttr(field,'listTitle','list') %}
     List="{listid:{{getAttr(field,'listTitle','list')}}}"
 
-    {% else if hasAttr(field,'listId') %}
+    {% el if hasAttr(field,'listId') %}
     List="{{getAttr(field,'listId','listGuid')}}"
     {% endif %}>
     {% if hasAttr(field,'default') %}
