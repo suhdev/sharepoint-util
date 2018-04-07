@@ -253,32 +253,51 @@
 
 {% macro WebSettings(webSettings) %}
 <pnp:WebSettings 
-{% if hasAttr(webSettings,'requestAccessEmail') %}
-RequestAccessEmail="{{getAttr(webSettings,'requestAccessEmail')}}"
+{% if hasAttr(webSettings,'requestAccessEmail') %} 
+
+RequestAccessEmail="{{getAttr(webSettings,'requestAccessEmail')}}" 
+
 {% endif %}
-{% if hasAttr(webSettings,'noCrawl') %}
-NoCrawl="{{getAttr(webSettings,'noCrawl')}}"
+{% if hasAttr(webSettings,'noCrawl') %} 
+
+NoCrawl="{{getAttr(webSettings,'noCrawl')}}" 
+
 {% endif %}
 {% if hasAttr(webSettings,'welcomePage') %}
-WelcomePage="{{getAttr(webSettings,'welcomePage')}}"
+
+WelcomePage="{{getAttr(webSettings,'welcomePage')}}" 
+
 {% endif %}
 {% if hasAttr(webSettings,'title') %}
-Title="{{getAttr(webSettings,'title')}}"
+
+Title="{{getAttr(webSettings,'title')}}" 
+
 {% endif %}
 {% if hasAttr(webSettings,'desc','description') %}
-Description="{{getAttr(webSettings,'desc','description')}}"
+
+Description="{{getAttr(webSettings,'desc','description')}}" 
+
 {% endif %}
+
 {% if hasAttr(webSettings,'logo','siteLogo') %}
-SiteLogo="{{getAttr(webSettings,'logo','siteLogo')}}"
+
+SiteLogo="{{getAttr(webSettings,'logo','siteLogo')}}" 
+
 {% endif %}
 {% if hasAttr(webSettings,'alternateCss','alternateCSS') %}
-AlternateCSS="{{getAttr(webSettings,'alternateCss','alternateCSS')}}"
+
+AlternateCSS="{{getAttr(webSettings,'alternateCss','alternateCSS')}}" 
+ 
 {% endif %}
 {% if hasAttr(webSettings,'materPage','masterPageUrl') %}
-MasterPageUrl="{{getAttr(webSettings,'materPage','masterPageUrl')}}"
+
+MasterPageUrl="{{getAttr(webSettings,'materPage','masterPageUrl')}}" 
+
 {% endif %}
 {% if hasAttr(webSettings,'customMasterPage','customMasterPageUrl') %}
-CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageUrl')}}"
+
+CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageUrl')}}" 
+
 {% endif %}
 />
 {% endmacro %}

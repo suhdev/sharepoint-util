@@ -36,12 +36,6 @@
     
     <pnp:Templates ID="{{getAttr(template,'templatesId')|default('BasicTemplates')}}">
         {{ProvisioningTemplate(template)}}
-
-    {% if hasAttr(template,'subsites') %}{{log('Provisioning Template','Subsites')}}
-        {% for site in getAttr(template,'subsites') %}{{log('Provisioning Template','Subsite '+getAttr(site,'url'))}}
-        {{ProvisioningTemplate(site)}}
-        {% endfor %}
-    {% endif %}
     </pnp:Templates>
     {% if hasAttr(template,'sequences') %}
         {% for seq in getAttr(template,'sequences') %}
