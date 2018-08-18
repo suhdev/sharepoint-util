@@ -1420,22 +1420,11 @@ $parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'r
 
 if ($parentWeb -eq $null) 
 {
-    $parentWeb = Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'parentWeb')}}" 
-
-    if ($parentWeb -eq $null){
-        $parentWeb = Get-WebByUrl -Web $rootWeb -UrlOrTitle "{{getAttr(s,'parentWeb')}}"
-    }
-
-    if ($parentWeb -eq $null){
-        Write-Host "Parent Web {{getAttr(s,'parentWeb')}} could not be found" 
-    }
+    $parentWeb = Get-WebByUrl -Web $rootWeb -Url "{{getAttr(s,'parentWeb')}}" 
 }
-$subweb = Get-WebByUrl -Web $parentWeb -UrlOrTitle "{{getAttr(s,'title')}}" 
-
-if ($subweb -eq $null)
-{
-    $subweb = Get-WebByUrl -Web $parentWeb -UrlOrTitle "{{getAttr(s,'url')}}" 
-}
+$subWebUrl = "{{getAttr(s,'url')}}"
+$fullSubWebUrl = "{{getAttr(s,'parentWeb')}}"+"/"+$subWebUrl;
+$subweb = Get-WebByUrl -Web $parentWeb -Url $fullSubWebUrl
 
 if ($subweb -eq $null)
 {
