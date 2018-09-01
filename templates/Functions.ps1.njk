@@ -127,6 +127,9 @@ function Get-WebByUrl {
     }
     Catch
     {
-        return $null
+        $ww = $site.RootWeb; 
+        $ctx.Load($ww); 
+        $ctx.ExecuteQuery(); 
+        return $ww; 
     }
 }
