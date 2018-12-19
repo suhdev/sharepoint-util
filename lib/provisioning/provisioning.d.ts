@@ -1,4 +1,3 @@
-/// <reference types="lodash" />
 import { SharePointSite } from './sharepointsite';
 import { Field } from './field';
 import { Dictionary } from 'lodash';
@@ -37,8 +36,8 @@ export interface TransformConfig {
     options?: ProvisionOptions;
 }
 export declare function createTransformer(config: TransformConfig): {
-    setConfig: ({outputDir, rootDir, srcDir, interfacesDir, templatesPaths, consumeContentType}: TransformConfig) => Promise<void>;
-    transform: ({spHost, url}: SiteConfig, site: SharePointSite) => Promise<void>;
+    setConfig: ({ outputDir, rootDir, srcDir, interfacesDir, templatesPaths, consumeContentType }: TransformConfig) => Promise<void>;
+    transform: ({ spHost, url }: SiteConfig, site: SharePointSite) => Promise<void>;
     validate: (site: any) => CleanConfig;
     readonly errors: string[];
 };

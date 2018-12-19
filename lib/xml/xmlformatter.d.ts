@@ -5,8 +5,8 @@ export declare class XmlFormatter {
     splitNamespaces: boolean;
     format(xml: string): string;
     minify(xml: string, removeComments?: boolean): string;
-    private _getIndent(level, trailingValue?);
-    private _stripLineBreaks(xml);
+    private _getIndent;
+    private _stripLineBreaks;
 }
 export interface IXmlFormatterOptions {
     preferSpaces?: boolean;

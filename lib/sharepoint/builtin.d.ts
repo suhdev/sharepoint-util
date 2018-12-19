@@ -225,6 +225,9 @@ export declare const FieldTypes: {
     html: string;
     gridchoice: string;
     multichoice: string;
+    choicemulti: string;
+    ChoiceMulti: string;
+    Choicemulti: string;
     multicolumn: string;
     guid: string;
     pageseparator: string;
@@ -306,7 +309,7 @@ export declare enum ListTemplateType {
     AdminTasks = 1200,
     HealthRules = 1220,
     HealthReports = 1221,
-    DeveloperSiteDraftApps = 1230,
+    DeveloperSiteDraftApps = 1230
 }
 export declare const ListTemplateTypeByValue: {
     '-1': string;

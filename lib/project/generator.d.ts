@@ -1,4 +1,3 @@
-/// <reference types="lodash" />
 import { Dictionary } from 'lodash';
 export interface ProjectConfig {
     spHost: string;

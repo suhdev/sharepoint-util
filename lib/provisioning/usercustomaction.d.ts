@@ -3,38 +3,38 @@ export declare enum StandardMenuGroup {
     ActionsMenu = "ActionMenu",
     ActionsMenuForSurvey = "ActionsMenuForSurvey",
     SettingsMenuForSurvey = "SettingsMenuForSurvey",
-    SiteActions = "SiteActions",
+    SiteActions = "SiteActions"
 }
 export declare const CustomActionLocationList: string[];
 export declare const ContentTypeSettingsGroupList: string[];
 export declare enum ContentTypeSettingsGroup {
     Fields = "Fields",
-    General = "General",
+    General = "General"
 }
 export declare const CreateGroupList: string[];
 export declare enum CreateGroup {
-    WebPages = "WebPages",
+    WebPages = "WebPages"
 }
 export declare const GroupsPageList: string[];
 export declare enum GroupsPage {
     NewMenu = "NewMenu",
-    SettingsMenu = "SettingsMenu",
+    SettingsMenu = "SettingsMenu"
 }
 export declare const ListEditGroupList: string[];
 export declare enum ListEditGroup {
     Communications = "Communications",
     GeneralSettings = "GeneralSettings",
-    Permissions = "Permissions",
+    Permissions = "Permissions"
 }
 export declare const DocumentLibraryGroupList: string[];
 export declare enum DocumentLibraryGroup {
-    GeneralSettings = "GeneralSettings",
+    GeneralSettings = "GeneralSettings"
 }
 export declare const PeoplePageGroupList: string[];
 export declare enum PeoplePageGroup {
     ActionsMenu = "ActionsMenu",
     NewMenu = "NewMenu",
-    SettingsMenu = "SettingsMenu",
+    SettingsMenu = "SettingsMenu"
 }
 export declare const SiteSettingsGroupList: string[];
 export declare enum SiteSettingsGroup {
@@ -42,20 +42,20 @@ export declare enum SiteSettingsGroup {
     Galleries = "Galleries",
     SiteAdministration = "SiteAdministration",
     SiteCollectionAdmin = "SiteCollectionAdmin",
-    UsersAndPermissions = "UsersAndPermissions",
+    UsersAndPermissions = "UsersAndPermissions"
 }
 export declare enum AdministrationApplicationsGroup {
     Databases = "Databases",
     ServiceApplications = "ServiceApplications",
     SiteCollections = "SiteCollections",
-    WebApplications = "WebApplications",
+    WebApplications = "WebApplications"
 }
 export declare enum AdministrationBackupsGroup {
     FarmBackup = "FarmBackup",
-    GranularBackup = "GranularBackup",
+    GranularBackup = "GranularBackup"
 }
 export declare enum ConfigurationWizardsGroup {
-    FarmConfiguration = "FarmConfiguration",
+    FarmConfiguration = "FarmConfiguration"
 }
 export declare type CustomActionLocation = "DisplayFormToolbar" | "EditControlBlock" | "EditFormToolbar" | "NewFormToolbar" | "ViewToolbar" | "Microsoft.SharePoint.StandardMenu" | "CommandUI.Ribbon.ListView" | "CommandUI.Ribbon.NewForm" | "CommandUI.Ribbon.EditForm" | "CommandUI.Ribbon.DisplayForm" | "CommandUI.Ribbon" | "Microsoft.SharePoint.ContentTypeSettings" | "Microsoft.SharePoint.ContentTypeTemplateSettings" | "Microsoft.SharePoint.Create" | "Microsoft.SharePoint.GroupsPage" | "Microsoft.SharePoint.ListEdit" | "Microsoft.SharePoint.ListEdit.DocumentLibrary" | "Microsoft.SharePoint.PeoplePage" | "Microsoft.SharePoint.SiteSettings" | "Microsoft.SharePoint.Administration.Applications" | "Microsoft.SharePoint.Administration.Backups" | "Microsoft.SharePoint.Administration.ConfigurationWizards" | "Microsoft.SharePoint.Administration.Default" | "Microsoft.SharePoint.Administration.GeneralApplicationSettings" | "Microsoft.SharePoint.Administration.Monitoring" | "Microsoft.SharePoint.Administration.Security" | "Microsoft.SharePoint.Administration.SystemSettings" | "Microsoft.SharePoint.Administration.UpgradeAndMigration";
 export declare type CustomActionRight = "ViewListItems" | "EmptyMask" | "AddListItems" | "EditListItems" | "DeleteListItems" | "ApproveItems" | "OpenItems" | "ViewVersions" | "DeleteVersions" | "CancelCheckout" | "ManagePersonalViews" | "ManageLists" | "ViewFormPages" | "AnonymousSearchAccessList" | "Open" | "ViewPages" | "AddAndCustomizePages" | "ApplyThemeAndBorder" | "ApplyStyleSheets" | "ViewUsageData" | "CreateSSCSite" | "ManageSubwebs" | "CreateGroups" | "ManagePermissions" | "BrowseDirectories" | "BrowseUserInfo" | "AddDelPrivateWebParts" | "UpdatePersonalWebParts" | "ManageWeb" | "AnonymousSearchAccessWebLists" | "UseClientIntegration" | "UseRemoteAPIs" | "ManageAlerts" | "CreateAlerts" | "EditMyUserInfo" | "EnumeratePermissions" | "FullMask";

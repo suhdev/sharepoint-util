@@ -1,4 +1,3 @@
-/// <reference types="lodash" />
 import { ContentType } from './contenttype';
 import { Field } from './field';
 import { List } from './List';
