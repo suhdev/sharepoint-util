@@ -612,6 +612,20 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
         {% endfor %}
     </CHOICES>
     {% endif %}
+    {% if getAttr(field,'type') == "ChoiceMulti" and hasAttr(field,'choices') %}
+    <CHOICES>
+        {% for item in getAttr(field,'choices') %}
+        <CHOICE>{{item}}</CHOICE>
+        {% endfor %}
+    </CHOICES>
+    {% endif %}
+    {% if getAttr(field,'type') == "MultiChoice" and hasAttr(field,'choices') %}
+    <CHOICES>
+        {% for item in getAttr(field,'choices') %}
+        <CHOICE>{{item}}</CHOICE>
+        {% endfor %}
+    </CHOICES>
+    {% endif %}
     {% if getAttr(field,'type') == "Choice" and hasAttr(field,'mappings') %}
     <MAPPINGS>
         {% for item in getAttr(field,'mappings') %}
