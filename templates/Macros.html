@@ -466,8 +466,14 @@ CustomMasterPageUrl="{{getAttr(webSettings,'customMasterPage','customMasterPageU
 {% set taxFieldId = generateTaxonomyFieldId(getAttr(field,'id')) %}
 <Field Type="Note" 
     DisplayName="{{getAttr(field,'displayName')}}_TaxonomyField" 
+    {% set fl = getAttr(field,'StaticName','InternalName','name') | length %}
+    {% if fl <= 22 %}
+    StaticName="{{getAttr(field,'StaticName','InternalName','name')}}TaxHTField" 
+    Name="{{getAttr(field,'StaticName','InternalName','name')}}TaxHTField" 
+    {% else %}
     StaticName="{{getAttr(field,'StaticName','InternalName','name')|truncate(22,true,'TaxHTField')}}" 
     Name="{{getAttr(field,'StaticName','InternalName','name')|truncate(22,true,'TaxHTField')}}" 
+    {% endif %}
     ID="{{taxFieldId}}" 
     ShowInViewForms="FALSE" 
     Required="FALSE" 
