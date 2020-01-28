@@ -21,7 +21,7 @@ Write-Log "Connecting to $siteUrl"
 
 {% endfor %}
 
-Connect-PnPOnline -Url $siteUrl
+Connect-PnPOnline -Url $siteUrl -UseWebLogin
 
 {% for command in getAttr(template,'postConnectCommands') %}
     
