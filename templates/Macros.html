@@ -1436,7 +1436,7 @@ Write-Log "Unknown Command Type {{type}}"
 
 {% macro ProvisionSubSite(s) %}
 
-$parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'root' or not hasAttr(s,'parentWeb') %} $rootWeb.ServerRelativeUrl {% else %} Get-WebByUrl -Url "$($rootWeb.ServerRelativeUrl)/{{getAttr(s,'parentWeb')}}" {% endif %}
+$parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'root' or not hasAttr(s,'parentWeb') %} $rootWeb {% else %} Get-WebByUrl -Url "$($rootWeb.ServerRelativeUrl)/{{getAttr(s,'parentWeb')}}" {% endif %}
 
 $subWebUrl = "{{getAttr(s,'url')}}"
 $fullSubWebUrl = "$($parentWeb.ServerRelativeUrl)/$($subWebUrl)";
