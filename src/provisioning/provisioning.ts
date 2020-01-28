@@ -251,7 +251,7 @@ export function createTransformer(config: TransformConfig) {
     }
 
     function getFilePath(fileName: string) {
-        return ".\\\\" + OUTPUT_DIR + "\\" + fileName;
+        return ".\\" + fileName;
     }
 
     var formatter = new XmlFormatter({
