@@ -1436,15 +1436,11 @@ Write-Log "Unknown Command Type {{type}}"
 
 {% macro ProvisionSubSite(s) %}
 
-$parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'root' or not hasAttr(s,'parentWeb') %} $rootWeb {% else %} $null {% endif %}
+$parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'root' or not hasAttr(s,'parentWeb') %} $rootWeb.ServerRelativeUrl {% else %} Get-WebByUrl -Url "$($rootWeb.ServerRelativeUrl)/{{getAttr(s,'parentWeb')}}" {% endif %}
 
-if ($parentWeb -eq $null) 
-{
-    $parentWeb = Get-WebByUrl -Web $rootWeb -Url "{{getAttr(s,'parentWeb')}}" 
-}
 $subWebUrl = "{{getAttr(s,'url')}}"
-$fullSubWebUrl = "{{getAttr(s,'parentWeb')}}"+"/"+$subWebUrl;
-$subweb = Get-WebByUrl -Web $parentWeb -Url $fullSubWebUrl
+$fullSubWebUrl = "$($parentWeb.ServerRelativeUrl)/$($subWebUrl)";
+$subweb = Get-WebByUrl -Url $fullSubWebUrl
 
 if ($subweb -eq $null)
 {
