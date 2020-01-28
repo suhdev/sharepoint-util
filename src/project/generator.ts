@@ -1,39 +1,39 @@
-import {writeFileSync,existsSync} from 'fs'; 
-import {createDirectoryIfNotExist} from '../io/util'; 
+import { writeFileSync, existsSync } from 'fs';
+import { createDirectoryIfNotExist } from '../io/util';
 import { logError, log } from '../util/logger';
-import * as path from 'path'; 
+import * as path from 'path';
 import { Dictionary } from 'lodash';
-export interface ProjectConfig{
-    spHost:string; 
-    url:string; 
-    name:string;
-    version:string; 
-    assetsDir:string; 
-    libDir:string; 
-    configDir:string; 
-    env:string;
-    srcDir:string;  
-    sassDir:string;
-    useSharePoint:boolean; 
-    sharePointVersion:'online'|'2013'|'2016'; 
-    distDir:string; 
-    distCssDir:string; 
-    distJsDir:string; 
-    provisioningDir:string; 
+export interface ProjectConfig {
+    spHost: string;
+    url: string;
+    name: string;
+    version: string;
+    assetsDir: string;
+    libDir: string;
+    configDir: string;
+    env: string;
+    srcDir: string;
+    sassDir: string;
+    useSharePoint: boolean;
+    sharePointVersion: 'online' | '2013' | '2016';
+    distDir: string;
+    distCssDir: string;
+    distJsDir: string;
+    provisioningDir: string;
     templatesDir: string;
-    masterPageTemplatesDir: string; 
-    pageLayoutTemplatesDir: string; 
-    templatesExtraConfig:Dictionary<any>;
-    deploymentDir:string; 
-    masterpageCatalogDrive?:string; 
-    siteAssetsDrive?:string; 
-    styleLibraryDrive?:string;
-    cdn:string[];
+    masterPageTemplatesDir: string;
+    pageLayoutTemplatesDir: string;
+    templatesExtraConfig: Dictionary<any>;
+    deploymentDir: string;
+    masterpageCatalogDrive?: string;
+    siteAssetsDrive?: string;
+    styleLibraryDrive?: string;
+    cdn: string[];
 }
 
 const COMPANY_DIR = '.sysdoc';
 
-const defaultConfig:ProjectConfig = {
+const defaultConfig: ProjectConfig = {
     spHost: 'http://tenant.sharepoint.com/',
     name: 'test-project',
     url: 'test-site',
@@ -44,27 +44,27 @@ const defaultConfig:ProjectConfig = {
     sassDir: './sass',
     distDir: './dist',
     deploymentDir: 'Sysdoc',
-    useSharePoint:true, 
-    sharePointVersion:'online',
+    useSharePoint: true,
+    sharePointVersion: 'online',
     distCssDir: './dist/css',
     distJsDir: './dist/js',
     provisioningDir: './deploy',
     templatesDir: './templates',
-    version:'1.0.0',
+    version: '1.0.0',
     masterPageTemplatesDir: './templates/masterpage',
     pageLayoutTemplatesDir: './templates/pagelayouts',
     templatesExtraConfig: {},
     cdn: [],
-    env:'dev',
+    env: 'dev',
     masterpageCatalogDrive: null,
     siteAssetsDrive: null,
     styleLibraryDrive: null,
 };
 
-export async function createConfigFile(config:ProjectConfig){
-    const cfg = {...defaultConfig,...config}; 
-    const companyName = COMPANY_DIR; 
-    const projectName = cfg.name; 
+export async function createConfigFile(config: ProjectConfig) {
+    const cfg = { ...defaultConfig, ...config };
+    const companyName = COMPANY_DIR;
+    const projectName = cfg.name;
     let filePath = `${process.cwd()}`;
     log('Creating Default Config File',
         `creating base config file in current folder: ${filePath}`);
@@ -86,23 +86,23 @@ export async function createConfigFile(config:ProjectConfig){
     }
 }
 
-export async function createDefaultConfigFile(){
+export async function createDefaultConfigFile() {
     var projectName = 'test-project';
-    var companyName = COMPANY_DIR; 
+    var companyName = COMPANY_DIR;
     log('Creating Default Config File', `creating default config file`);
-    if (existsSync(path.resolve(process.cwd(),'package.json'))){
-        log('Creating Default Config File', 
+    if (existsSync(path.resolve(process.cwd(), 'package.json'))) {
+        log('Creating Default Config File',
             `Found package.json in current folder going to use 'name' as project name`);
-        projectName = require(path.resolve(process.cwd(), 'package.json')).name; 
+        projectName = require(path.resolve(process.cwd(), 'package.json')).name;
     }
-    const config = {...defaultConfig,name:projectName};
-    createConfigFile(config); 
+    const config = { ...defaultConfig, name: projectName };
+    createConfigFile(config);
 }
 
-export function createProject(name:string, config?: ProjectConfig){
-    if (!config){
-        createDefaultConfigFile(); 
-    }else {
-        createConfigFile(config); 
+export function createProject(name: string, config?: ProjectConfig) {
+    if (!config) {
+        createDefaultConfigFile();
+    } else {
+        createConfigFile(config);
     }
 }
