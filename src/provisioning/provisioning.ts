@@ -2,7 +2,7 @@ import * as nunjucks from 'nunjucks';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as pretty from 'pretty-data';
-import { removeSpaces, parenthesize, capitalize, lowerize,getPowershellValue, getAttr, hasAttr, isString, hasItems, hasKeys } from '../util/filters';
+import { removeSpaces, parenthesize, capitalize, lowerize, getPowershellValue, getAttr, hasAttr, isString, hasItems, hasKeys } from '../util/filters';
 import { BuiltInContentType, FieldTypes, BuiltInFields } from '../sharepoint/builtin';
 import { XmlFormatter } from '../xml/xmlformatter';
 import { SharePointSite } from './sharepointsite';
@@ -18,10 +18,10 @@ import { List } from './List';
 import { TermGroup } from './termgroup';
 import { TermSet } from './termset';
 
-const INTERFACES_DIR = 'interfaces'; 
-const SRC_DIR = 'src'; 
-const OUTPUT_DIR = 'deploy'; 
-const TEMPLATES_DIR = 'templates'; 
+const INTERFACES_DIR = 'interfaces';
+const SRC_DIR = 'src';
+const OUTPUT_DIR = 'deploy';
+const TEMPLATES_DIR = 'templates';
 
 export interface ProvisionOptions {
     copyInterfaces?: boolean;
@@ -33,58 +33,58 @@ export interface SiteConfig {
 }
 
 export interface CleanAction {
-    name:string;
-    value:string; 
-    fn:(generator?:any)=>void;
+    name: string;
+    value: string;
+    fn: (generator?: any) => void;
 
 }
 
 export interface CleanConfig {
-    fields:Dictionary<Field>; 
-    contentTypes:Dictionary<ContentType>; 
-    lists:Dictionary<List>; 
-    termGroups:Dictionary<TermGroup>;
-    termSets:Dictionary<TermSet>; 
-    cleanActions:CleanAction[];
-    errors:string[];
+    fields: Dictionary<Field>;
+    contentTypes: Dictionary<ContentType>;
+    lists: Dictionary<List>;
+    termGroups: Dictionary<TermGroup>;
+    termSets: Dictionary<TermSet>;
+    cleanActions: CleanAction[];
+    errors: string[];
 }
 
 export interface TransformConfig {
     outputDir?: string;
-    rootDir ?: string;
-    srcDir ?: string;
-    interfacesDir?:string; 
-    templatesPaths?:string[];
-    consumeContentType?:(name:string,id:string)=>void; 
-    options?:ProvisionOptions; 
+    rootDir?: string;
+    srcDir?: string;
+    interfacesDir?: string;
+    templatesPaths?: string[];
+    consumeContentType?: (name: string, id: string) => void;
+    options?: ProvisionOptions;
 }
 
-export function createTransformer(config:TransformConfig) {
+export function createTransformer(config: TransformConfig) {
     var ctypes = {};
     var fields = {};
-    var errors:string[] = [];
+    var errors: string[] = [];
 
     var cfg: TransformConfig = {
-        outputDir: path.resolve(process.cwd(),OUTPUT_DIR),
-        templatesPaths:config.templatesPaths || [],
-        srcDir: config.srcDir || (config.rootDir && path.resolve(config.rootDir,SRC_DIR)) 
+        outputDir: path.resolve(process.cwd(), OUTPUT_DIR),
+        templatesPaths: config.templatesPaths || [],
+        srcDir: config.srcDir || (config.rootDir && path.resolve(config.rootDir, SRC_DIR))
     };
-    var env:nunjucks.Environment = nunjucks.configure([path.resolve(__dirname, path.join('..', '..', TEMPLATES_DIR)),...(cfg.templatesPaths||[])], {
+    var env: nunjucks.Environment = nunjucks.configure([path.resolve(__dirname, path.join('..', '..', TEMPLATES_DIR)), ...(cfg.templatesPaths || [])], {
         trimBlocks: true
     });
 
-    async function setConfig({outputDir,rootDir,srcDir,interfacesDir,templatesPaths,consumeContentType}:TransformConfig){
+    async function setConfig({ outputDir, rootDir, srcDir, interfacesDir, templatesPaths, consumeContentType }: TransformConfig) {
         var cwd = process.cwd();
         var rootdir = rootDir || cwd;
         await createDirectoryIfNotExist(rootdir, 'Creating Root Directory');
-        cfg.outputDir = outputDir || path.resolve(rootdir ,'deploy');
-        await createDirectoryIfNotExist(cfg.outputDir,'Creating Output Directory'); 
+        cfg.outputDir = outputDir || path.resolve(rootdir, 'deploy');
+        await createDirectoryIfNotExist(cfg.outputDir, 'Creating Output Directory');
         cfg.srcDir = srcDir || path.resolve(rootDir || cwd, SRC_DIR);
-        await createDirectoryIfNotExist(cfg.srcDir, 'Creating Source Directory'); 
-        cfg.interfacesDir = interfacesDir || path.resolve(rootDir || cwd, path.join(SRC_DIR,INTERFACES_DIR));
-        await createDirectoryIfNotExist(cfg.interfacesDir, 'Creating Interfaces Directory'); 
-        cfg.templatesPaths = templatesPaths; 
-        env = nunjucks.configure([...(cfg.templatesPaths || []),path.resolve(__dirname, path.join('..', '..', TEMPLATES_DIR))], {
+        await createDirectoryIfNotExist(cfg.srcDir, 'Creating Source Directory');
+        cfg.interfacesDir = interfacesDir || path.resolve(rootDir || cwd, path.join(SRC_DIR, INTERFACES_DIR));
+        await createDirectoryIfNotExist(cfg.interfacesDir, 'Creating Interfaces Directory');
+        cfg.templatesPaths = templatesPaths;
+        env = nunjucks.configure([...(cfg.templatesPaths || []), path.resolve(__dirname, path.join('..', '..', TEMPLATES_DIR))], {
             trimBlocks: true
         });
         env.addGlobal('hasAttr', hasAttr);
@@ -106,25 +106,25 @@ export function createTransformer(config:TransformConfig) {
         env.addGlobal('booleanToUpper', booleanToUpper);
         env.addGlobal('getJsTypeForField', getJsTypeForField);
         env.addGlobal('log', log);
-        env.addGlobal('isString',isString); 
-        env.addGlobal('isObject',isObject); 
-        env.addGlobal('hasItems',hasItems);
+        env.addGlobal('isString', isString);
+        env.addGlobal('isObject', isObject);
+        env.addGlobal('hasItems', hasItems);
         env.addGlobal('hasKeys', hasKeys);
         env.addGlobal('validateContentType', validateContentType);
-        env.addGlobal('addError',addError);
-        env.addGlobal('getPowershellValue',getPowershellValue); 
-        if (consumeContentType){
-            env.addGlobal('writeContentType',function(name,id){
-                consumeContentType(name,id); 
+        env.addGlobal('addError', addError);
+        env.addGlobal('getPowershellValue', getPowershellValue);
+        if (consumeContentType) {
+            env.addGlobal('writeContentType', function (name, id) {
+                consumeContentType(name, id);
             })
         }
     }
-    
-    function clearErrors(){
-        errors = []; 
+
+    function clearErrors() {
+        errors = [];
     }
 
-    function addError(error){
+    function addError(error) {
         errors.push(error);
     }
 
@@ -142,8 +142,8 @@ export function createTransformer(config:TransformConfig) {
     function getFieldIdByName(name: string) {
         if (fields[name]) {
             return `${getAttr(fields[name], 'id')}`;
-        }else if (BuiltInFields[name]){
-            return BuiltInFields[name]; 
+        } else if (BuiltInFields[name]) {
+            return BuiltInFields[name];
         }
         errors.push(`ERROR no field with name ${name}`);
         return `ERROR no field with name ${name}`
@@ -171,13 +171,13 @@ export function createTransformer(config:TransformConfig) {
         });
     }
 
-    async function transform({spHost,url}:SiteConfig, site: SharePointSite) {
+    async function transform({ spHost, url }: SiteConfig, site: SharePointSite) {
         await setConfig(config);
         errors = [];
         ctypes = {};
         fields = {};
-        if (!spHost){
-            logError('Transform','spHost parameter is missing')
+        if (!spHost) {
+            logError('Transform', 'spHost parameter is missing')
             throw new Error('No spHost provided');
         }
         addFileds(site.fields);
@@ -207,7 +207,7 @@ export function createTransformer(config:TransformConfig) {
             template: site
         })));
         log('Base Interfaces', 'Creating base interfaces');
-        createBaseInterfaces(site); 
+        createBaseInterfaces(site);
         log('List Schemas', 'Creating site collection list schemas');
         createListSchemas(site);
         if (site.subsites) {
@@ -223,7 +223,7 @@ export function createTransformer(config:TransformConfig) {
             });
         }
         site.spHost = site.spHost || spHost;
-        if (!site.spHost.endsWith('/')){
+        if (!site.spHost.endsWith('/')) {
             site.spHost += '/';
         }
         site.url = site.url || url;
@@ -241,8 +241,8 @@ export function createTransformer(config:TransformConfig) {
         fs.writeFileSync(path.resolve(cfg.outputDir, `./deploy-${postfix}.ps1`), env.render('Deployment.ps1.njk', {
             template: site,
             postfix,
-            spHost:site.spHost,
-            url:site.url,
+            spHost: site.spHost,
+            url: site.url,
         }));
     }
 
@@ -251,7 +251,7 @@ export function createTransformer(config:TransformConfig) {
     }
 
     function getFilePath(fileName: string) {
-        return path.resolve(cfg.outputDir, fileName);
+        return ".\\" + fileName;
     }
 
     var formatter = new XmlFormatter({
@@ -267,16 +267,16 @@ export function createTransformer(config:TransformConfig) {
         ], childFields);
     }
 
-    function getFieldsForContentType(contentType:ContentType, childFields = []) {
-        if (!contentType){
-            logError('Get Fields For Content Type',`Undefined content type provided`);
+    function getFieldsForContentType(contentType: ContentType, childFields = []) {
+        if (!contentType) {
+            logError('Get Fields For Content Type', `Undefined content type provided`);
             errors.push(`Undefined content type provided`);
             throw new Error(`Content type cannot be undefined`);
         }
         var ff = [].concat(childFields, contentType.fields.map((e) => {
             if (!fields[e]) {
-                errors.push('Get Fields For Content Type'+`: Field ${e} does not exist`);
-                logError('Get Fields For Content Type',`Field ${e} does not exist`);
+                errors.push('Get Fields For Content Type' + `: Field ${e} does not exist`);
+                logError('Get Fields For Content Type', `Field ${e} does not exist`);
                 throw new Error(`Field ${e} does not exist`);
             }
             return fields[e];
@@ -291,9 +291,9 @@ export function createTransformer(config:TransformConfig) {
         }
     }
 
-    function createBaseInterfaces(site:SharePointSite){
+    function createBaseInterfaces(site: SharePointSite) {
         var fileName = `${cfg.interfacesDir}/CommonType.ts`;
-        log('Creating Base Interfaces',`Creating CommonType.ts at ${fileName}`);
+        log('Creating Base Interfaces', `Creating CommonType.ts at ${fileName}`);
         fs.writeFileSync(fileName, nunjucks.render('CommonType.ts.njk', {}));
         fileName = `${cfg.interfacesDir}/User.ts`;
         log('Creating Base Interfaces', `Creating User.ts at ${fileName}`);
@@ -305,28 +305,28 @@ export function createTransformer(config:TransformConfig) {
     }
 
     function createListSchemas(site: SharePointSite) {
-        site.lists.forEach((e:List) => {
-            
+        site.lists.forEach((e: List) => {
+
             var fileName = `${cfg.outputDir}/${site.id}-${e.title}.ts`;
             let tx = {};
             var fields: any[] = null;
             var contentTypeName = !e.contentTypes || e.contentTypes.length === 0 ? "Item" : e.contentTypes[0];
-            if (contentTypeName !== "Item" && !ctypes[contentTypeName]){
-                logError('Content type not found',`Content type ${contentTypeName} does not exist`);
+            if (contentTypeName !== "Item" && !ctypes[contentTypeName]) {
+                logError('Content type not found', `Content type ${contentTypeName} does not exist`);
                 throw new Error(`Could not find definition for content type ${contentTypeName}.`);
             }
             fields = !e.contentTypes || e.contentTypes.length === 0 ? getBuiltInContentTypeFields("Item") : getFieldsForContentType(ctypes[contentTypeName]);
             fields.forEach((e) => {
                 tx[e.name] = e.type;
             });
-            log('List Schemas',`Creating list schema for list ${e.title}`);
+            log('List Schemas', `Creating list schema for list ${e.title}`);
             fs.writeFileSync(fileName,
                 nunjucks.render('ListSchema.ts.njk', {
                     listTitle: (e.title),
                     schema: JSON.stringify(tx, null, '    ')
                 }));
             if (e['interface']) {
-                log('List Schemas',`Creating interface for list ${e.title}`)
+                log('List Schemas', `Creating interface for list ${e.title}`)
                 var interfaceFileName = `${cfg.interfacesDir}/${e['interface']}.ts`;
                 fs.writeFileSync(interfaceFileName, nunjucks.render('ListInterface.ts.njk', {
                     fields,
@@ -336,23 +336,23 @@ export function createTransformer(config:TransformConfig) {
         })
     }
 
-    function validate(site){
-        return _validate(site,{
-            lists:{},
-            contentTypes:{},
-            fields:{}, 
-            termGroups:{},
-            termSets:{},
-            errors:[],
-            cleanActions:[],
+    function validate(site) {
+        return _validate(site, {
+            lists: {},
+            contentTypes: {},
+            fields: {},
+            termGroups: {},
+            termSets: {},
+            errors: [],
+            cleanActions: [],
         });
     }
 
-    
 
-    function _validate(site,cleanConfig:CleanConfig){
-        (site.fields||[]).forEach((f)=>{
-            cleanConfig.fields[f.name] = f; 
+
+    function _validate(site, cleanConfig: CleanConfig) {
+        (site.fields || []).forEach((f) => {
+            cleanConfig.fields[f.name] = f;
         });
         (site.contentTypes || []).forEach((f) => {
             cleanConfig.contentTypes[f.name] = f;
@@ -363,17 +363,18 @@ export function createTransformer(config:TransformConfig) {
         (site.termGroups || []).forEach((f) => {
             cleanConfig.termGroups[f.name] = f;
         });
-        const termSets = _(site.termGroups || []).map((e: any) => e.termSets).flatten().value(); 
+        // @ts-ignore
+        const termSets = _(site.termGroups || []).map((e: any) => e.termSets).flatten().value();
         termSets.forEach((f) => {
             cleanConfig.termSets[f.name] = f;
         });
-        if (site.navigation){
-            if (site.navigation.global){
-                if (site.navigation.global.navType && site.navigation.global.navType.toLowerCase() === 'managed'){
-                    const tset = termSets.find((e)=>{
+        if (site.navigation) {
+            if (site.navigation.global) {
+                if (site.navigation.global.navType && site.navigation.global.navType.toLowerCase() === 'managed') {
+                    const tset = termSets.find((e) => {
                         return e.id === site.navigation.global.termSetId
                     });
-                    if (!tset){
+                    if (!tset) {
                         logError('Validation',
                             `Site global navigation is using a term set that does not exist ${site.navigation.global.termSetId}`)
                         cleanConfig.errors.push(`Site global navigation is using a term set that does not exist ${site.navigation.global.termSetId}`);
@@ -401,16 +402,16 @@ export function createTransformer(config:TransformConfig) {
                 }
             })
         }
-        (site.fields || []).forEach((field)=>{
+        (site.fields || []).forEach((field) => {
             if (field.type && (field.type.toLowerCase().indexOf('lookup') !== -1)) {
                 if (field.listTitle) {
                     if (!cleanConfig.lists[field.listTitle]) {
                         cleanConfig.cleanActions.push({
                             name: `Delete this field ${field.name}`,
-                            value:`delete.${site.url}.${field.id}`, 
+                            value: `delete.${site.url}.${field.id}`,
                             fn: () => {
-                                site.fields = site.fields.filter((e)=>{
-                                    return e.name !== field.name; 
+                                site.fields = site.fields.filter((e) => {
+                                    return e.name !== field.name;
                                 });
                             }
                         });
@@ -432,59 +433,59 @@ export function createTransformer(config:TransformConfig) {
                 }
             } else if (field.type && (field.type.toLowerCase().indexOf('taxonomy') !== -1)) {
                 if (field.termGroupName) {
-                    if (!cleanConfig.termGroups[field.termGroupName]){
+                    if (!cleanConfig.termGroups[field.termGroupName]) {
                         cleanConfig.cleanActions.push({
                             name: `Create term set ${field.termSetName} in ${field.termGroupName}`,
                             fn: () => {
                                 var termGroup = {
-                                    name:field.termGroupName,
-                                    termSets:[]
-                                }; 
-                                if (field.termSetName){
+                                    name: field.termGroupName,
+                                    termSets: []
+                                };
+                                if (field.termSetName) {
                                     termGroup.termSets.push({
-                                        id:generateGuid(), 
-                                        name:field.termSetName
+                                        id: generateGuid(),
+                                        name: field.termSetName
                                     });
                                 }
                                 site.termGroups.push({
-                                    name:field.termGroupName, 
+                                    name: field.termGroupName,
                                 });
                             },
                             value: `createTermGroup.${site.url}.${field.id}`,
                         });
-                        logError('Validation',`Taxonomy field ${field.name} refers to a group name that does not exist ${field.termGroupName}`);
+                        logError('Validation', `Taxonomy field ${field.name} refers to a group name that does not exist ${field.termGroupName}`);
                         errors.push(`Taxonomy field ${field.name} refers to a group name that does not exist ${field.termGroupName}`)
-                    }else {
-                        var termGroup = cleanConfig.termGroups[field.termGroupName]; 
-                        if(termGroup.termSets && termGroup.termSets.length){
-                            var tset = termGroup.termSets.find((e)=>{
-                                return e.name === field.termSetName; 
+                    } else {
+                        var termGroup = cleanConfig.termGroups[field.termGroupName];
+                        if (termGroup.termSets && termGroup.termSets.length) {
+                            var tset = termGroup.termSets.find((e) => {
+                                return e.name === field.termSetName;
                             });
                             cleanConfig.cleanActions.push({
-                                name:`Remove field ${field.name}`, 
-                                fn:()=>{
-                                    site.fields = site.fields.filter((e)=>{
-                                        return e.name !== field.name; 
-                                    }); 
+                                name: `Remove field ${field.name}`,
+                                fn: () => {
+                                    site.fields = site.fields.filter((e) => {
+                                        return e.name !== field.name;
+                                    });
                                 },
                                 value: `delete.${site.url}.${field.id}`,
-                            }); 
-                            if (!tset){
+                            });
+                            if (!tset) {
                                 cleanConfig.cleanActions.push({
                                     name: `Create term set ${field.termSetName} in ${field.termGroupName}`,
                                     fn: () => {
                                         termGroup.termSets.push({
-                                            name:field.termSetName,
+                                            name: field.termSetName,
                                             id: generateGuid(),
                                         });
                                     },
                                     value: `createTermSet.${site.url}.${field.id}`,
                                 });
                                 logError('Validation',
-                                `Taxonomy field ${field.name} refers to a term set that does not exist in term gorup ${field.termGroupname}`);
+                                    `Taxonomy field ${field.name} refers to a term set that does not exist in term gorup ${field.termGroupname}`);
                                 cleanConfig.errors.push(`Taxonomy field ${field.name} refers to a term set that does not exist in term gorup ${field.termGroupname}`);
                             }
-                        }else {
+                        } else {
                             cleanConfig.cleanActions.push({
                                 name: `Create term set ${field.termSetName} in ${field.termGroupName}`,
                                 fn: () => {
@@ -499,23 +500,23 @@ export function createTransformer(config:TransformConfig) {
                                 `Taxonomy field ${field.name} refers to a term set ${field.termSetName} in a term group ${field.termGroupName} that has no term sets`);
                         }
                     }
-                }else {
-                    logError('Validation',`Taxonomy field ${field.name} is missing a 'termGroupName' attribute.`);
+                } else {
+                    logError('Validation', `Taxonomy field ${field.name} is missing a 'termGroupName' attribute.`);
                 }
-                if (!field.termSetName){
+                if (!field.termSetName) {
                     logError('Validation', `Taxonomy field ${field.name} is missing a 'termSetName' attribute.`);
                 }
             }
-        }); 
+        });
         (site.contentTypes || []).forEach((contentType) => {
             (contentType.fields || []).forEach((f) => {
                 if (!cleanConfig.fields[f]) {
                     cleanConfig.cleanActions.push({
                         name: `Remove field ${f} from content type ${contentType.name}`,
-                        value:`remove.field.${f}.contentType.${site.url}.${contentType.id}`,
-                        fn:()=>{
-                            contentType.fields = contentType.fields.filter((e)=>{
-                                return e !== f; 
+                        value: `remove.field.${f}.contentType.${site.url}.${contentType.id}`,
+                        fn: () => {
+                            contentType.fields = contentType.fields.filter((e) => {
+                                return e !== f;
                             });
                         }
                     });
@@ -524,9 +525,9 @@ export function createTransformer(config:TransformConfig) {
                         value: `create.field.${f}.contentType.${site.url}.${contentType.id}`,
                         fn: () => {
                             return {
-                                action:'addField',
-                                param:{
-                                    name:f
+                                action: 'addField',
+                                param: {
+                                    name: f
                                 }
                             };
                         }
@@ -538,17 +539,17 @@ export function createTransformer(config:TransformConfig) {
             if (contentType.parent) {
                 if (!cleanConfig.contentTypes[contentType.parent] && !BuiltInContentType[contentType.parent]) {
                     cleanConfig.cleanActions.push({
-                        name:`Create content type ${contentType.parent}`,
-                        value:`field.${contentType.name}.${contentType.parent}`,
-                        fn:(generator)=>{
-                           return {
-                               action:'addContentType',
-                               param:{
-                                   name:contentType.parent
-                               }
-                           };
+                        name: `Create content type ${contentType.parent}`,
+                        value: `field.${contentType.name}.${contentType.parent}`,
+                        fn: (generator) => {
+                            return {
+                                action: 'addContentType',
+                                param: {
+                                    name: contentType.parent
+                                }
+                            };
                         }
-                    }); 
+                    });
                     logError('Validation', `Parent content type ${contentType.parent} for content type ${contentType.name} does not exist`);
                     errors.push(`Parent content type ${contentType.parent} for content type ${contentType.name} does not exist`)
                 }
@@ -561,9 +562,9 @@ export function createTransformer(config:TransformConfig) {
                         name: `Remove content type ${ct} from list ${e.title}`,
                         value: `contentType.${site.url}.remove.${e.title}.${ct}`,
                         fn: (generator) => {
-                            e.contentTypes = e.contentTypes.filter(e=>e !== ct); 
+                            e.contentTypes = e.contentTypes.filter(e => e !== ct);
                         }
-                    }); 
+                    });
                     cleanConfig.cleanActions.push({
                         name: `Create content type ${ct}`,
                         value: `contentType.${site.url}.create.${ct}`,
@@ -575,7 +576,7 @@ export function createTransformer(config:TransformConfig) {
                                 }
                             };
                         }
-                    }); 
+                    });
                     logError('Validation', `List ${e.title} contains a content types that does not exist ${ct}`);
                     errors.push(`List ${e.title} contains a content types that does not exist ${ct}`);
                 }
@@ -599,18 +600,18 @@ export function createTransformer(config:TransformConfig) {
     //         termGroups:{},
     //         errors:[]
     //     });
-        
+
     // }
-    
-    
+
+
     return {
         setConfig,
         transform,
         validate,
         // clean,
-        get errors(){
+        get errors() {
             return errors;
         }
     };
-    
+
 }

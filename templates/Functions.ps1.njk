@@ -123,13 +123,10 @@ function Get-WebByUrl {
         $ww = $site.OpenWeb($Url)
         $ctx.Load($ww)
         $ctx.ExecuteQuery()
-        return $ww; 
+        return $ww;
     }
     Catch
     {
-        $ww = $site.RootWeb; 
-        $ctx.Load($ww); 
-        $ctx.ExecuteQuery(); 
-        return $ww; 
+        return $null;
     }
 }
