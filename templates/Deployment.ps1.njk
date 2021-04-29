@@ -45,7 +45,7 @@ Set-PnPTraceLog -On -Level Debug
 
 Write-Log "Applying SiteCollection Provisioning..."
 
-Apply-PnPProvisioningTemplate -Path "{{getFilePath('sitecollection-'+getAttr(template,'id')+'-'+postfix+'.xml')}}"
+Invoke-PnPSiteTemplate -Path "{{getFilePath('sitecollection-'+getAttr(template,'id')+'-'+postfix+'.xml')}}"
 
 Write-Host "Disabling SiteAssets versioning..."
 
@@ -69,7 +69,7 @@ Write-Host "Setting default content type on pages library"
 Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(template,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType')}}"
 {% endif %}
 
-Write-Host "Updating page library fieldss settings"
+Write-Host "Updating page library field settings"
 
 {% if hasAttr(template,'pagesFieldsSettings','pagesFieldSettings') %}
     {% for fieldName,fieldSettings in getAttr(template,'pagesFieldsSettings','pagesFieldSettings') %}
@@ -249,11 +249,7 @@ Confirm-Continue -message "This site collection supportes localization, have you
 
 Confirm-Continue -message "Do you want to deploy subsites?. Press y to continue"
 
-$ctx = Get-PnPContext 
-
-$web = $ctx.Web 
-
-$rootWeb = Get-PnPWeb 
+$rootWeb = Get-PnPWeb
 
 
 {% for s in template.subsites %}

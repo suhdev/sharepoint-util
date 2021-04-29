@@ -1435,24 +1435,39 @@ Write-Log "Unknown Command Type {{type}}"
 {% endmacro %}
 
 {% macro ProvisionSubSite(s) %}
+Disconnect-PnPOnline
 
-$parentWeb = {% if getAttr(s,'parentWeb') == '/' or getAttr(s,'parentWeb') == 'root' or not hasAttr(s,'parentWeb') %} $rootWeb {% else %} Get-WebByUrl -Url "$($rootWeb.ServerRelativeUrl)/{{getAttr(s,'parentWeb')}}" {% endif %}
+{% if getAttr(s,'parentWeb') == "/" %}
+$parentWebUrl = "$($rootWeb.Url)"
+{% else %}
+$parentWebUrl = "$($rootWeb.Url)/{{getAttr(s,'parentWeb')}}"
+{% endif %}
+Connect-PnPOnline -Url $parentWebUrl -UseWebLogin 
+$parentWeb = Get-PnPWeb
 
 $subWebUrl = "{{getAttr(s,'url')}}"
-$fullSubWebUrl = "$($parentWeb.ServerRelativeUrl)/$($subWebUrl)";
+$fullSubWebUrl = "$($parentWeb.ServerRelativeUrl)/$($subWebUrl)"
 $subweb = Get-WebByUrl -Url $fullSubWebUrl
-
 if ($subweb -eq $null)
 {
-    $subweb = New-PnPWeb -Title "{{getAttr(s,'title')}}" -Url "{{getAttr(s,'url')}}" -Template "{{getAttr(s,'template','baseSiteTemplate')}}" -Description "{{getAttr(s,'description')}}" -Web $parentWeb
+    Write-Host "$($fullSubWebUrl) not found. Creating under parent web $($parentWeb.Url)..."
+    $subweb = New-PnPWeb -Title "{{getAttr(s,'title')}}" -Url "{{getAttr(s,'url')}}" -Template "{{getAttr(s,'template','baseSiteTemplate')}}" -Description "{{getAttr(s,'description')}}"
+} else {
+    Write-Host "$($subweb.Url) found as existing site"
 }
-Apply-PnPProvisioningTemplate -Path "{{getFilePath('site-'+getAttr(s,'id')+'-1.xml')}}" -Web $subweb 
+
+Disconnect-PnPOnline
+Connect-PnPOnline -Url $subweb.Url -UseWebLogin 
+$currentWeb = Get-PnPWeb
+Write-Host "Applying provisioning template to $($currentWeb.Url)..."
+
+Invoke-PnPSiteTemplate -Path "{{getFilePath('site-'+getAttr(s,'id')+'-1.xml')}}"
 {% for ct in getAttr(s,'pagesLibraryContentTypes','pagesLibraryContentTypes') %}
-Add-PnPContentTypeToList -List "Pages" -ContentType "{{ct}}" -Web $subweb 
+Add-PnPContentTypeToList -List "Pages" -ContentType "{{ct}}" 
 {% endfor %}
 
 {% if getAttr(s,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType') %}
-Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(s,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType')}}" -Web $subweb 
+Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(s,'defaultPagesContentType','pagesLibraryDefaultContentType','pagesContentType')}}" 
 {% endif %}
 
 {% if hasAttr(s,'pagesFieldsSettings','pagesFieldSettings') %}
@@ -1480,21 +1495,21 @@ Set-PnPDefaultContentTypeToList -List "Pages" -ContentType "{{getAttr(s,'default
             {% endif %}
         {% endfor %}
 
-        Set-PnPField -Identity "{{fieldName}}" -List "Pages" -Values $dict  -Web $subweb
+        Set-PnPField -Identity "{{fieldName}}" -List "Pages" -Values $dict 
 
     {% endfor %}
 {% endif %}
 
 {% if s.homePage %}
 
-Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb 
+Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" 
 
 {% endif %}
 
 {% for list in getAttr(s,'lists') %}
     {% if hasAttr(list,'readSecurity') or hasAttr(list,'writeSecurity') %}
 
-    $list = Get-PnPList -Identity $listTitle -Includes ReadSecurity,WriteSecurity -Web $subweb
+    $list = Get-PnPList -Identity $listTitle -Includes ReadSecurity,WriteSecurity
 
     if ($list -ne $null){
 
@@ -1517,7 +1532,7 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
     {% if hasAttr(list, 'fieldDefs', 'fieldDefinitions') %}
         [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client")
         
-        $list = Get-PnPList -Identity "{{getAttr(list,'title')}}" -Web $subweb
+        $list = Get-PnPList -Identity "{{getAttr(list,'title')}}"
 
         $listContentTypes = $list.ContentTypes
 
@@ -1539,7 +1554,7 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
             {% if def.addToContentTypes %}
             
 
-                $field = Get-PnPField -List "{{getAttr(list,'title')}}" -Identity "{{def.name}}" -Web $subweb
+                $field = Get-PnPField -List "{{getAttr(list,'title')}}" -Identity "{{def.name}}"
                 
                 {% for item in def.addToContentTypes %}
                 
@@ -1604,7 +1619,7 @@ Set-PnPHomePage -RootFolderRelativeUrl "{{getAttr(s,'homePage')}}" -Web $subweb
                 {% endif %}
             {% endfor %}
 
-            Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict -Web $subweb 
+            Set-PnPField -Identity "{{fieldName}}" -List "{{getAttr(list,'title')}}" -Values $dict 
 
         {% endfor %}
 
